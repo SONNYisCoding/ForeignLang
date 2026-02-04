@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${lesson.title}">Lesson View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/lessons/topic/{id}(id=${lesson.topic.id})}" class="text-gray-500 hover:text-gray-700 font-medium">
+                        &larr; Back to List
+                    </a>
+                    <span class="ml-4 text-xl font-bold text-gray-900" th:text="${lesson.title}">Lesson Title</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Lesson Content (Left Side) -->
+        <div class="flex-1 overflow-y-auto p-8 bg-white border-r border-gray-200">
+            <div class="max-w-3xl mx-auto prose lg:prose-xl">
+                <h1 th:text="${lesson.title}">Title</h1>
+                <div th:utext="${lesson.contentBody}">
+                    <!-- Rich Text Content injected here -->
+                </div>
+
+                <div class="mt-10 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+                    <h3 class="text-yellow-800 font-bold">Practice Exercise</h3>
+                    <p class="text-yellow-700">Try writing an email using the structure above. Ask the AI Teacher for feedback!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Teacher Sidebar (Right Side) -->
+        <div class="w-96 bg-gray-50 flex flex-col border-l border-gray-200">
+            <div class="p-4 bg-indigo-600 text-white font-bold flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                AI Teacher
+            </div>
+
+            <div id="chat-history" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="flex items-start">
+                    <div class="bg-indigo-100 text-indigo-800 p-3 rounded-lg text-sm">
+                        Hi! I'm your AI Teacher. Do you have any questions about this lesson?
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 bg-white">
+                <div class="flex space-x-2">
+                    <input type="text" id="teacher-input" class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ask a question...">
+                    <button onclick="askTeacher()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function askTeacher() {
+            const inputField = document.getElementById('teacher-input');
+            const text = inputField.value;
+            if (!text) return;
+
+            const chatHistory = document.getElementById('chat-history');
+
+            // User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = "flex items-end justify-end";
+            userDiv.innerHTML = `<div class="bg-gray-200 text-gray-800 p-3 rounded-lg text-sm max-w-xs">${text}</div>`;
+            chatHistory.appendChild(userDiv);
+
+            inputField.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Call Backend API
+            try {
+                // We pass the Lesson ID as context if needed (not used in mock yet)
+                const response = await fetch('/api/v1/ai/chat?type=TEACHER', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: text
+                });
+                const data = await response.text();
+
+                // Bot Message
+                const botDiv = document.createElement('div');
+                botDiv.className = "flex items-start";
+                botDiv.innerHTML = `<div class="bg-indigo-100 text-indigo-800 p-3 rounded-lg text-sm max-w-xs">${data}</div>`;
+                chatHistory.appendChild(botDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+
+</body>
+</html>
