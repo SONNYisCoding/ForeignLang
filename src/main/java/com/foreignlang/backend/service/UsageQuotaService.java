@@ -1,7 +1,9 @@
 package com.foreignlang.backend.service;
 
 import com.foreignlang.backend.entity.UsageQuota;
+import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
+import com.foreignlang.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.UUID;
 
 /**
  * Service for managing and enforcing daily usage quotas.
- * Core component of the Freemium business model.
+ * Hybrid model: 5 bonus + 2 daily free + 3 from ads
  */
 @Service
 @RequiredArgsConstructor
@@ -21,21 +23,21 @@ public class UsageQuotaService {
     private final UsageQuotaRepository usageQuotaRepository;
     private final SubscriptionService subscriptionService;
 
-    // Free tier daily limit
-    private static final int FREE_DAILY_LIMIT = 5;
-
-    // Premium users have unlimited (represented by a high number)
-    private static final int PREMIUM_DAILY_LIMIT = Integer.MAX_VALUE;
-
     /**
      * Check if a user can make an AI request (has quota remaining)
      */
     public boolean canMakeRequest(UUID userId) {
         UsageQuota quota = getOrCreateQuota(userId);
-        quota.resetIfNewDay(); // Auto-reset if new day
+        boolean isPremium = subscriptionService.isPremium(userId);
+        return quota.canUseAI(isPremium);
+    }
 
-        int limit = getDailyLimit(userId);
-        return !quota.isQuotaExceeded(limit);
+    /**
+     * Check if user can watch an ad for extra credits
+     */
+    public boolean canWatchAd(UUID userId) {
+        UsageQuota quota = getOrCreateQuota(userId);
+        return quota.canWatchAd();
     }
 
     /**
@@ -45,17 +47,35 @@ public class UsageQuotaService {
      */
     @Transactional
     public boolean consumeRequest(UUID userId) {
-        if (!canMakeRequest(userId)) {
-            log.warn("User {} has exceeded daily quota", userId);
+        UsageQuota quota = getOrCreateQuota(userId);
+        boolean isPremium = subscriptionService.isPremium(userId);
+
+        if (!quota.useOneCredit(isPremium)) {
+            log.warn("User {} has no available credits", userId);
             return false;
         }
 
-        UsageQuota quota = getOrCreateQuota(userId);
-        quota.resetIfNewDay();
-        quota.incrementUsage();
         usageQuotaRepository.save(quota);
+        log.debug("User {} used 1 credit, remaining: {}", userId, quota.getRemainingUses(isPremium));
+        return true;
+    }
 
-        log.debug("User {} used request, count now: {}", userId, quota.getDailyRequestsCount());
+    /**
+     * Reward user for watching an ad
+     * 
+     * @return true if reward was granted, false if max ads reached
+     */
+    @Transactional
+    public boolean rewardAdWatch(UUID userId) {
+        UsageQuota quota = getOrCreateQuota(userId);
+
+        if (!quota.rewardAdWatch()) {
+            log.warn("User {} has reached max ads for today", userId);
+            return false;
+        }
+
+        usageQuotaRepository.save(quota);
+        log.debug("User {} watched ad, gained 1 credit", userId);
         return true;
     }
 
@@ -64,31 +84,66 @@ public class UsageQuotaService {
      */
     public int getRemainingRequests(UUID userId) {
         UsageQuota quota = getOrCreateQuota(userId);
-        quota.resetIfNewDay();
-
-        int limit = getDailyLimit(userId);
-        int remaining = limit - quota.getDailyRequestsCount();
-        return Math.max(0, remaining);
+        boolean isPremium = subscriptionService.isPremium(userId);
+        return quota.getRemainingUses(isPremium);
     }
 
     /**
-     * Get current usage count for today
+     * Alias for getRemainingRequests (used by EmailGenerationController)
      */
-    public int getCurrentUsage(UUID userId) {
+    public int getRemainingUses(UUID userId) {
+        return getRemainingRequests(userId);
+    }
+
+    /**
+     * Alias for canWatchAd (used by EmailGenerationController)
+     */
+    public boolean canWatchAdForBonus(UUID userId) {
+        return canWatchAd(userId);
+    }
+
+    /**
+     * Get quota details for display
+     */
+    public QuotaStatus getQuotaStatus(UUID userId) {
         UsageQuota quota = getOrCreateQuota(userId);
+        boolean isPremium = subscriptionService.isPremium(userId);
         quota.resetIfNewDay();
-        return quota.getDailyRequestsCount();
+
+        return new QuotaStatus(
+                quota.getBonusUses(),
+                quota.getDailyFreeUses(),
+                quota.getAdUsesToday(),
+                3 - quota.getAdUsesToday(), // Remaining ads
+                isPremium);
     }
 
-    /**
-     * Get daily limit based on subscription tier
-     */
-    private int getDailyLimit(UUID userId) {
-        return subscriptionService.isPremium(userId) ? PREMIUM_DAILY_LIMIT : FREE_DAILY_LIMIT;
+    public record QuotaStatus(
+            int bonusUses,
+            int dailyFreeUses,
+            int adsWatchedToday,
+            int adsRemaining,
+            boolean isPremium) {
     }
+
+    private final UserRepository userRepository;
+
+    // ... (other fields are handled by lombok RequiredArgsConstructor, but I need
+    // to make sure UserRepository is included)
+    // Wait, RequiredArgsConstructor generates constructor for FINAL fields.
+    // I need to add UserRepository as a final field at class level.
+
+    // Changing the whole class field section and getOrCreateQuota method
 
     private UsageQuota getOrCreateQuota(UUID userId) {
         return usageQuotaRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("Usage quota not found for user: " + userId));
+                .orElseGet(() -> {
+                    User user = userRepository.findById(userId)
+                            .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+
+                    log.info("Creating new UsageQuota for user: {}", userId);
+                    UsageQuota newQuota = UsageQuota.createForNewUser(user);
+                    return usageQuotaRepository.save(newQuota);
+                });
     }
 }

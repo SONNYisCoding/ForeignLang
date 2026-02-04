@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,16 +29,17 @@ public class SubscriptionController {
     @GetMapping("/status/{userId}")
     public ResponseEntity<Map<String, Object>> getSubscriptionStatus(@PathVariable UUID userId) {
         boolean isPremium = subscriptionService.isPremium(userId);
-        int remainingRequests = usageQuotaService.getRemainingRequests(userId);
-        int currentUsage = usageQuotaService.getCurrentUsage(userId);
+        UsageQuotaService.QuotaStatus quotaStatus = usageQuotaService.getQuotaStatus(userId);
 
-        Map<String, Object> status = Map.of(
-                "userId", userId,
-                "isPremium", isPremium,
-                "tier", isPremium ? "PREMIUM" : "FREE",
-                "dailyRequestsUsed", currentUsage,
-                "dailyRequestsRemaining", isPremium ? "unlimited" : remainingRequests,
-                "dailyLimit", isPremium ? "unlimited" : 5);
+        Map<String, Object> status = new HashMap<>();
+        status.put("userId", userId);
+        status.put("isPremium", isPremium);
+        status.put("tier", isPremium ? "PREMIUM" : "FREE");
+        status.put("bonusUses", quotaStatus.bonusUses());
+        status.put("dailyFreeUses", quotaStatus.dailyFreeUses());
+        status.put("adsWatchedToday", quotaStatus.adsWatchedToday());
+        status.put("adsRemaining", quotaStatus.adsRemaining());
+        status.put("totalRemaining", isPremium ? "unlimited" : (quotaStatus.bonusUses() + quotaStatus.dailyFreeUses()));
 
         return ResponseEntity.ok(status);
     }
@@ -49,10 +51,30 @@ public class SubscriptionController {
     public ResponseEntity<Map<String, Object>> canMakeRequest(@PathVariable UUID userId) {
         boolean canRequest = usageQuotaService.canMakeRequest(userId);
         int remaining = usageQuotaService.getRemainingRequests(userId);
+        boolean canWatchAd = usageQuotaService.canWatchAd(userId);
 
         return ResponseEntity.ok(Map.of(
                 "canMakeRequest", canRequest,
-                "remainingRequests", remaining));
+                "remainingRequests", remaining,
+                "canWatchAd", canWatchAd));
+    }
+
+    /**
+     * Reward user for watching an ad
+     */
+    @PostMapping("/watch-ad/{userId}")
+    public ResponseEntity<Map<String, Object>> rewardAdWatch(@PathVariable UUID userId) {
+        boolean success = usageQuotaService.rewardAdWatch(userId);
+
+        if (success) {
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "You earned 1 AI credit!"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "You've reached the maximum ads for today."));
+        }
     }
 
     /**

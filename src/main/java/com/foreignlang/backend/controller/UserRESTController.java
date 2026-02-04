@@ -1,6 +1,5 @@
 package com.foreignlang.backend.controller;
 
-import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.service.SubscriptionService;
@@ -23,7 +22,6 @@ public class UserRESTController {
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
     private final SubscriptionService subscriptionService;
-    private static final int FREE_DAILY_LIMIT = 5;
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
@@ -41,17 +39,72 @@ public class UserRESTController {
 
         // Database Info
         userRepository.findByEmail(email).ifPresent(user -> {
+            // Use database name if available
+            if (user.getFullName() != null && !user.getFullName().isBlank()) {
+                response.put("name", user.getFullName());
+            }
+
             boolean isPremium = subscriptionService.isPremium(user.getId());
             response.put("tier", isPremium ? "PREMIUM" : "FREE");
             response.put("isPremium", isPremium);
+            response.put("role", user.getRole().name());
+            response.put("profileComplete", user.isProfileComplete());
+            response.put("username", user.getUsername());
 
             usageQuotaRepository.findByUserId(user.getId()).ifPresent(quota -> {
                 quota.resetIfNewDay();
-                response.put("usageCount", quota.getDailyRequestsCount());
-                response.put("usageLimit", isPremium ? -1 : FREE_DAILY_LIMIT); // -1 = Unlimited
+                int remaining = quota.getRemainingUses(isPremium);
+                response.put("bonusUses", quota.getBonusUses());
+                response.put("dailyFreeUses", quota.getDailyFreeUses());
+                response.put("adsRemaining", 3 - quota.getAdUsesToday());
+                response.put("usageRemaining", remaining);
+                response.put("usageLimit", isPremium ? -1 : (quota.getBonusUses() + quota.getDailyFreeUses())); // -1 =
+                                                                                                                // Unlimited
             });
         });
 
         return ResponseEntity.ok(response);
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            @org.springframework.web.bind.annotation.RequestBody ProfileUpdateRequest request,
+            @AuthenticationPrincipal OAuth2User principal,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+
+        String email = null;
+        if (principal != null) {
+            email = principal.getAttribute("email");
+        } else {
+            jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                email = (String) session.getAttribute("userEmail");
+            }
+        }
+
+        if (email == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+        }
+
+        String finalEmail = email;
+        return userRepository.findByEmail(email).map(user -> {
+            if (request.fullName() != null && !request.fullName().isBlank()) {
+                user.setFullName(request.fullName());
+            }
+            if (request.username() != null && !request.username().isBlank()) {
+                // Check if username collision
+                userRepository.findByUsername(request.username())
+                        .filter(u -> !u.getId().equals(user.getId()))
+                        .ifPresent(u -> {
+                            throw new IllegalArgumentException("Username already taken");
+                        });
+                user.setUsername(request.username());
+            }
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Profile updated"));
+        }).orElse(ResponseEntity.status(404).body(Map.of("error", "User not found")));
+    }
+
+    public record ProfileUpdateRequest(String fullName, String username) {
     }
 }
