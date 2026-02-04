@@ -1,0 +1,69 @@
+{
+    "common": {
+        "loading": "Đang tải...",
+        "save": "Lưu thay đổi",
+        "saved": "Đã lưu",
+        "cancel": "Hủy bỏ",
+        "confirm": "Xác nhận",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "back": "Quay lại",
+        "error": "Lỗi",
+        "success": "Thành công"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "register": "Đăng ký",
+        "logout": "Đăng xuất",
+        "email": "Địa chỉ Email",
+        "password": "Mật khẩu",
+        "fullName": "Họ và Tên",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
+        "dontHaveAccount": "Chưa có tài khoản?",
+        "haveAccount": "Đã có tài khoản?",
+        "welcomeBack": "Chào mừng trở lại!",
+        "welcomeBackSub": "Rất vui được gặp lại bạn!",
+        "createAccount": "Tạo tài khoản mới",
+        "createAccountSub": "Tham gia ngay để bắt đầu hành trình của bạn!",
+        "orContinueWith": "Hoặc tiếp tục với",
+        "googleLogin": "Đăng nhập bằng Google"
+    },
+    "dashboard": {
+        "overview": "Tổng quan",
+        "aiGenerator": "AI Generator",
+        "templates": "Mẫu Email",
+        "profile": "Hồ sơ cá nhân",
+        "logout": "Đăng xuất",
+        "welcome": "Chào mừng, {{name}}!",
+        "myProfile": "Hồ sơ của tôi",
+        "settings": "Cài đặt",
+        "help": "Trợ giúp"
+    },
+    "generator": {
+        "title": "AI Email Generator",
+        "subtitle": "Viết email chuyên nghiệp chỉ trong vài giây",
+        "promptLabel": "Bạn muốn viết về điều gì?",
+        "promptPlaceholder": "Ví dụ: Xin nghỉ phép 2 ngày vì lý do gia đình...",
+        "recipient": "Người nhận",
+        "purpose": "Mục đích",
+        "tone": "Giọng văn",
+        "language": "Ngôn ngữ",
+        "generate": "Tạo Email",
+        "regenerate": "Tạo lại",
+        "copy": "Sao chép",
+        "copied": "Đã sao chép!",
+        "generatedResult": "Kết quả",
+        "subject": "Tiêu đề",
+        "generatedBy": "✨ Được viết bởi AI",
+        "quota": "Giới hạn: còn {{count}} lượt hôm nay",
+        "readyTitle": "Sẵn sàng sáng tạo",
+        "readySubtitle": "Nhập nội dung để tạo bản xem trước email tại đây"
+    },
+    "landing": {
+        "heroTitle": "Chinh phục Ngoại ngữ cùng AI",
+        "heroSubtitle": "Nền tảng hỗ trợ AI tiên tiến nhất giúp bạn học, thực hành và làm chủ ngôn ngữ mới một cách dễ dàng.",
+        "getStarted": "Bắt đầu ngay",
+        "learnMore": "Tìm hiểu thêm"
+    }
+}

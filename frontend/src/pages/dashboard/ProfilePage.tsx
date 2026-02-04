@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, Lock, Mail } from 'lucide-react';
+import { User, Save, Lock, Mail, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 const ProfilePage = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
@@ -52,119 +55,141 @@ const ProfilePage = () => {
             const data = await res.json();
 
             if (res.ok) {
-                setSuccess('Profile updated successfully!');
-                // Reload page after short delay to refresh layout data
-                setTimeout(() => window.location.reload(), 1000);
+                setSuccess(t('common.saved'));
+                // Reload page after short delay
+                setTimeout(() => window.location.reload(), 800);
             } else {
                 setError(data.error || 'Failed to update profile');
             }
         } catch (err) {
-            setError('Network error occurred');
+            setError(t('common.error'));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                <User className="text-indigo-600" />
-                Hồ sơ cá nhân
-            </h1>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-                {success && (
-                    <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100">
-                        {success}
+        <div className="max-w-3xl mx-auto">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <h1 className="text-3xl font-bold mb-8 text-gray-900 flex items-center gap-3">
+                    <div className="p-2 bg-indigo-100 rounded-xl">
+                        <User className="text-indigo-600" size={28} />
                     </div>
-                )}
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
-                        {error}
-                    </div>
-                )}
+                    {t('dashboard.profile')}
+                </h1>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Email</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    disabled
-                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
-                                />
+                <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden">
+                    <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
+                        <div className="absolute -bottom-12 left-8">
+                            <div className="w-24 h-24 rounded-full bg-white p-1 shadow-lg">
+                                <div className="w-full h-full rounded-full bg-indigo-100 flex items-center justify-center text-2xl font-bold text-indigo-600">
+                                    {formData.fullName?.[0]?.toUpperCase()}
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-500">Email không thể thay đổi</p>
                         </div>
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Vai trò</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <div className="pt-16 pb-8 px-8">
+                        {success && (
+                            <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-100 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-green-500" />
+                                {success}
+                            </div>
+                        )}
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-red-500" />
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">{t('auth.email')}</label>
+                                    <div className="relative">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            disabled
+                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-400 ml-1">Email managed by system</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Account Tier</label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <input
+                                            type="text"
+                                            value={formData.tier === 'PREMIUM' ? 'Premium Member' : 'Free Member'}
+                                            disabled
+                                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed font-medium"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">{t('auth.fullName')}</label>
                                 <input
                                     type="text"
-                                    value={formData.tier === 'PREMIUM' ? 'Premium Member' : 'Free Member'}
-                                    disabled
-                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed font-medium"
+                                    name="fullName"
+                                    value={formData.fullName}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
+                                    placeholder="Enter your name"
                                 />
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Họ và tên</label>
-                        <input
-                            type="text"
-                            name="fullName"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                            placeholder="Nhập họ tên của bạn"
-                        />
-                    </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Username</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
+                                    placeholder="Choose a username"
+                                />
+                            </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Username</label>
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                            placeholder="Chọn tên đăng nhập"
-                        />
+                            <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className={`
+                                        px-8 py-3 rounded-xl font-bold text-white flex items-center gap-2
+                                        transition-all transform active:scale-95 shadow-lg shadow-indigo-200
+                                        ${loading
+                                            ? 'bg-indigo-300 cursor-wait'
+                                            : 'bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5'}
+                                    `}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                            {t('common.save')}...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={18} />
+                                            {t('common.save')}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <div className="pt-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`
-                                w-full md:w-auto px-6 py-2.5 rounded-lg font-medium text-white flex items-center justify-center gap-2
-                                transition-all transform active:scale-95
-                                ${loading
-                                    ? 'bg-indigo-300 cursor-wait'
-                                    : 'bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg'}
-                            `}
-                        >
-                            {loading ? (
-                                <>
-                                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                    Đang lưu...
-                                </>
-                            ) : (
-                                <>
-                                    <Save size={18} />
-                                    Lưu thay đổi
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </motion.div>
         </div>
     );
 };
