@@ -17,39 +17,56 @@ const DashboardPage = () => {
         tier: 'FREE',
         usageCount: 0,
         usageLimit: 5,
-        avatar: null
+        avatar: null as string | null
     });
 
-    const [topics, setTopics] = useState([
-        { id: 1, title: 'Business Emails', description: 'Learn to write professional emails', level: 'BEGINNER', color: 'bg-green-100 text-green-700' },
-        { id: 2, title: 'Presentations', description: 'Master public speaking skills', level: 'INTERMEDIATE', color: 'bg-yellow-100 text-yellow-700' },
-        { id: 3, title: 'Negotiations', description: 'Advanced negotiation tactics', level: 'ADVANCED', color: 'bg-red-100 text-red-700' },
-    ]);
+    const [topics, setTopics] = useState<any[]>([]);
 
     useEffect(() => {
-        // Fetch user data from backend
-        // Note: Credentials include is required for JSESSIONID cookie
-        import('axios').then(axios => {
-            axios.default.get('http://localhost:8080/api/v1/user/me', { withCredentials: true })
-                .then(response => {
-                    if (response.data) {
-                        setUser(prev => ({
-                            ...prev,
-                            name: response.data.name || 'User',
-                            email: response.data.email,
-                            avatar: response.data.avatar,
-                            tier: response.data.tier,
-                            usageCount: response.data.usageCount || 0,
-                            usageLimit: response.data.usageLimit || 5
-                        }));
-                    }
-                })
-                .catch(error => {
-                    console.error("Failed to fetch user:", error);
-                    // Redirect to login if 401? For now just stay on loading or show guest
-                });
+        // Fetch user data
+        import('axios').then(async (axiosModule) => {
+            const axios = axiosModule.default;
+            try {
+                // Fetch User
+                const userRes = await axios.get('http://localhost:8080/api/v1/user/me', { withCredentials: true });
+                if (userRes.data) {
+                    setUser(prev => ({
+                        ...prev,
+                        name: userRes.data.name || 'User',
+                        email: userRes.data.email,
+                        avatar: userRes.data.avatar,
+                        tier: userRes.data.tier,
+                        usageCount: userRes.data.usageCount || 0,
+                        usageLimit: userRes.data.usageLimit || 5
+                    }));
+                }
+
+                // Fetch Topics
+                const topicsRes = await axios.get('http://localhost:8080/api/v1/topics', { withCredentials: true });
+                if (topicsRes.data) {
+                    const mappedTopics = topicsRes.data.map((t: any) => ({
+                        id: t.id,
+                        title: t.title,
+                        description: t.description,
+                        level: t.difficultyLevel,
+                        color: getColorForLevel(t.difficultyLevel)
+                    }));
+                    setTopics(mappedTopics);
+                }
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
         });
     }, []);
+
+    const getColorForLevel = (level: string) => {
+        switch (level) {
+            case 'BEGINNER': return 'bg-green-100 text-green-700';
+            case 'INTERMEDIATE': return 'bg-yellow-100 text-yellow-700';
+            case 'ADVANCED': return 'bg-red-100 text-red-700';
+            default: return 'bg-gray-100 text-gray-700';
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 flex font-sans text-gray-900">

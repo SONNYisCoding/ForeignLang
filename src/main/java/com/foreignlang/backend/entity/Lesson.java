@@ -20,6 +20,7 @@ public class Lesson {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Topic topic;
 
     @Column(nullable = false)
