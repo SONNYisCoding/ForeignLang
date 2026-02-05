@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle } from 'lucide-react';
+import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,6 +17,7 @@ interface User {
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
@@ -93,22 +94,27 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-100 
-                transform transition-transform duration-300 ease-in-out flex flex-col shadow-sm
+                fixed lg:sticky top-0 left-0 z-50 h-screen bg-white border-r border-gray-100 
+                transform transition-all duration-300 ease-in-out flex flex-col shadow-sm
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
             `}>
-                <div className="p-6 flex items-center justify-between border-b border-gray-50/50">
+                <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} border-b border-gray-50/50`}>
                     <Link to="/dashboard" className="flex items-center gap-3 group" onClick={() => setIsSidebarOpen(false)}>
-                        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
-                            🌍
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform overflow-hidden">
+                            <img src="/mascot/main.png" alt="ForeignLang" className="w-full h-full object-cover" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700">
-                            ForeignLang
-                        </span>
+                        {!isCollapsed && (
+                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-sky-600 whitespace-nowrap">
+                                ForeignLang
+                            </span>
+                        )}
                     </Link>
-                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-900 transition-colors">
-                        <X size={24} />
-                    </button>
+                    {!isCollapsed && (
+                        <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-900 transition-colors">
+                            <X size={24} />
+                        </button>
+                    )}
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2 mt-2">
@@ -121,7 +127,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                 ${isActive(item.path)
                                     ? 'bg-indigo-50 text-indigo-700 shadow-sm'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                                ${isCollapsed ? 'justify-center px-0' : ''}
                             `}
+                            title={isCollapsed ? item.name : ''}
                         >
                             {isActive(item.path) && (
                                 <motion.div
@@ -129,23 +137,40 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                     className="absolute left-0 w-1 h-8 bg-indigo-600 rounded-r-full"
                                 />
                             )}
-                            <item.icon size={22} className={isActive(item.path) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'} />
-                            {item.name}
+                            <item.icon size={22} className={`min-w-[22px] ${isActive(item.path) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                            {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
                         </Link>
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-gray-100">
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-xl shadow-indigo-200">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Sparkles size={16} className="text-yellow-300" />
-                            <span className="font-bold text-sm">Pro Plan</span>
-                        </div>
-                        <p className="text-xs text-indigo-100 mb-3">Upgrade for unlimited AI credits.</p>
-                        <button className="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold transition-colors backdrop-blur-sm">
-                            Upgrade Now
-                        </button>
+                <div className="p-4 border-t border-gray-100 flex flex-col gap-2">
+                    {/* Upgrade Card */}
+                    <div className={`p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-xl shadow-indigo-200 transition-all ${isCollapsed ? 'p-2 flex justify-center items-center' : ''}`}>
+                        {isCollapsed ? (
+                            <Link to="/upgrade" className="p-2 hover:bg-white/20 rounded-lg transition-colors" title="Upgrade to Pro">
+                                <Sparkles size={20} className="text-yellow-300" />
+                            </Link>
+                        ) : (
+                            <>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Sparkles size={16} className="text-yellow-300" />
+                                    <span className="font-bold text-sm">Pro Plan</span>
+                                </div>
+                                <p className="text-xs text-indigo-100 mb-3">Upgrade for unlimited AI credits.</p>
+                                <Link to="/upgrade" className="w-full block text-center py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold transition-colors backdrop-blur-sm">
+                                    Upgrade Now
+                                </Link>
+                            </>
+                        )}
                     </div>
+
+                    {/* Collapse Toggle (Desktop Only) */}
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="hidden lg:flex items-center justify-center p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all mt-2"
+                    >
+                        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                    </button>
                 </div>
             </aside>
 

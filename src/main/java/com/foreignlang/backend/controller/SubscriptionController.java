@@ -35,11 +35,12 @@ public class SubscriptionController {
         status.put("userId", userId);
         status.put("isPremium", isPremium);
         status.put("tier", isPremium ? "PREMIUM" : "FREE");
-        status.put("bonusUses", quotaStatus.bonusUses());
-        status.put("dailyFreeUses", quotaStatus.dailyFreeUses());
+        status.put("purchasedCredits", quotaStatus.purchasedCredits());
+        status.put("freeCredits", quotaStatus.freeCredits());
+        status.put("subscriptionCredits", quotaStatus.subscriptionCredits());
         status.put("adsWatchedToday", quotaStatus.adsWatchedToday());
         status.put("adsRemaining", quotaStatus.adsRemaining());
-        status.put("totalRemaining", isPremium ? "unlimited" : (quotaStatus.bonusUses() + quotaStatus.dailyFreeUses()));
+        status.put("totalRemaining", quotaStatus.totalRemaining());
 
         return ResponseEntity.ok(status);
     }

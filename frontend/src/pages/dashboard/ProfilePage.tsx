@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, Lock, Mail, Globe } from 'lucide-react';
+import { User, Save, Lock, Mail, Calendar, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
@@ -13,7 +13,9 @@ const ProfilePage = () => {
         username: '',
         email: '',
         role: '',
-        tier: ''
+        tier: '',
+        birthDate: '',
+        avatarUrl: ''
     });
 
     useEffect(() => {
@@ -26,7 +28,9 @@ const ProfilePage = () => {
                     username: data.username || '',
                     email: data.email || '',
                     role: data.role || 'LEARNER',
-                    tier: data.tier || 'FREE'
+                    tier: data.tier || 'FREE',
+                    birthDate: data.birthDate || '',
+                    avatarUrl: data.avatar || ''
                 });
             })
             .catch(err => console.error('Failed to fetch profile:', err));
@@ -48,7 +52,9 @@ const ProfilePage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     fullName: formData.fullName,
-                    username: formData.username
+                    username: formData.username,
+                    avatarUrl: formData.avatarUrl,
+                    birthDate: formData.birthDate || null
                 })
             });
 
@@ -56,7 +62,7 @@ const ProfilePage = () => {
 
             if (res.ok) {
                 setSuccess(t('common.saved'));
-                // Reload page after short delay
+                // Reload page after short delay to update global context
                 setTimeout(() => window.location.reload(), 800);
             } else {
                 setError(data.error || 'Failed to update profile');
@@ -83,12 +89,23 @@ const ProfilePage = () => {
                 </h1>
 
                 <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
+                    <div className="h-32 bg-gradient-to-r from-indigo-500 to-sky-500 relative">
                         <div className="absolute -bottom-12 left-8">
-                            <div className="w-24 h-24 rounded-full bg-white p-1 shadow-lg">
-                                <div className="w-full h-full rounded-full bg-indigo-100 flex items-center justify-center text-2xl font-bold text-indigo-600">
-                                    {formData.fullName?.[0]?.toUpperCase()}
-                                </div>
+                            <div className="w-24 h-24 rounded-full bg-white p-1 shadow-lg overflow-hidden">
+                                {formData.avatarUrl ? (
+                                    <img
+                                        src={formData.avatarUrl}
+                                        alt="Avatar"
+                                        className="w-full h-full object-cover rounded-full"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${formData.fullName}&background=e0e7ff&color=4f46e5`;
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="w-full h-full rounded-full bg-indigo-100 flex items-center justify-center text-2xl font-bold text-indigo-600">
+                                        {formData.fullName?.[0]?.toUpperCase()}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -149,16 +166,50 @@ const ProfilePage = () => {
                                 />
                             </div>
 
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Username</label>
+                                    <div className="relative">
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
+                                            placeholder="Choose a username"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">{t('profileSetup.birthDate') || 'Date of Birth'}</label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <input
+                                            type="date"
+                                            name="birthDate"
+                                            value={formData.birthDate}
+                                            onChange={handleChange}
+                                            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-700">Username</label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
-                                    placeholder="Choose a username"
-                                />
+                                <label className="text-sm font-semibold text-gray-700">Avatar URL</label>
+                                <div className="relative">
+                                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                    <input
+                                        type="url"
+                                        name="avatarUrl"
+                                        value={formData.avatarUrl}
+                                        onChange={handleChange}
+                                        className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all"
+                                        placeholder="https://example.com/avatar.jpg"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-400 ml-1">Paste a URL for your profile picture</p>
                             </div>
 
                             <div className="pt-6 border-t border-gray-100 flex justify-end">

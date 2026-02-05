@@ -50,7 +50,7 @@ const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
                 {/* Content */}
                 <div className="px-8 py-10 text-center">
                     {/* Icon */}
-                    <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-sky-500 rounded-2xl flex items-center justify-center">
                         <Sparkles className="text-white" size={32} />
                     </div>
 
@@ -82,7 +82,7 @@ const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
                     <div className="space-y-3">
                         <button
                             onClick={goToRegister}
-                            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition shadow-lg"
+                            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-sky-500 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-sky-600 transition shadow-lg"
                         >
                             Đăng ký miễn phí
                         </button>

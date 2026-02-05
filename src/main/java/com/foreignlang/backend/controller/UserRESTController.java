@@ -1,5 +1,6 @@
 package com.foreignlang.backend.controller;
 
+import com.foreignlang.backend.dto.ProfileUpdateRequest;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.service.SubscriptionService;
@@ -10,6 +11,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +65,10 @@ public class UserRESTController {
             if (user.getFullName() != null && !user.getFullName().isBlank()) {
                 response.put("name", user.getFullName());
             }
+            // Use database avatar if available (override Google avatar)
+            if (user.getAvatarUrl() != null && !user.getAvatarUrl().isBlank()) {
+                response.put("avatar", user.getAvatarUrl());
+            }
 
             boolean isPremium = subscriptionService.isPremium(user.getId());
             response.put("tier", isPremium ? "PREMIUM" : "FREE");
@@ -69,25 +76,39 @@ public class UserRESTController {
             response.put("role", user.getRole().name());
             response.put("profileComplete", user.isProfileComplete());
             response.put("username", user.getUsername());
+            response.put("birthDate", user.getBirthDate());
+            response.put("emailsGenerated", user.getEmailsGenerated());
+            response.put("streak", user.getStreakDays());
 
             usageQuotaRepository.findByUserId(user.getId()).ifPresent(quota -> {
-                quota.resetIfNewDay();
+                quota.checkAndResetQuotas(isPremium);
                 int remaining = quota.getRemainingUses(isPremium);
-                response.put("bonusUses", quota.getBonusUses());
-                response.put("dailyFreeUses", quota.getDailyFreeUses());
-                response.put("adsRemaining", 3 - quota.getAdUsesToday());
+
+                int purchased = quota.getPurchasedCredits() != null ? quota.getPurchasedCredits() : 0;
+                int free = quota.getFreeCredits() != null ? quota.getFreeCredits() : 0;
+                int sub = quota.getSubscriptionCredits() != null ? quota.getSubscriptionCredits() : 0;
+                int adUses = quota.getAdUsesToday() != null ? quota.getAdUsesToday() : 0;
+
+                response.put("purchasedCredits", purchased);
+                response.put("freeCredits", free);
+                response.put("subscriptionCredits", sub);
+
+                response.put("adsRemaining", 3 - adUses);
                 response.put("usageRemaining", remaining);
-                response.put("usageLimit", isPremium ? -1 : (quota.getBonusUses() + quota.getDailyFreeUses())); // -1 =
-                                                                                                                // Unlimited
+
+                // For display purposes, maybe show Total Limit if not premium
+                int totalLimit = isPremium ? -1 : (purchased + 2 + sub);
+                // Note: Hardcoded 2 for weekly limit visual if needed, but dynamic is better
+                response.put("usageLimit", totalLimit);
             });
         });
 
         return ResponseEntity.ok(response);
     }
 
-    @org.springframework.web.bind.annotation.PutMapping("/profile")
+    @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(
-            @org.springframework.web.bind.annotation.RequestBody ProfileUpdateRequest request,
+            @RequestBody ProfileUpdateRequest request,
             @AuthenticationPrincipal OAuth2User principal,
             jakarta.servlet.http.HttpServletRequest httpRequest) {
 
@@ -105,7 +126,6 @@ public class UserRESTController {
             return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
         }
 
-        String finalEmail = email;
         return userRepository.findByEmail(email).map(user -> {
             if (request.fullName() != null && !request.fullName().isBlank()) {
                 user.setFullName(request.fullName());
@@ -119,11 +139,17 @@ public class UserRESTController {
                         });
                 user.setUsername(request.username());
             }
+            if (request.avatarUrl() != null) { // Allow clearing avatar possibly, or just updating
+                user.setAvatarUrl(request.avatarUrl());
+            }
+            if (request.birthDate() != null) {
+                user.setBirthDate(request.birthDate());
+            }
+
+            user.setProfileComplete(true); // Mark profile as complete on update if logic deems it
+
             userRepository.save(user);
             return ResponseEntity.ok(Map.of("success", true, "message", "Profile updated"));
         }).orElse(ResponseEntity.status(404).body(Map.of("error", "User not found")));
-    }
-
-    public record ProfileUpdateRequest(String fullName, String username) {
     }
 }

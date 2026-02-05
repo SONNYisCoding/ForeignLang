@@ -65,7 +65,7 @@ const ProfileSetupPage = () => {
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-10 text-white text-center">
+                <div className="bg-gradient-to-r from-indigo-600 to-sky-500 px-8 py-10 text-white text-center">
                     <div className="w-20 h-20 bg-white/20 rounded-full mx-auto flex items-center justify-center mb-4">
                         <User size={40} className="text-white" />
                     </div>
@@ -144,7 +144,7 @@ const ProfileSetupPage = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-gradient-to-r from-indigo-600 to-sky-500 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-sky-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             t('profileSetup.submitting')

@@ -105,35 +105,35 @@ public class UsageQuotaService {
     /**
      * Get quota details for display
      */
+    /**
+     * Get quota details for display
+     */
     public QuotaStatus getQuotaStatus(UUID userId) {
         UsageQuota quota = getOrCreateQuota(userId);
         boolean isPremium = subscriptionService.isPremium(userId);
-        quota.resetIfNewDay();
+        quota.checkAndResetQuotas(isPremium);
 
         return new QuotaStatus(
-                quota.getBonusUses(),
-                quota.getDailyFreeUses(),
+                quota.getPurchasedCredits(),
+                quota.getFreeCredits(),
+                quota.getSubscriptionCredits(),
                 quota.getAdUsesToday(),
                 3 - quota.getAdUsesToday(), // Remaining ads
-                isPremium);
+                isPremium,
+                quota.getRemainingUses(isPremium));
     }
 
     public record QuotaStatus(
-            int bonusUses,
-            int dailyFreeUses,
+            int purchasedCredits,
+            int freeCredits,
+            int subscriptionCredits,
             int adsWatchedToday,
             int adsRemaining,
-            boolean isPremium) {
+            boolean isPremium,
+            int totalRemaining) {
     }
 
     private final UserRepository userRepository;
-
-    // ... (other fields are handled by lombok RequiredArgsConstructor, but I need
-    // to make sure UserRepository is included)
-    // Wait, RequiredArgsConstructor generates constructor for FINAL fields.
-    // I need to add UserRepository as a final field at class level.
-
-    // Changing the whole class field section and getOrCreateQuota method
 
     private UsageQuota getOrCreateQuota(UUID userId) {
         return usageQuotaRepository.findByUserId(userId)

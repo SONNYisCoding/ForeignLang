@@ -57,6 +57,14 @@ public class User {
     @Builder.Default
     private Role role = Role.GUEST;
 
+    @Column(name = "items_generated", nullable = false, columnDefinition = "integer default 0")
+    @Builder.Default
+    private int emailsGenerated = 0;
+
+    @Column(name = "streak_days", nullable = false, columnDefinition = "integer default 0")
+    @Builder.Default
+    private int streakDays = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "subscription_tier", nullable = false)
     @Builder.Default

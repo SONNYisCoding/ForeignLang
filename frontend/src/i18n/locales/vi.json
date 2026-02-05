@@ -64,6 +64,16 @@
                 "desc": "Ôn tập từ vựng Business English theo chủ đề.",
                 "soon": "Sắp ra mắt"
             }
+        },
+        "upgrade": {
+            "title": "Nâng cấp Pro",
+            "subtitle": "Mở khóa không giới hạn AI credits & lộ trình học",
+            "cta": "Xem các gói"
+        },
+        "streak": {
+            "keepItUp": "🔥 Tuyệt vời, tiếp tục nhé!",
+            "startToday": "Bắt đầu chuỗi ngày học hôm nay!",
+            "nextMilestone": "Mốc tiếp theo"
         }
     },
     "generator": {
@@ -84,13 +94,16 @@
         "generatedBy": "✨ Được viết bởi AI",
         "quota": "Giới hạn: còn {{count}} lượt hôm nay",
         "readyTitle": "Sẵn sàng sáng tạo",
-        "readySubtitle": "Nhập nội dung để tạo bản xem trước email tại đây"
-    },
-    "landing": {
-        "heroTitle": "Chinh phục Ngoại ngữ cùng AI",
-        "heroSubtitle": "Nền tảng hỗ trợ AI tiên tiến nhất giúp bạn học, thực hành và làm chủ ngôn ngữ mới một cách dễ dàng.",
-        "getStarted": "Bắt đầu ngay",
-        "learnMore": "Tìm hiểu thêm"
+        "readySubtitle": "Nhập nội dung để tạo bản xem trước email tại đây",
+        "getMore": "Thêm lượt",
+        "watchAdTitle": "Xem QC nhận 1 lượt miễn phí",
+        "watchAdSubtitle": "Ủng hộ chúng tôi bằng cách xem QC ngắn để tiếp tục.",
+        "claimReward": "Nhận thưởng",
+        "pleaseWait": "Vui lòng chờ {{seconds}}s...",
+        "closeNoReward": "Đóng (Không nhận thưởng)",
+        "adRewardSuccess": "Bạn đã nhận được 1 lượt!",
+        "adPlaying": "Đang chạy QC: {{seconds}}s",
+        "adCompleted": "QC Hoàn tất"
     },
     "profileSetup": {
         "title": "Hoàn thiện hồ sơ",
@@ -104,5 +117,212 @@
         "birthDate": "Ngày sinh",
         "submit": "Bắt đầu học ngay",
         "submitting": "Đang xử lý..."
+    },
+    "landing": {
+        "nav": {
+            "features": "Tính năng",
+            "pricing": "Bảng giá",
+            "about": "Về chúng tôi",
+            "login": "Đăng nhập",
+            "getStarted": "Bắt đầu ngay"
+        },
+        "hero": {
+            "badge": "🦉 AI + Lộ trình học trong 1 nền tảng",
+            "title": "Viết Email Hoàn Hảo trong 30 Giây",
+            "titleHighlight": "VÀ Học Cách Tự Viết",
+            "subtitle": "Không chỉ là công cụ AI — đây là nền tảng học tập hoàn chỉnh giúp bạn làm chủ kỹ năng viết email chuyên nghiệp. Tạo email tức thì, đồng thời xây dựng kỹ năng thực sự.",
+            "ctaPrimary": "Thử Miễn Phí Ngay",
+            "ctaSecondary": "Xem Cách Hoạt Động",
+            "stats": {
+                "emails": "10,000+",
+                "emailsLabel": "Emails đã tạo",
+                "users": "2,500+",
+                "usersLabel": "Người dùng",
+                "rating": "4.9",
+                "ratingLabel": "Đánh giá"
+            }
+        },
+        "usp": {
+            "title": "Tại sao chọn ForeignLang?",
+            "subtitle": "Nền tảng duy nhất kết hợp AI tạo email với lộ trình học có hệ thống",
+            "cards": {
+                "ai": {
+                    "title": "🤖 AI Tạo Email",
+                    "desc": "Tạo email chuyên nghiệp trong vài giây. Chỉ cần mô tả, AI lo phần còn lại.",
+                    "highlight": "Email trong 30 giây"
+                },
+                "learn": {
+                    "title": "📚 Lộ Trình Học",
+                    "desc": "Chương trình bài bản từ cơ bản đến nâng cao. Học thật, không chỉ copy.",
+                    "highlight": "Xây dựng kỹ năng thật"
+                },
+                "business": {
+                    "title": "💼 Tập Trung Doanh Nghiệp",
+                    "desc": "Chuyên biệt cho giao tiếp công việc. Không chung chung, mà chuyên nghiệp.",
+                    "highlight": "Hướng nghiệp"
+                }
+            },
+            "comparison": {
+                "title": "So sánh với các công cụ khác",
+                "feature": "Tính năng",
+                "chatgpt": "ChatGPT",
+                "grammarly": "Grammarly",
+                "foreignlang": "ForeignLang",
+                "aiGen": "AI tạo Email",
+                "learning": "Lộ trình học",
+                "templates": "Kho mẫu Email",
+                "businessFocus": "Tập trung doanh nghiệp"
+            }
+        },
+        "howItWorks": {
+            "title": "Cách Hoạt Động",
+            "subtitle": "Ba bước đơn giản để làm chủ email chuyên nghiệp",
+            "step1": {
+                "title": "Mô Tả Email Cần Viết",
+                "desc": "Cho AI biết bạn cần gì: xin nghỉ phép, mời họp, phản hồi..."
+            },
+            "step2": {
+                "title": "AI Tạo Email Tức Thì",
+                "desc": "Nhận email hoàn chỉnh, chuyên nghiệp trong dưới 30 giây"
+            },
+            "step3": {
+                "title": "Học & Tiến Bộ",
+                "desc": "Theo lộ trình cá nhân hóa để tự viết tốt hơn"
+            }
+        },
+        "features": {
+            "title": "Mọi Thứ Bạn Cần",
+            "subtitle": "Công cụ thiết kế cho người muốn thành công",
+            "emailGen": {
+                "title": "AI Tạo Email",
+                "desc": "Email chuyên nghiệp trong giây lát. AI tiên tiến.",
+                "click": "Thử Ngay"
+            },
+            "templates": {
+                "title": "Kho Mẫu Email",
+                "desc": "500+ mẫu xác thực cho mọi tình huống công việc"
+            },
+            "tracking": {
+                "title": "Theo Dõi Tiến Độ",
+                "desc": "Theo dõi chuỗi ngày, kiếm thành tích, thi đua bảng xếp hạng"
+            }
+        },
+        "testimonials": {
+            "title": "Được Tin Dùng Bởi Chuyên Gia",
+            "subtitle": "Tham gia cùng hàng nghìn người đã cải thiện kỹ năng email",
+            "review1": {
+                "text": "\"AI generator giúp tôi tiết kiệm 5 tiếng mỗi tuần. Nhưng quan trọng hơn, tôi còn học được cách viết tốt hơn.\"",
+                "author": "Sarah Jenkins",
+                "role": "Trưởng phòng Marketing"
+            },
+            "review2": {
+                "text": "\"Cuối cùng cũng có công cụ dạy viết, chứ không chỉ làm hộ.\"",
+                "author": "David Chen",
+                "role": "Kỹ sư phần mềm"
+            },
+            "review3": {
+                "text": "\"Email tiếng Anh trước đây mất cả ngày. Giờ tôi tự tin và nhanh hơn nhiều.\"",
+                "author": "Minh Nguyễn",
+                "role": "Business Analyst"
+            }
+        },
+        "cta": {
+            "title": "Sẵn Sàng Làm Chủ Email?",
+            "subtitle": "Bắt đầu miễn phí ngay hôm nay. Không cần thẻ tín dụng.",
+            "button": "Bắt Đầu Miễn Phí",
+            "note": "Gói miễn phí bao gồm 5 lượt AI mỗi ngày"
+        },
+        "footer": {
+            "desc": "Giúp người đi làm tự tin giao tiếp trên toàn cầu.",
+            "product": "Sản phẩm",
+            "company": "Công ty",
+            "legal": "Pháp lý",
+            "careers": "Tuyển dụng",
+            "contact": "Liên hệ",
+            "privacy": "Bảo mật",
+            "terms": "Điều khoản",
+            "copyright": "© 2026 ForeignLang Inc. Bảo lưu mọi quyền."
+        }
+    },
+    "pricing": {
+        "back": "← Về trang chủ",
+        "backToDashboard": "← Về Dashboard",
+        "title": "Chọn gói phù hợp với bạn",
+        "subtitle": "Hai cách tiếp cận: Học bài bản hoặc Gen nhanh email AI",
+        "forLearners": "Cho người học",
+        "forLearnersDesc": "Muốn thành thạo viết email chuyên nghiệp",
+        "forGenerators": "Cho người cần nhanh",
+        "forGeneratorsDesc": "Chỉ cần AI gen email, không cần học",
+        "recommended": "Khuyên dùng",
+        "signUp": "Đăng ký ngay",
+        "buyNow": "Mua ngay",
+        "startWatching": "Bắt đầu xem",
+        "paymentSecure": "Thanh toán an toàn qua MoMo, ZaloPay, VNPAY • Bảo mật SSL 256-bit",
+        "plans": {
+            "flproMonthly": {
+                "name": "FLPro 1 Tháng",
+                "price": "29.000₫",
+                "period": "/tháng",
+                "desc": "Học viết email chuyên nghiệp với lộ trình cá nhân hóa.",
+                "bonus": "+5 AI Credits miễn phí"
+            },
+            "flproQuarterly": {
+                "name": "FLPro 3 Tháng",
+                "price": "79.000₫",
+                "period": "/3 tháng",
+                "desc": "Tiết kiệm 9% so với gói tháng.",
+                "bonus": "+20 AI Credits miễn phí"
+            },
+            "freeAds": {
+                "name": "Xem Quảng Cáo",
+                "price": "Miễn phí",
+                "desc": "Xem video ngắn để nhận credit."
+            },
+            "credits5": {
+                "name": "Gói 5 Credits",
+                "price": "29.000₫",
+                "desc": "Mua trực tiếp, không cần subscription."
+            }
+        },
+        "features": {
+            "fullLearningPath": "Truy cập toàn bộ lộ trình học",
+            "unlimitedTemplates": "Template Library không giới hạn",
+            "bonus5Credits": "Tặng 5 AI Credits",
+            "prioritySupport": "Hỗ trợ ưu tiên",
+            "allFlproMonthly": "Tất cả quyền lợi FLPro 1 Tháng",
+            "bonus20Credits": "Tặng 20 AI Credits",
+            "save8k": "Tiết kiệm 8.000₫",
+            "earlyAccess": "Ưu tiên tính năng mới",
+            "1CreditPerAd": "1 AI Credit / lượt xem",
+            "unlimitedAds": "Không giới hạn lượt xem",
+            "supportDev": "Hỗ trợ nhà phát triển",
+            "5Credits": "5 AI Credits",
+            "neverExpires": "Không hết hạn",
+            "useAnytime": "Dùng khi nào cũng được"
+        }
+    },
+    "about": {
+        "back": "← Về trang chủ",
+        "title": "Về ForeignLang",
+        "subtitle": "Sứ mệnh của chúng tôi là xóa bỏ rào cản ngôn ngữ trong môi trường chuyên nghiệp bằng công nghệ AI tiên tiến.",
+        "mission": {
+            "title": "Sứ mệnh",
+            "p1": "Thành lập năm 2026, ForeignLang bắt đầu từ một quan sát đơn giản: Kỹ năng chuyên môn giúp bạn được tuyển dụng, nhưng kỹ năng giao tiếp giúp bạn thăng tiến.",
+            "p2": "Chúng tôi tin rằng ngôn ngữ không nên là rào cản cho sự phát triển sự nghiệp. Bằng cách kết hợp AI tạo sinh với các phương pháp sư phạm đã được kiểm chứng, chúng tôi tạo ra nền tảng giúp người không phải bản xứ viết, nói và thuyết trình tự tin.",
+            "learners": "Học viên Tích cực",
+            "generated": "Email Đã tạo"
+        },
+        "team": {
+            "title": "Đội ngũ",
+            "role1": "Nhà sáng lập & CEO",
+            "role2": "Kiến trúc sư AI"
+        }
+    },
+    "authModal": {
+        "title": "Yêu cầu Đăng nhập",
+        "subtitle": "Vui lòng đăng nhập hoặc tạo tài khoản để sử dụng tính năng cao cấp này.",
+        "login": "Đăng nhập",
+        "createAccount": "Tạo tài khoản",
+        "footer": "Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi."
     }
 }

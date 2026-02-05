@@ -23,85 +23,139 @@ public class UsageQuota {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    // Signup bonus uses (one-time, doesn't reset)
-    @Column(name = "bonus_uses", nullable = false)
+    @Column(name = "purchased_credits", nullable = true) // Nullable for migration
     @Builder.Default
-    private int bonusUses = 5;
+    private Integer purchasedCredits = 5; // Initial bonus or purchased
 
-    // Daily free uses (resets every day)
-    @Column(name = "daily_free_uses", nullable = false)
+    // Free credits (resets weekly)
+    @Column(name = "free_credits", nullable = true) // Nullable for migration
     @Builder.Default
-    private int dailyFreeUses = 2;
+    private Integer freeCredits = 2;
+
+    // Subscription credits (resets monthly)
+    // Subscription credits (resets monthly)
+    @Column(name = "subscription_credits", nullable = true) // Nullable for migration
+    @Builder.Default
+    private Integer subscriptionCredits = 0;
 
     // Ad-rewarded uses today (max 3/day, resets every day)
-    @Column(name = "ad_uses_today", nullable = false)
+    @Column(name = "ad_uses_today", nullable = true) // Nullable for migration
     @Builder.Default
-    private int adUsesToday = 0;
+    private Integer adUsesToday = 0;
 
-    // Max ads per day
-    private static final int MAX_ADS_PER_DAY = 3;
-    private static final int DAILY_FREE_LIMIT = 2;
+    // --- DEPRECATED FIELDS (Keep for legacy DB compatibility) ---
+    @Column(name = "daily_free_uses", nullable = true) // Set nullable=true to avoid issues if we drop it later
+    @Builder.Default
+    private int dailyFreeUses = 2; // Default to satisfy NOT NULL if exists
 
-    @Column(name = "last_reset_date", nullable = false)
+    @Column(name = "bonus_uses", nullable = true)
+    @Builder.Default
+    private int bonusUses = 0;
+
+    @Column(name = "last_reset_date", nullable = true) // Legacy field
     private LocalDate lastResetDate;
+    // ------------------------------------------------------------
 
-    // Check if user can use AI (has any available uses)
+    // Limits
+    private static final int MAX_ADS_PER_DAY = 3;
+    private static final int WEEKLY_FREE_LIMIT = 2;
+    private static final int MONTHLY_SUB_LIMIT = 20;
+
+    @Column(name = "last_free_reset")
+    private LocalDate lastFreeReset;
+
+    @Column(name = "last_sub_reset")
+    private LocalDate lastSubReset;
+
+    @Column(name = "last_ad_reset")
+    private LocalDate lastAdReset;
+
+    // Check if user can use AI
     public boolean canUseAI(boolean isPremium) {
-        if (isPremium)
-            return true; // Unlimited for premium
-        resetIfNewDay();
-        return bonusUses > 0 || dailyFreeUses > 0;
-    }
-
-    // Check if user can watch ad for extra use
-    public boolean canWatchAd() {
-        resetIfNewDay();
-        return adUsesToday < MAX_ADS_PER_DAY;
+        checkAndResetQuotas(isPremium);
+        return (freeCredits != null ? freeCredits : 0) > 0 ||
+                (subscriptionCredits != null ? subscriptionCredits : 0) > 0 ||
+                (purchasedCredits != null ? purchasedCredits : 0) > 0;
     }
 
     // Get remaining uses for display
     public int getRemainingUses(boolean isPremium) {
-        if (isPremium)
-            return -1; // -1 means unlimited
-        resetIfNewDay();
-        return bonusUses + dailyFreeUses;
+        checkAndResetQuotas(isPremium);
+        return (freeCredits != null ? freeCredits : 0) +
+                (subscriptionCredits != null ? subscriptionCredits : 0) +
+                (purchasedCredits != null ? purchasedCredits : 0);
     }
 
-    // Use one AI credit (prioritizes: bonus → daily free)
+    // Use one AI credit
     public boolean useOneCredit(boolean isPremium) {
-        if (isPremium)
-            return true; // Premium users don't consume credits
+        checkAndResetQuotas(isPremium);
 
-        resetIfNewDay();
-
-        if (bonusUses > 0) {
-            bonusUses--;
+        // Priority 1: Free Weekly Credits
+        if (freeCredits != null && freeCredits > 0) {
+            freeCredits--;
             return true;
         }
-        if (dailyFreeUses > 0) {
-            dailyFreeUses--;
+        // Priority 2: Subscription Credits (if Premium)
+        if (isPremium && subscriptionCredits != null && subscriptionCredits > 0) {
+            subscriptionCredits--;
             return true;
         }
-        return false; // No credits available
+        // Priority 3: Purchased/Bonus Credits
+        if (purchasedCredits != null && purchasedCredits > 0) {
+            purchasedCredits--;
+            return true;
+        }
+        return false;
     }
 
     // Reward user for watching an ad
     public boolean rewardAdWatch() {
-        resetIfNewDay();
+        checkAndResetQuotas(false); // Ad limit is daily
+        if (adUsesToday == null)
+            adUsesToday = 0;
         if (adUsesToday < MAX_ADS_PER_DAY) {
-            dailyFreeUses++; // Add 1 use
-            adUsesToday++; // Track ad count
+            if (purchasedCredits == null)
+                purchasedCredits = 0;
+            purchasedCredits++; // Ads give permanent credits
+            adUsesToday++;
             return true;
         }
-        return false; // Max ads reached
+        return false;
     }
 
-    // Reset daily counters if new day
-    public void resetIfNewDay() {
-        if (lastResetDate == null || LocalDate.now().isAfter(lastResetDate)) {
-            dailyFreeUses = DAILY_FREE_LIMIT; // Reset to 2
+    public boolean canWatchAd() {
+        checkAndResetQuotas(false);
+        return (adUsesToday != null ? adUsesToday : 0) < MAX_ADS_PER_DAY;
+    }
+
+    // Rolling Window Reset Logic
+    public void checkAndResetQuotas(boolean isPremium) {
+        LocalDate now = LocalDate.now();
+
+        // 1. Weekly Free Reset (Rolling 7 days)
+        if (lastFreeReset == null) {
+            lastFreeReset = now;
+            freeCredits = WEEKLY_FREE_LIMIT;
+        } else if (now.isAfter(lastFreeReset.plusDays(6))) { // 7th day implies reset
+            lastFreeReset = now;
+            freeCredits = WEEKLY_FREE_LIMIT;
+        }
+
+        // 2. Monthly Subscription Reset (Rolling 30 days)
+        if (isPremium) {
+            if (lastSubReset == null) {
+                lastSubReset = now;
+                subscriptionCredits = MONTHLY_SUB_LIMIT;
+            } else if (now.isAfter(lastSubReset.plusDays(29))) { // 30th day implies reset
+                lastSubReset = now;
+                subscriptionCredits = MONTHLY_SUB_LIMIT;
+            }
+        }
+
+        // 3. Daily Ad Limit Reset
+        if (lastAdReset == null || now.isAfter(lastAdReset)) {
+            lastAdReset = now;
             adUsesToday = 0;
-            lastResetDate = LocalDate.now();
         }
     }
 
@@ -109,10 +163,14 @@ public class UsageQuota {
     public static UsageQuota createForNewUser(User user) {
         return UsageQuota.builder()
                 .user(user)
-                .bonusUses(5)
-                .dailyFreeUses(2)
+                .purchasedCredits(5) // Signup Bonus
+                .freeCredits(2)
+                .subscriptionCredits(0)
                 .adUsesToday(0)
-                .lastResetDate(LocalDate.now())
+                .lastFreeReset(LocalDate.now())
+                .lastFreeReset(LocalDate.now())
+                .lastAdReset(LocalDate.now())
+                .lastResetDate(LocalDate.now()) // Legacy support
                 .build();
     }
 }

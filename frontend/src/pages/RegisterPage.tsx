@@ -91,7 +91,7 @@ const RegisterPage = () => {
                             {t('auth.createAccountSub')}
                         </h1>
                         <p className="text-xl text-indigo-100 leading-relaxed mb-8 font-light">
-                            {t('landing.heroSubtitle')}
+                            {t('landing.hero.subtitle')}
                         </p>
 
                         <div className="space-y-4">
@@ -146,10 +146,10 @@ const RegisterPage = () => {
                 {/* Top Left Logo */}
                 <div className="absolute top-6 left-6 z-20">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                            <span className="text-xl">🌍</span>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform overflow-hidden">
+                            <img src="/mascot/main.png" alt="ForeignLang" className="w-full h-full object-cover" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hidden sm:block">
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-sky-500 hidden sm:block">
                             ForeignLang
                         </span>
                     </Link>
@@ -218,12 +218,12 @@ const RegisterPage = () => {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700 ml-1">{t('auth.fullName')}</label>
                                 <div className="relative group">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-600 transition-colors" size={20} />
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sky-600 transition-colors" size={20} />
                                     <input
                                         type="text"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="John Doe"
                                         required
                                     />
@@ -233,12 +233,12 @@ const RegisterPage = () => {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700 ml-1">{t('auth.email')}</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-600 transition-colors" size={20} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sky-600 transition-colors" size={20} />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="user@example.com"
                                         required
                                     />
@@ -248,12 +248,12 @@ const RegisterPage = () => {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700 ml-1">{t('auth.password')}</label>
                                 <div className="relative group">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-600 transition-colors" size={20} />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sky-600 transition-colors" size={20} />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -270,12 +270,12 @@ const RegisterPage = () => {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700 ml-1">{t('auth.confirmPassword')}</label>
                                 <div className="relative group">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-600 transition-colors" size={20} />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sky-600 transition-colors" size={20} />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -340,7 +340,7 @@ const RegisterPage = () => {
 
                         <p className="mt-8 text-center text-sm text-gray-500">
                             {t('auth.haveAccount')} {' '}
-                            <Link to="/login" className="font-bold text-purple-600 hover:text-purple-500 transition-colors">
+                            <Link to="/login" className="font-bold text-sky-600 hover:text-purple-500 transition-colors">
                                 {t('auth.login')}
                             </Link>
                         </p>

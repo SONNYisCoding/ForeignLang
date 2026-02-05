@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Copy, RefreshCw, Sparkles, Check, Briefcase, MessageSquare, Zap } from 'lucide-react';
-import { useTranslation } from 'react-i18next'; // Import i18n hook
+import { useTranslation } from 'react-i18next';
+import { useToast } from '../../contexts/ToastContext';
 
 // DTOs matching backend
 interface EmailGenerateRequest {
@@ -21,10 +22,13 @@ interface EmailGenerateResponse {
 }
 
 const EmailGeneratorPage = () => {
-    const { t, i18n } = useTranslation(); // Use hook
+    const { t, i18n } = useTranslation();
+    const { showSuccess, showError } = useToast();
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<EmailGenerateResponse | null>(null);
     const [copied, setCopied] = useState(false);
+    const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
+    const [quotaDetails, setQuotaDetails] = useState({ free: 0, sub: 0, purchased: 0 });
 
     // Form state
     const [formData, setFormData] = useState<EmailGenerateRequest>({
@@ -35,8 +39,29 @@ const EmailGeneratorPage = () => {
         recipientType: 'colleague'
     });
 
+    // Fetch quota on mount
+    React.useEffect(() => {
+        fetch('/api/v1/user/me')
+            .then(res => res.json())
+            .then(data => {
+                if (data.usageRemaining !== undefined) {
+                    setRemainingCredits(data.usageRemaining);
+                    setQuotaDetails({
+                        free: data.freeCredits || 0,
+                        sub: data.subscriptionCredits || 0,
+                        purchased: data.purchasedCredits || 0
+                    });
+                }
+            })
+            .catch(console.error);
+    }, []);
+
     const handleGenerate = async () => {
         if (!formData.prompt.trim()) return;
+        if (remainingCredits === 0) {
+            showError(t('common.error') + ": No credits left!");
+            return;
+        }
 
         setLoading(true);
         setCopied(false);
@@ -57,12 +82,29 @@ const EmailGeneratorPage = () => {
 
             if (response.ok) {
                 setResult(data);
+                if (data.remainingUses !== undefined) {
+                    setRemainingCredits(data.remainingUses);
+                    // Refresh breakdown
+                    fetch('/api/v1/user/me')
+                        .then(res => res.json())
+                        .then(userData => {
+                            if (userData.usageRemaining !== undefined) {
+                                setRemainingCredits(userData.usageRemaining);
+                                setQuotaDetails({
+                                    free: userData.freeCredits || 0,
+                                    sub: userData.subscriptionCredits || 0,
+                                    purchased: userData.purchasedCredits || 0
+                                });
+                            }
+                        });
+                }
             } else if (response.status === 401) {
                 // Redirect will be handled by Layout or protected route effectively,
                 // but explicit check helps.
                 window.location.href = '/login';
             } else {
                 console.error('Error:', data);
+                showError(data.error || 'Generation failed');
             }
         } catch (error) {
             console.error('Network error:', error);
@@ -76,11 +118,104 @@ const EmailGeneratorPage = () => {
         const textToCopy = `Subject: ${result.subject}\n\n${result.body}`;
         navigator.clipboard.writeText(textToCopy);
         setCopied(true);
+        showSuccess('Email copied to clipboard!');
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const [showAdModal, setShowAdModal] = useState(false);
+    const [adTimer, setAdTimer] = useState(5);
+    const [adFinished, setAdFinished] = useState(false);
+
+    const handleWatchAd = () => {
+        setShowAdModal(true);
+        setAdTimer(5);
+        setAdFinished(false);
+        const interval = setInterval(() => {
+            setAdTimer((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    setAdFinished(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    const handleClaimReward = async () => {
+        try {
+            const response = await fetch('/api/v1/email/ad-reward', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setRemainingCredits(data.remainingUses);
+                // Refresh breakdown
+                fetch('/api/v1/user/me')
+                    .then(res => res.json())
+                    .then(userData => {
+                        if (userData.usageRemaining !== undefined) {
+                            setRemainingCredits(userData.usageRemaining);
+                            setQuotaDetails({
+                                free: userData.freeCredits || 0,
+                                sub: userData.subscriptionCredits || 0,
+                                purchased: userData.purchasedCredits || 0
+                            });
+                        }
+                    });
+
+                setShowAdModal(false);
+                alert(t('generator.adRewardSuccess') || 'You earned 1 credit!');
+            } else {
+                alert(data.error);
+                setShowAdModal(false);
+            }
+        } catch (error) {
+            console.error('Ad reward error:', error);
+        }
+    };
+
     return (
-        <div className="max-w-5xl mx-auto pb-12">
+        <div className="max-w-5xl mx-auto pb-12 relative">
+            {/* Ad Modal */}
+            {showAdModal && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative">
+                        <div className="bg-gray-900 h-64 flex items-center justify-center relative">
+                            <Zap size={64} className="text-yellow-400 animate-pulse" />
+                            <p className="text-white mt-4 absolute bottom-4">
+                                {adFinished ? "Ad Completed" : `Ad Playing: ${adTimer}s`}
+                            </p>
+                        </div>
+                        <div className="p-6 text-center">
+                            <h3 className="text-xl font-bold mb-2">Watch Ad to get 1 Free Credit</h3>
+                            <p className="text-gray-500 mb-6">Support us by watching a short ad to continue generating emails.</p>
+
+                            {adFinished ? (
+                                <button
+                                    onClick={handleClaimReward}
+                                    className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all"
+                                >
+                                    Claim Reward
+                                </button>
+                            ) : (
+                                <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                    Please Wait {adTimer}s...
+                                </button>
+                            )}
+
+                            <button
+                                onClick={() => setShowAdModal(false)}
+                                className="mt-4 text-sm text-gray-400 hover:text-gray-600"
+                            >
+                                Close (No Reward)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                     <div className="p-2 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-200">
@@ -88,9 +223,30 @@ const EmailGeneratorPage = () => {
                     </div>
                     {t('generator.title')}
                 </h1>
-                <p className="text-gray-500 mt-2 text-lg ml-14">
+                <div className="text-gray-500 mt-2 text-lg ml-14 flex items-center gap-4">
                     {t('generator.subtitle')}
-                </p>
+                    {remainingCredits !== null && (
+                        <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium border flex items-center gap-2 ${remainingCredits > 0
+                                ? 'bg-indigo-50 text-indigo-700 border-indigo-100'
+                                : 'bg-red-50 text-red-700 border-red-100'
+                                }`}>
+                                <span>{remainingCredits} {remainingCredits === 1 ? 'credit' : 'credits'} left</span>
+                                <span className="text-xs opacity-75 border-l pl-2 border-indigo-200">
+                                    {quotaDetails.free} Free • {quotaDetails.sub} Sub • {quotaDetails.purchased} Extra
+                                </span>
+                            </span>
+                            {remainingCredits < 2 && (
+                                <button
+                                    onClick={handleWatchAd}
+                                    className="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors flex items-center gap-1"
+                                >
+                                    <Zap size={12} fill="currentColor" /> {t('generator.getMore') || 'Get More'}
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
@@ -186,7 +342,7 @@ const EmailGeneratorPage = () => {
                                 className={`w-full py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 shadow-lg transition-all transform active:scale-95
                                     ${loading || !formData.prompt.trim()
                                         ? 'bg-gray-300 cursor-not-allowed shadow-none'
-                                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-indigo-500/30 hover:-translate-y-0.5'}
+                                        : 'bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 shadow-indigo-500/30 hover:-translate-y-0.5'}
                                 `}
                             >
                                 {loading ? (

@@ -82,7 +82,7 @@ const LoginPage = () => {
                             ForeignLang
                         </h1>
                         <p className="text-xl text-indigo-100 leading-relaxed mb-8 font-light">
-                            {t('landing.heroSubtitle')}
+                            {t('landing.hero.subtitle')}
                         </p>
                         <div className="flex gap-4">
                             <motion.div
@@ -121,10 +121,10 @@ const LoginPage = () => {
                 {/* Top Left Logo */}
                 <div className="absolute top-6 left-6 z-20">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                            <span className="text-xl">🌍</span>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform overflow-hidden">
+                            <img src="/mascot/main.png" alt="ForeignLang" className="w-full h-full object-cover" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hidden sm:block">
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-sky-500 hidden sm:block">
                             ForeignLang
                         </span>
                     </Link>
@@ -242,7 +242,7 @@ const LoginPage = () => {
                                 type="submit"
                                 disabled={loading}
                                 className={`w-full py-3.5 rounded-2xl font-bold text-white text-lg shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all
-                                    ${loading ? 'bg-indigo-400 cursor-wait' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'}
+                                    ${loading ? 'bg-indigo-400 cursor-wait' : 'bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600'}
                                 `}
                             >
                                 {loading ? 'Checking...' : (
