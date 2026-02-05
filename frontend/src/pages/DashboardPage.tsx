@@ -1,25 +1,66 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, FileText, Zap, Clock, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+interface DashboardStats {
+    credits: number;
+    emailsGenerated: number;
+    streak: number;
+}
 
 const DashboardPage = () => {
     const navigate = useNavigate();
-
-    // Mock user data
-    const user = { name: 'User' };
-    const stats = {
-        credits: 7, // 5 bonus + 2 daily
+    const { t } = useTranslation();
+    const [user, setUser] = useState<{ name: string } | null>(null);
+    const [stats, setStats] = useState<DashboardStats>({
+        credits: 0,
         emailsGenerated: 0,
-        streak: 1
-    };
+        streak: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/v1/user/me', { credentials: 'include' })
+            .then(res => {
+                if (res.status === 401) {
+                    navigate('/login');
+                    return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data) {
+                    setUser({ name: data.name || 'User' });
+                    // Calculate total credits (bonus + daily)
+                    const totalCredits = (data.bonusUses || 0) + (data.dailyFreeUses || 0);
+                    setStats({
+                        credits: totalCredits,
+                        emailsGenerated: 0, // Placeholder as backend doesn't track this yet
+                        streak: 1 // Placeholder
+                    });
+                }
+            })
+            .catch(err => console.error('Error fetching dashboard data:', err))
+            .finally(() => setLoading(false));
+    }, [navigate]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto">
             {/* Welcome Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">
-                    Chào mừng trở lại, {user.name}! 👋
+                    {t('dashboard.welcome', { name: user?.name || 'User' })} 👋
                 </h1>
-                <p className="text-gray-500 mt-2 text-lg">Hôm nay bạn muốn cải thiện kỹ năng gì?</p>
+                <p className="text-gray-500 mt-2 text-lg">{t('dashboard.subtitle')}</p>
             </div>
 
             {/* Stats Overview */}
@@ -29,14 +70,14 @@ const DashboardPage = () => {
                         <Sparkles size={100} />
                     </div>
                     <div className="relative z-10">
-                        <p className="text-indigo-100 font-medium mb-1">AI Credits hôm nay</p>
+                        <p className="text-indigo-100 font-medium mb-1">{t('dashboard.stats.creditsToday')}</p>
                         <h3 className="text-4xl font-bold mb-4">{stats.credits}</h3>
                         <Link
                             to="/dashboard/generator"
                             className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-semibold transition-colors backdrop-blur-sm"
                         >
                             <Zap size={16} />
-                            Dùng ngay
+                            {t('dashboard.stats.useNow')}
                         </Link>
                     </div>
                 </div>
@@ -47,7 +88,7 @@ const DashboardPage = () => {
                             <FileText size={24} />
                         </div>
                         <div>
-                            <p className="text-gray-500 text-sm font-medium">Emails đã tạo</p>
+                            <p className="text-gray-500 text-sm font-medium">{t('dashboard.stats.emailsGenerated')}</p>
                             <h3 className="text-2xl font-bold text-gray-900">{stats.emailsGenerated}</h3>
                         </div>
                     </div>
@@ -59,15 +100,15 @@ const DashboardPage = () => {
                             <Clock size={24} />
                         </div>
                         <div>
-                            <p className="text-gray-500 text-sm font-medium">Chuỗi ngày học</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{stats.streak} ngày</h3>
+                            <p className="text-gray-500 text-sm font-medium">{t('dashboard.stats.streak')}</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{stats.streak} {t('dashboard.stats.days')}</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Quick Actions */}
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Truy cập nhanh</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">{t('dashboard.quickActions.title')}</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div
                     onClick={() => navigate('/dashboard/generator')}
@@ -76,35 +117,35 @@ const DashboardPage = () => {
                     <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <Sparkles size={24} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Tạo Email AI mới</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{t('dashboard.quickActions.newEmail.title')}</h3>
                     <p className="text-gray-500 text-sm mb-4 flex-1">
-                        Viết email chuyên nghiệp trong vài giây với sự trợ giúp của AI.
+                        {t('dashboard.quickActions.newEmail.desc')}
                     </p>
                     <div className="flex items-center text-indigo-600 font-medium text-sm">
-                        Bắt đầu <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        {t('dashboard.quickActions.newEmail.cta')} <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
                 </div>
 
-                <div className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full">
+                <div className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full opacity-70">
                     <div className="w-12 h-12 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <FileText size={24} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Kho Mẫu Email</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{t('dashboard.quickActions.templates.title')}</h3>
                     <p className="text-gray-500 text-sm mb-4 flex-1">
-                        Tham khảo 500+ mẫu email tiếng Anh chuẩn cho mọi tình huống.
+                        {t('dashboard.quickActions.templates.desc')}
                     </p>
-                    <div className="text-gray-400 text-sm italic">Sắp ra mắt</div>
+                    <div className="text-gray-400 text-sm italic">{t('dashboard.quickActions.templates.soon')}</div>
                 </div>
 
-                <div className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full">
+                <div className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full opacity-70">
                     <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <Zap size={24} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Học từ vựng</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{t('dashboard.quickActions.vocabulary.title')}</h3>
                     <p className="text-gray-500 text-sm mb-4 flex-1">
-                        Ôn tập từ vựng Business English theo chủ đề.
+                        {t('dashboard.quickActions.vocabulary.desc')}
                     </p>
-                    <div className="text-gray-400 text-sm italic">Sắp ra mắt</div>
+                    <div className="text-gray-400 text-sm italic">{t('dashboard.quickActions.vocabulary.soon')}</div>
                 </div>
             </div>
         </div>

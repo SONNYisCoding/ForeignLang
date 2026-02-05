@@ -71,13 +71,15 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/api/v1/auth/register").permitAll()
                                                 .requestMatchers("/api/v1/auth/login").permitAll()
+                                                .requestMatchers("/api/v1/user/**").permitAll() // Allow manual session
+                                                                                                // check
 
                                                 // Public APIs
                                                 .requestMatchers("/api/v1/public/**").permitAll()
                                                 .requestMatchers("/api/v1/topics/**").permitAll()
                                                 .requestMatchers("/api/v1/templates/**").permitAll()
-                                                .requestMatchers("/api/v1/email/status").permitAll() // Exposed for
-                                                                                                     // testing
+                                                .requestMatchers("/api/v1/email/**").permitAll() // Allow manual session
+                                                                                                 // check in controller
 
                                                 // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")

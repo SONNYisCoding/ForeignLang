@@ -49,7 +49,12 @@ const LoginPage = () => {
             const data = await res.json();
 
             if (res.ok) {
-                navigate('/dashboard');
+                // Check if profile is complete (handled by backend response)
+                if (data.user && !data.user.profileComplete) {
+                    navigate('/profile-setup');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setError(data.error || 'Login failed');
             }

@@ -36,9 +36,35 @@
         "profile": "Hồ sơ cá nhân",
         "logout": "Đăng xuất",
         "welcome": "Chào mừng, {{name}}!",
+        "subtitle": "Hôm nay bạn muốn cải thiện kỹ năng gì?",
         "myProfile": "Hồ sơ của tôi",
         "settings": "Cài đặt",
-        "help": "Trợ giúp"
+        "help": "Trợ giúp",
+        "stats": {
+            "creditsToday": "AI Credits hôm nay",
+            "emailsGenerated": "Emails đã tạo",
+            "streak": "Chuỗi ngày học",
+            "useNow": "Dùng ngay",
+            "days": "ngày"
+        },
+        "quickActions": {
+            "title": "Truy cập nhanh",
+            "newEmail": {
+                "title": "Tạo Email AI mới",
+                "desc": "Viết email chuyên nghiệp trong vài giây với sự trợ giúp của AI.",
+                "cta": "Bắt đầu"
+            },
+            "templates": {
+                "title": "Kho Mẫu Email",
+                "desc": "Tham khảo 500+ mẫu email tiếng Anh chuẩn cho mọi tình huống.",
+                "soon": "Sắp ra mắt"
+            },
+            "vocabulary": {
+                "title": "Học từ vựng",
+                "desc": "Ôn tập từ vựng Business English theo chủ đề.",
+                "soon": "Sắp ra mắt"
+            }
+        }
     },
     "generator": {
         "title": "AI Email Generator",
@@ -65,5 +91,18 @@
         "heroSubtitle": "Nền tảng hỗ trợ AI tiên tiến nhất giúp bạn học, thực hành và làm chủ ngôn ngữ mới một cách dễ dàng.",
         "getStarted": "Bắt đầu ngay",
         "learnMore": "Tìm hiểu thêm"
+    },
+    "profileSetup": {
+        "title": "Hoàn thiện hồ sơ",
+        "subtitle": "Chỉ còn vài bước nữa thôi!",
+        "bonus": "🎉 Chào mừng! Bạn nhận được <bold>5 lượt AI MIỄN PHÍ</bold> để bắt đầu!",
+        "username": "Tên đăng nhập",
+        "usernamePlaceholder": "ten_dang_nhap_cua_ban",
+        "usernameHint": "Chỉ chứa chữ cái, số và dấu gạch dưới",
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ tên đầy đủ",
+        "birthDate": "Ngày sinh",
+        "submit": "Bắt đầu học ngay",
+        "submitting": "Đang xử lý..."
     }
 }

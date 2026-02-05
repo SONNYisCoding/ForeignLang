@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,12 +19,29 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const langDropdownRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
     const navigate = useNavigate();
 
+    // Close language dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+                setIsLangOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     useEffect(() => {
         // Fetch user data
-        fetch('/api/v1/user/me')
+        fetch('/api/v1/user/me', {
+            credentials: 'include'
+        })
             .then(res => {
                 if (res.status === 401) {
                     navigate('/login');
@@ -49,10 +66,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             .then(() => navigate('/login'));
     };
 
-    const toggleLanguage = () => {
-        const newLang = i18n.language === 'en' ? 'vi' : 'en';
-        i18n.changeLanguage(newLang);
-    };
+
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -79,7 +93,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-white border-r border-gray-100 
+                fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-100 
                 transform transition-transform duration-300 ease-in-out flex flex-col shadow-sm
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
@@ -149,13 +163,43 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
                     <div className="flex items-center gap-6">
                         {/* Language Switch */}
-                        <button
-                            onClick={toggleLanguage}
-                            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-                        >
-                            <Globe size={16} />
-                            {i18n.language === 'en' ? 'EN' : 'VI'}
-                        </button>
+                        <div className="relative" ref={langDropdownRef}>
+                            <button
+                                onClick={() => setIsLangOpen(!isLangOpen)}
+                                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all bg-white shadow-sm"
+                            >
+                                <Globe size={16} className="text-gray-500" />
+                                <span className="text-sm font-medium text-gray-700">
+                                    {i18n.language === 'en' ? 'EN' : 'VI'}
+                                </span>
+                                <ChevronDown size={14} className={`text-gray-400 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {/* Dropdown Menu */}
+                            <AnimatePresence>
+                                {isLangOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.1 }}
+                                        className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden z-50"
+                                    >
+                                        <button
+                                            onClick={() => { i18n.changeLanguage('vi'); setIsLangOpen(false); }}
+                                            className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${i18n.language === 'vi' ? 'text-indigo-600 font-medium' : 'text-gray-600'}`}
+                                        >
+                                            Tiếng Việt
+                                        </button>
+                                        <button
+                                            onClick={() => { i18n.changeLanguage('en'); setIsLangOpen(false); }}
+                                            className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${i18n.language === 'en' ? 'text-indigo-600 font-medium' : 'text-gray-600'}`}
+                                        >
+                                            English
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* Profile Dropdown */}
                         <div className="relative group" onMouseEnter={() => setIsProfileDropdownOpen(true)} onMouseLeave={() => setIsProfileDropdownOpen(false)}>
@@ -194,10 +238,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                             <UserIcon size={18} className="text-gray-400" />
                                             {t('dashboard.myProfile')}
                                         </Link>
-                                        <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <Link to="/dashboard/settings" className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                             <Settings size={18} className="text-gray-400" />
                                             {t('dashboard.settings')}
-                                        </button>
+                                        </Link>
                                         <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                             <HelpCircle size={18} className="text-gray-400" />
                                             {t('dashboard.help')}

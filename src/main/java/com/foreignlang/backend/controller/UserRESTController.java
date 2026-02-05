@@ -24,18 +24,37 @@ public class UserRESTController {
     private final SubscriptionService subscriptionService;
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
-        if (principal == null) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal OAuth2User principal,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+        String email = null;
+        String name = "User";
+        String avatar = null;
+
+        // 1. Try OAuth2 (Google)
+        if (principal != null) {
+            email = principal.getAttribute("email");
+            name = principal.getAttribute("name");
+            avatar = principal.getAttribute("picture");
+        }
+
+        // 2. Try Manual Session (Form Login)
+        else {
+            jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                email = (String) session.getAttribute("userEmail");
+            }
+        }
+
+        if (email == null) {
             return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
         }
 
-        String email = principal.getAttribute("email");
         Map<String, Object> response = new HashMap<>();
-
-        // Basic Info from OAuth
-        response.put("name", principal.getAttribute("name"));
         response.put("email", email);
-        response.put("avatar", principal.getAttribute("picture"));
+        if (avatar != null)
+            response.put("avatar", avatar);
+        if (name != null)
+            response.put("name", name);
 
         // Database Info
         userRepository.findByEmail(email).ifPresent(user -> {

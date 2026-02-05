@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import ProfilePage from './pages/dashboard/ProfilePage';
+import SettingsPage from './pages/dashboard/SettingsPage';
 
 // Wrapper for dashboard routes to apply layout
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
@@ -62,6 +63,14 @@ function App() {
           element={
             <DashboardRoute>
               <ProfilePage />
+            </DashboardRoute>
+          }
+        />
+        <Route
+          path="/dashboard/settings"
+          element={
+            <DashboardRoute>
+              <SettingsPage />
             </DashboardRoute>
           }
         />

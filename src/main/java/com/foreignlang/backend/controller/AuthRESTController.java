@@ -49,6 +49,7 @@ public class AuthRESTController {
     }
 
     @PostMapping("/register")
+    @org.springframework.transaction.annotation.Transactional // Ensure atomic save of User + Quota
     public ResponseEntity<?> register(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         log.info("Registration attempt for email: {}", request.email());
 
@@ -68,13 +69,17 @@ public class AuthRESTController {
         }
 
         // Create new user
+        String encodedPassword = passwordEncoder.encode(request.password());
+        log.info("Generating hash for new user. Raw pwd length: {}, Hash length: {}", request.password().length(),
+                encodedPassword.length());
+
         User user = User.builder()
                 .email(request.email())
-                .passwordHash(passwordEncoder.encode(request.password()))
+                .passwordHash(encodedPassword)
                 .fullName(request.fullName() != null ? request.fullName() : "User")
                 .role(User.Role.LEARNER)
                 .authProvider(User.AuthProvider.LOCAL)
-                .profileComplete(true)
+                .profileComplete(false)
                 .subscriptionTier(User.SubscriptionTier.FREE)
                 .build();
 
@@ -82,9 +87,14 @@ public class AuthRESTController {
         log.info("User created with ID: {}", user.getId());
 
         // Create usage quota with 5 bonus uses
-        UsageQuota quota = UsageQuota.createForNewUser(user);
-        usageQuotaRepository.save(quota);
-        log.info("Usage quota created for user: {}", user.getId());
+        try {
+            UsageQuota quota = UsageQuota.createForNewUser(user);
+            usageQuotaRepository.save(quota);
+            log.info("Usage quota created for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Failed to create usage quota: {}", e.getMessage());
+            throw e; // Will trigger rollback
+        }
 
         // Auto-login after registration
         HttpSession session = httpRequest.getSession(true);
@@ -105,6 +115,7 @@ public class AuthRESTController {
         Optional<User> userOpt = userRepository.findByEmail(request.email());
 
         if (userOpt.isEmpty()) {
+            log.warn("Login failed: User not found");
             return ResponseEntity.status(401).body(Map.of(
                     "error", "Invalid email or password",
                     "code", "INVALID_CREDENTIALS"));
@@ -114,13 +125,17 @@ public class AuthRESTController {
 
         // Check if user has password (might be Google-only user)
         if (user.getPasswordHash() == null) {
+            log.warn("Login failed: Google account only");
             return ResponseEntity.status(401).body(Map.of(
                     "error", "This account uses Google login. Please sign in with Google.",
                     "code", "GOOGLE_ONLY_ACCOUNT"));
         }
 
         // Verify password
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        boolean matches = passwordEncoder.matches(request.password(), user.getPasswordHash());
+        if (!matches) {
+            log.warn("Login failed: Password mismatch for user {}. Hash in DB: {}", user.getEmail(),
+                    user.getPasswordHash());
             return ResponseEntity.status(401).body(Map.of(
                     "error", "Invalid email or password",
                     "code", "INVALID_CREDENTIALS"));

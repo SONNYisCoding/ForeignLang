@@ -59,7 +59,11 @@ const RegisterPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                navigate('/dashboard');
+                if (data.userId) {
+                    navigate('/profile-setup');
+                } else {
+                    navigate('/dashboard'); // Fallback
+                }
             } else {
                 setError(data.error || 'Registration failed');
             }

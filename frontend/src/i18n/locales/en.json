@@ -36,9 +36,35 @@
         "profile": "Profile",
         "logout": "Logout",
         "welcome": "Welcome back, {{name}}!",
+        "subtitle": "What would you like to improve today?",
         "myProfile": "My Profile",
         "settings": "Settings",
-        "help": "Help Center"
+        "help": "Help Center",
+        "stats": {
+            "creditsToday": "AI Credits Today",
+            "emailsGenerated": "Emails Generated",
+            "streak": "Day Streak",
+            "useNow": "Use Now",
+            "days": "days"
+        },
+        "quickActions": {
+            "title": "Quick Actions",
+            "newEmail": {
+                "title": "New AI Email",
+                "desc": "Draft professional emails in seconds with AI assistance.",
+                "cta": "Start"
+            },
+            "templates": {
+                "title": "Email Templates",
+                "desc": "Browse 500+ templates for every situation.",
+                "soon": "Coming Soon"
+            },
+            "vocabulary": {
+                "title": "Vocabulary",
+                "desc": "Learn Business English vocabulary by topic.",
+                "soon": "Coming Soon"
+            }
+        }
     },
     "generator": {
         "title": "AI Email Generator",
@@ -65,5 +91,18 @@
         "heroSubtitle": "The most advanced AI-powered platform to learn, practice, and master new languages effortlessly.",
         "getStarted": "Get Started",
         "learnMore": "Learn More"
+    },
+    "profileSetup": {
+        "title": "Complete Your Profile",
+        "subtitle": "Almost there! Just a few more details.",
+        "bonus": "🎉 Welcome! You have <bold>5 FREE AI uses</bold> to get started!",
+        "username": "Username",
+        "usernamePlaceholder": "your_username",
+        "usernameHint": "Letters, numbers, and underscores only",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Your full name",
+        "birthDate": "Date of Birth",
+        "submit": "Start Learning",
+        "submitting": "Setting up..."
     }
 }

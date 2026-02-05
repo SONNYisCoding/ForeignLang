@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Calendar, AtSign, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 const ProfileSetupPage = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +34,7 @@ const ProfileSetupPage = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:8080/api/v1/auth/profile-setup', {
+            const response = await fetch('/api/v1/auth/profile-setup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -45,7 +48,7 @@ const ProfileSetupPage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || 'Something went wrong');
+                setError(data.error || t('common.error'));
                 setLoading(false);
                 return;
             }
@@ -53,7 +56,7 @@ const ProfileSetupPage = () => {
             // Success - redirect to dashboard
             navigate('/dashboard');
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError(t('common.error'));
             setLoading(false);
         }
     };
@@ -66,8 +69,8 @@ const ProfileSetupPage = () => {
                     <div className="w-20 h-20 bg-white/20 rounded-full mx-auto flex items-center justify-center mb-4">
                         <User size={40} className="text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold">Complete Your Profile</h1>
-                    <p className="text-indigo-200 mt-2">Almost there! Just a few more details.</p>
+                    <h1 className="text-2xl font-bold">{t('profileSetup.title')}</h1>
+                    <p className="text-indigo-200 mt-2">{t('profileSetup.subtitle')}</p>
                 </div>
 
                 {/* Form */}
@@ -81,39 +84,39 @@ const ProfileSetupPage = () => {
                     {/* Bonus Message */}
                     <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                         <p className="text-green-700 text-sm font-medium flex items-center gap-2">
-                            🎉 Welcome! You have <span className="font-bold">5 FREE AI uses</span> to get started!
+                            <Trans i18nKey="profileSetup.bonus" components={{ bold: <span className="font-bold" /> }} />
                         </p>
                     </div>
 
                     {/* Username */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Username <span className="text-red-500">*</span>
+                            {t('profileSetup.username')} <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input
                                 type="text"
-                                placeholder="your_username"
+                                placeholder={t('profileSetup.usernamePlaceholder')}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value.toLowerCase())}
                                 required
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Letters, numbers, and underscores only</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('profileSetup.usernameHint')}</p>
                     </div>
 
                     {/* Full Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name
+                            {t('profileSetup.fullName')}
                         </label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input
                                 type="text"
-                                placeholder="Your full name"
+                                placeholder={t('profileSetup.fullNamePlaceholder')}
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -124,7 +127,7 @@ const ProfileSetupPage = () => {
                     {/* Birth Date */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Date of Birth
+                            {t('profileSetup.birthDate')}
                         </label>
                         <div className="relative">
                             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -144,10 +147,10 @@ const ProfileSetupPage = () => {
                         className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading ? (
-                            'Setting up...'
+                            t('profileSetup.submitting')
                         ) : (
                             <>
-                                Start Learning
+                                {t('profileSetup.submit')}
                                 <ArrowRight size={18} />
                             </>
                         )}

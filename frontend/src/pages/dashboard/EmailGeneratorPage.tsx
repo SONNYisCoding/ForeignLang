@@ -46,6 +46,7 @@ const EmailGeneratorPage = () => {
             const response = await fetch('/api/v1/email/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Ensure session cookies are sent
                 body: JSON.stringify({
                     ...formData,
                     language: i18n.language === 'vi' ? 'vi' : 'en' // Ensure we send correct lang

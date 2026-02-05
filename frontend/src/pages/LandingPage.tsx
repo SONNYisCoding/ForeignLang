@@ -194,37 +194,73 @@ const LandingPage = () => {
                     >
                         <div className="absolute inset-0 bg-indigo-500/20 blur-3xl -z-10" />
                         <div className="rounded-xl overflow-hidden bg-[#0F172A] aspect-video flex items-center justify-center border border-white/5 relative">
-                            {/* Mock UI Interface */}
-                            <div className="absolute inset-0 flex">
-                                {/* Sidebar Mock */}
-                                <div className="w-64 border-r border-white/5 bg-[#0F172A] hidden md:block p-6 space-y-4">
-                                    <div className="w-8 h-8 rounded-lg bg-indigo-600/20 mb-8" />
-                                    <div className="h-4 w-3/4 bg-white/10 rounded" />
-                                    <div className="h-4 w-1/2 bg-white/10 rounded" />
-                                    <div className="h-4 w-5/6 bg-white/10 rounded" />
-                                </div>
-                                {/* Content Mock */}
-                                <div className="flex-1 p-8">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <div className="h-8 w-1/3 bg-white/10 rounded" />
-                                        <div className="h-10 w-10 bg-white/10 rounded-full" />
+                            {/* Mock UI Interface (High Fidelity) */}
+                            <div className="absolute inset-0 flex bg-gray-50 text-slate-800 font-sans text-[10px] select-none pointer-events-none overflow-hidden">
+                                {/* Mock Sidebar */}
+                                <div className="w-1/4 max-w-[180px] bg-white border-r border-gray-100 flex flex-col p-4 z-10">
+                                    <div className="flex items-center gap-2 mb-8">
+                                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg">🌍</div>
+                                        <div className="h-3 w-20 bg-gray-200 rounded-full" />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="h-40 bg-white/5 rounded-xl border border-white/5 p-4">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <div className="w-3 h-3 rounded-full bg-red-400" />
-                                                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                                                <div className="w-3 h-3 rounded-full bg-green-400" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <div className="h-3 w-full bg-white/10 rounded" />
-                                                <div className="h-3 w-5/6 bg-white/10 rounded" />
-                                                <div className="h-3 w-4/6 bg-white/10 rounded" />
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-medium">
+                                            <div className="w-4 h-4 bg-indigo-600 rounded" />
+                                            <span>Overview</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 px-3 py-2 text-gray-500">
+                                            <div className="w-4 h-4 bg-gray-300 rounded" />
+                                            <span>Generator</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 px-3 py-2 text-gray-500">
+                                            <div className="w-4 h-4 bg-gray-300 rounded" />
+                                            <span>Templates</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Mock Main Content */}
+                                <div className="flex-1 p-6 relative flex flex-col">
+                                    {/* Header */}
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900 mb-1">Welcome back, Alex!</h3>
+                                            <p className="text-gray-400 text-xs">What would you like to improve today?</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-gray-200" />
+                                        </div>
+                                    </div>
+
+                                    {/* Stats Grid */}
+                                    <div className="grid grid-cols-3 gap-4 mb-6">
+                                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-4 text-white relative overflow-hidden">
+                                            <div className="relative z-10">
+                                                <div className="text-[8px] opacity-80 mb-1">AI Credits</div>
+                                                <div className="text-2xl font-bold mb-2">12</div>
+                                                <div className="bg-white/20 w-fit px-2 py-1 rounded text-[8px]">Use Now</div>
                                             </div>
                                         </div>
-                                        <div className="h-40 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-xl border border-indigo-500/30 p-4 flex items-center justify-center">
-                                            <Sparkles className="text-indigo-400 w-12 h-12 opacity-50" />
+                                        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500">📄</div>
+                                            <div>
+                                                <div className="text-gray-400 text-[8px]">Generated</div>
+                                                <div className="font-bold text-lg">24</div>
+                                            </div>
                                         </div>
+                                        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center text-orange-500">🔥</div>
+                                            <div>
+                                                <div className="text-gray-400 text-[8px]">Streak</div>
+                                                <div className="font-bold text-lg">5 Days</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quick Actions (Partial) */}
+                                    <div className="flex gap-4 opacity-50">
+                                        <div className="bg-white p-4 rounded-xl border border-gray-100 w-1/3 h-24" />
+                                        <div className="bg-white p-4 rounded-xl border border-gray-100 w-1/3 h-24" />
+                                        <div className="bg-white p-4 rounded-xl border border-gray-100 w-1/3 h-24" />
                                     </div>
                                 </div>
                             </div>
