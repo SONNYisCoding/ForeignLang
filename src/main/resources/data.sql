@@ -1,8 +1,8 @@
 -- Topics
-INSERT INTO topics (id, title, description, difficulty_level) VALUES
-('11111111-1111-1111-1111-111111111111', 'Business Email Writing', 'Learn how to write professional emails for job applications and daily work.', 'BEGINNER'),
-('22222222-2222-2222-2222-222222222222', 'Effective Presentations', 'Master the art of public speaking and slide design.', 'INTERMEDIATE'),
-('33333333-3333-3333-3333-333333333333', 'Negotiation Skills', 'Advanced vocabulary and tactics for business deals.', 'ADVANCED')
+INSERT INTO topics (id, title, description, difficulty_level, status) VALUES
+('11111111-1111-1111-1111-111111111111', 'Business Email Writing', 'Learn how to write professional emails for job applications and daily work.', 'BEGINNER', 'APPROVED'),
+('22222222-2222-2222-2222-222222222222', 'Effective Presentations', 'Master the art of public speaking and slide design.', 'INTERMEDIATE', 'APPROVED'),
+('33333333-3333-3333-3333-333333333333', 'Negotiation Skills', 'Advanced vocabulary and tactics for business deals.', 'ADVANCED', 'APPROVED')
 ON CONFLICT (id) DO NOTHING;
 
 -- Lessons for "Business Email Writing"

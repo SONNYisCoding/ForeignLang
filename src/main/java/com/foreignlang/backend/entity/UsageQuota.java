@@ -21,6 +21,7 @@ public class UsageQuota {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 
     @Column(name = "purchased_credits", nullable = true) // Nullable for migration
@@ -167,7 +168,6 @@ public class UsageQuota {
                 .freeCredits(2)
                 .subscriptionCredits(0)
                 .adUsesToday(0)
-                .lastFreeReset(LocalDate.now())
                 .lastFreeReset(LocalDate.now())
                 .lastAdReset(LocalDate.now())
                 .lastResetDate(LocalDate.now()) // Legacy support

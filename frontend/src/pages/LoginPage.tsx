@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, CheckCircle, ArrowRight, Globe, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 const LoginPage = () => {
     const { t, i18n } = useTranslation();
@@ -49,11 +50,25 @@ const LoginPage = () => {
             const data = await res.json();
 
             if (res.ok) {
+                console.log('Login response user:', data.user);
                 // Check if profile is complete (handled by backend response)
                 if (data.user && !data.user.profileComplete) {
                     navigate('/profile-setup');
                 } else {
-                    navigate('/dashboard');
+                    const roles = data.user?.roles || [];
+                    console.log('Detected roles:', roles);
+                    toast.success(t('auth.loginSuccess'));
+                    // DEBUG ALERT
+                    // alert(`Login Success! Roles: ${JSON.stringify(roles)}`);
+
+                    if (roles.includes('ADMIN')) {
+                        console.log('Redirecting to ADMIN');
+                        navigate('/admin');
+                    } else if (roles.includes('TEACHER')) {
+                        navigate('/teacher');
+                    } else {
+                        navigate('/dashboard');
+                    }
                 }
             } else {
                 setError(data.error || 'Login failed');

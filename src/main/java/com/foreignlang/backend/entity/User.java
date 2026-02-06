@@ -37,7 +37,7 @@ public class User {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", length = 1024)
     private String avatarUrl;
 
     @Column(name = "google_id", unique = true)
@@ -52,10 +52,12 @@ public class User {
     @Builder.Default
     private boolean profileComplete = false;
 
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role")
     @Builder.Default
-    private Role role = Role.GUEST;
+    private java.util.Set<Role> roles = new java.util.HashSet<>(java.util.Set.of(Role.GUEST));
 
     @Column(name = "items_generated", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default
@@ -69,6 +71,10 @@ public class User {
     @Column(name = "subscription_tier", nullable = false)
     @Builder.Default
     private SubscriptionTier subscriptionTier = SubscriptionTier.FREE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "proficiency_level")
+    private ProficiencyLevel proficiencyLevel;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UsageQuota usageQuota;

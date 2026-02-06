@@ -49,14 +49,36 @@ const DashboardPage = () => {
             .finally(() => setLoading(false));
     }, [navigate]);
 
+    import { SkeletonStats, SkeletonCard } from '../components/ui/Skeleton';
+
+    // ... (inside component)
+
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
-                />
+            <div className="max-w-6xl mx-auto px-2 space-y-6">
+                {/* Header Skeleton */}
+                <div className="space-y-2 mb-8">
+                    <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-64 bg-gray-100 rounded animate-pulse" />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column Skeleton */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="h-64 bg-gray-100 rounded-3xl animate-pulse" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <SkeletonCard />
+                            <SkeletonCard />
+                        </div>
+                    </div>
+
+                    {/* Right Column Skeleton */}
+                    <div className="space-y-4">
+                        <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
+                        <div className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
+                        <div className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
+                    </div>
+                </div>
             </div>
         );
     }

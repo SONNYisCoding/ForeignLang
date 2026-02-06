@@ -27,7 +27,14 @@
         "createAccount": "Create an Account",
         "createAccountSub": "Join us and start your journey today!",
         "orContinueWith": "Or continue with",
-        "googleLogin": "Continue with Google"
+        "googleLogin": "Continue with Google",
+        "loginSuccess": "Login successful!"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "viewDetails": "View details",
+        "empty": "No notifications yet"
     },
     "dashboard": {
         "overview": "Overview",
@@ -324,5 +331,69 @@
         "login": "Log In",
         "createAccount": "Create Account",
         "footer": "By continuing, you agree to our Terms of Service and Privacy Policy."
+    },
+    "admin": {
+        "dashboard": "Admin Dashboard",
+        "welcome": "Welcome back! Here's what's happening today.",
+        "stats": {
+            "totalUsers": "Total Users",
+            "learners": "Learners",
+            "teachers": "Teachers",
+            "lessons": "Lessons",
+            "pendingApproval": "Pending Approval",
+            "activeToday": "Active Today"
+        },
+        "approvals": {
+            "title": "Pending Approvals",
+            "viewAll": "View All",
+            "noPending": "No pending approvals 🎉",
+            "lesson": "Lesson",
+            "submittedBy": "Submitted by",
+            "review": "Review"
+        },
+        "activity": {
+            "title": "Recent Activity",
+            "viewAll": "View All",
+            "newRegister": "New user registered",
+            "lessonPublished": "Lesson published",
+            "emailGenerated": "Email generated"
+        }
+    },
+    "teacher": {
+        "analytics": {
+            "title": "Analytics Dashboard",
+            "subtitle": "Track your students progress and course performance",
+            "learningHours": "Total Learning Hours",
+            "activeStudents": "Active Students",
+            "completionRate": "Completion Rate",
+            "avgScore": "Average Score",
+            "engagement": "Student Engagement",
+            "performance": "Course Performance",
+            "comingSoon": "Charts coming soon..."
+        },
+        "lessons": {
+            "title": "My Lessons",
+            "subtitle": "Manage your course content",
+            "create": "Create Lesson",
+            "edit": "Edit Content",
+            "draft": "Draft",
+            "published": "Published",
+            "pending": "Pending",
+            "rejected": "Rejected",
+            "noLessons": "No lessons yet",
+            "startCreating": "Start creating content for your students today.",
+            "createFirst": "Create First Lesson"
+        },
+        "students": {
+            "title": "My Students",
+            "subtitle": "View and manage students in your groups",
+            "noStudents": "No Students Yet",
+            "noAssigned": "You haven't been assigned any groups efficiently.",
+            "name": "Name",
+            "email": "Email",
+            "joinedDate": "Joined Date",
+            "actions": "Actions",
+            "viewProfile": "View Profile"
+        }
     }
 }

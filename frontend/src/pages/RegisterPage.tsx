@@ -60,9 +60,11 @@ const RegisterPage = () => {
 
             if (response.ok) {
                 if (data.userId) {
+                    // Registration successful - always require profile setup
                     navigate('/profile-setup');
                 } else {
-                    navigate('/dashboard'); // Fallback
+                    // Fallback (shouldn't happen for new registration)
+                    navigate('/login');
                 }
             } else {
                 setError(data.error || 'Registration failed');

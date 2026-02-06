@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationDropdown from '../components/NotificationDropdown';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -187,6 +188,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     </div>
 
                     <div className="flex items-center gap-6">
+                        {/* Notifications */}
+                        <NotificationDropdown />
+
                         {/* Language Switch */}
                         <div className="relative" ref={langDropdownRef}>
                             <button

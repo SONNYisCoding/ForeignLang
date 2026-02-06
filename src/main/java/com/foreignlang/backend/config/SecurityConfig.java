@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import java.util.Optional;
 public class SecurityConfig {
 
         private final CustomOAuth2UserService customOAuth2UserService;
+        private final com.foreignlang.backend.service.CustomOidcUserService customOidcUserService;
         private final UserRepository userRepository;
 
         @Bean
@@ -39,26 +42,71 @@ public class SecurityConfig {
         @Bean
         public AuthenticationSuccessHandler oAuth2SuccessHandler() {
                 return (request, response, authentication) -> {
-                        if (authentication instanceof OAuth2AuthenticationToken token) {
-                                String email = token.getPrincipal().getAttribute("email");
-                                log.info("OAuth2 success handler for email: {}", email);
+                        Object principal = authentication.getPrincipal();
+                        log.info("Authentication Class: {}", authentication.getClass().getName());
+                        log.info("Principal Class: {}", principal != null ? principal.getClass().getName() : "NULL");
 
-                                Optional<User> userOpt = userRepository.findByEmail(email);
-                                if (userOpt.isPresent()) {
-                                        User user = userOpt.get();
-                                        log.info("User found: profileComplete={}, role={}", user.isProfileComplete(),
-                                                        user.getRole());
+                        User user = null;
 
-                                        if (!user.isProfileComplete()) {
-                                                log.info("Redirecting to profile-setup");
-                                                response.sendRedirect("http://localhost:5173/profile-setup");
-                                                return;
+                        if (principal instanceof com.foreignlang.backend.security.UserPrincipal) {
+                                user = ((com.foreignlang.backend.security.UserPrincipal) principal).getUser();
+                        } else if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User) {
+                                // Fallback if for some reason we got DefaultOAuth2User
+                                log.warn("Principal is NOT UserPrincipal. It is: {}", principal.getClass().getName());
+                                var oauth2User = (org.springframework.security.oauth2.core.user.OAuth2User) principal;
+
+                                // Try getting ID directly from attributes first (most reliable if passed)
+                                String userIdStr = (String) oauth2User.getAttribute("userId");
+                                if (userIdStr != null) {
+                                        log.info("Found userId in attributes: {}", userIdStr);
+                                        user = userRepository.findById(java.util.UUID.fromString(userIdStr))
+                                                        .orElse(null);
+                                }
+
+                                if (user == null) {
+                                        String email = oauth2User.getAttribute("email");
+                                        if (email != null) {
+                                                log.info("Attempting fallback lookup by email: {}", email);
+                                                user = userRepository.findByEmail(email.toLowerCase()).orElse(null);
                                         }
                                 }
                         }
-                        log.info("Redirecting to dashboard");
-                        response.sendRedirect("http://localhost:5173/dashboard");
+
+                        if (user != null) {
+                                log.info("OAuth2 Success: Direct User Object Access. ID={}, Email={}, ProfileComplete={}",
+                                                user.getId(), user.getEmail(), user.isProfileComplete());
+
+                                if (!user.isProfileComplete()) {
+                                        response.sendRedirect("http://localhost:5173/profile-setup");
+                                        return;
+                                }
+
+                                // Role-based redirection
+                                java.util.Set<com.foreignlang.backend.entity.User.Role> roles = user.getRoles();
+                                log.info("REDIRECT CHECK - User ID: {}", user.getId());
+                                log.info("REDIRECT CHECK - Roles: {}", roles);
+
+                                if (roles.contains(com.foreignlang.backend.entity.User.Role.ADMIN)) {
+                                        log.info("Redirecting to ADMIN dashboard");
+                                        response.sendRedirect("http://localhost:5173/admin");
+                                } else if (roles.contains(com.foreignlang.backend.entity.User.Role.TEACHER)) {
+                                        log.info("Redirecting to TEACHER dashboard");
+                                        response.sendRedirect("http://localhost:5173/teacher");
+                                } else {
+                                        log.info("Redirecting to LEARNER dashboard");
+                                        response.sendRedirect("http://localhost:5173/dashboard");
+                                }
+                        } else {
+                                log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
+                                response.sendRedirect("http://localhost:5173/login?error=auth_principal_failure");
+                        }
                 };
+
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+                return config.getAuthenticationManager();
         }
 
         @Bean
@@ -80,23 +128,29 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/templates/**").permitAll()
                                                 .requestMatchers("/api/v1/email/**").permitAll() // Allow manual session
                                                                                                  // check in controller
+                                                .requestMatchers("/api/v1/notifications/**").permitAll() // Allow manual
+                                                                                                         // session
+                                                                                                         // check
 
                                                 // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")
                                                 .permitAll()
 
                                                 // OAuth2 and login pages
-                                                .requestMatchers("/", "/login", "/oauth2/**", "/error").permitAll()
+                                                .requestMatchers("/", "/login", "/oauth2/**", "/login/oauth2/code/**",
+                                                                "/error")
+                                                .permitAll()
 
                                                 // Admin routes
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                                                 // All other API and pages require authentication
                                                 .anyRequest().authenticated())
                                 .oauth2Login(oauth2 -> oauth2
                                                 .loginPage("/login")
                                                 .userInfoEndpoint(userInfo -> userInfo
-                                                                .userService(customOAuth2UserService))
+                                                                .userService(customOAuth2UserService)
+                                                                .oidcUserService(customOidcUserService))
                                                 .successHandler(oAuth2SuccessHandler())
                                                 .failureUrl("http://localhost:5173/?error=true"))
                                 .logout(logout -> logout

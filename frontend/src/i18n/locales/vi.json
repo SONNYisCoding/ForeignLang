@@ -324,5 +324,69 @@
         "login": "Đăng nhập",
         "createAccount": "Tạo tài khoản",
         "footer": "Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi."
+    },
+    "admin": {
+        "dashboard": "Bảng điều khiển Admin",
+        "welcome": "Chào mừng trở lại! Đây là tình hình hôm nay.",
+        "stats": {
+            "totalUsers": "Tổng người dùng",
+            "learners": "Học viên",
+            "teachers": "Giáo viên",
+            "lessons": "Bài học",
+            "pendingApproval": "Chờ duyệt",
+            "activeToday": "Hoạt động hôm nay"
+        },
+        "approvals": {
+            "title": "Nội dung chờ duyệt",
+            "viewAll": "Xem tất cả",
+            "noPending": "Không có nội dung chờ duyệt 🎉",
+            "lesson": "Bài học",
+            "submittedBy": "Gửi bởi",
+            "review": "Duyệt"
+        },
+        "activity": {
+            "title": "Hoạt động gần đây",
+            "viewAll": "Xem tất cả",
+            "newRegister": "Người dùng mới đăng ký",
+            "lessonPublished": "Bài học được xuất bản",
+            "emailGenerated": "Email được tạo"
+        }
+    },
+    "teacher": {
+        "analytics": {
+            "title": "Bảng Phân Tích",
+            "subtitle": "Theo dõi tiến độ học sinh và hiệu quả khóa học",
+            "learningHours": "Tổng Giờ Học",
+            "activeStudents": "Học Sinh Tích Cực",
+            "completionRate": "Tỷ Lệ Hoàn Thành",
+            "avgScore": "Điểm Trung Bình",
+            "engagement": "Mức Độ Tương Tác",
+            "performance": "Hiệu Suất Khóa Học",
+            "comingSoon": "Biểu đồ đang được cập nhật..."
+        },
+        "lessons": {
+            "title": "Bài học của tôi",
+            "subtitle": "Quản lý nội dung khóa học",
+            "create": "Tạo bài học",
+            "edit": "Chỉnh sửa",
+            "draft": "Nháp",
+            "published": "Đã xuất bản",
+            "pending": "Đang chờ duyệt",
+            "rejected": "Bị từ chối",
+            "noLessons": "Chưa có bài học nào",
+            "startCreating": "Bắt đầu tạo nội dung cho học viên ngay hôm nay.",
+            "createFirst": "Tạo bài học đầu tiên"
+        },
+        "students": {
+            "title": "Học viên của tôi",
+            "subtitle": "Xem và quản lý học viên trong nhóm",
+            "noStudents": "Chưa có học viên",
+            "noAssigned": "Bạn chưa được phân công nhóm nào.",
+            "name": "Tên",
+            "email": "Email",
+            "joinedDate": "Ngày tham gia",
+            "actions": "Thao tác",
+            "viewProfile": "Xem hồ sơ"
+        }
     }
 }

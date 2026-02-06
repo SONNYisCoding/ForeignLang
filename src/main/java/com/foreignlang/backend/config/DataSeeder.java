@@ -1,72 +1,99 @@
 package com.foreignlang.backend.config;
 
-import com.foreignlang.backend.entity.Lesson;
-import com.foreignlang.backend.entity.Topic;
-import com.foreignlang.backend.repository.LessonRepository;
-import com.foreignlang.backend.repository.TopicRepository;
+import com.foreignlang.backend.entity.User;
+import com.foreignlang.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
+import java.time.LocalDate;
 
-// @Component
+@Configuration
 @RequiredArgsConstructor
-public class DataSeeder implements CommandLineRunner {
+@Slf4j
+public class DataSeeder {
 
-        private final TopicRepository topicRepository;
-        private final LessonRepository lessonRepository;
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
 
-        @Override
-        public void run(String... args) throws Exception {
-                if (topicRepository.count() == 0) {
-                        // 1. Create Topics
-                        Topic t1 = Topic.builder()
-                                        .title("Business Email Writing")
-                                        .description("Learn how to write professional emails for job applications and daily work.")
-                                        .difficultyLevel(Topic.DifficultyLevel.BEGINNER)
+        @Bean
+        public CommandLineRunner initData() {
+                return args -> {
+                        seedAdminUser();
+                        seedTeacherUser();
+                };
+        }
+
+        private void seedAdminUser() {
+                String adminEmail = "admin@foreignlang.com";
+                String adminUsername = "admin";
+
+                try {
+                        if (userRepository.findByEmail(adminEmail).isPresent()) {
+                                User admin = userRepository.findByEmail(adminEmail).get();
+                                if (!admin.getRoles().contains(User.Role.ADMIN)) {
+                                        admin.getRoles().add(User.Role.ADMIN);
+                                        userRepository.save(admin);
+                                        log.info("Updated existing admin user role to ADMIN");
+                                }
+                                return;
+                        }
+
+                        if (userRepository.findByUsername(adminUsername).isPresent()) {
+                                log.warn("Username '{}' already exists. Skipping admin creation.", adminUsername);
+                                return;
+                        }
+
+                        User admin = User.builder()
+                                        .email(adminEmail)
+                                        .passwordHash(passwordEncoder.encode("admin123"))
+                                        .fullName("System Administrator")
+                                        .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.ADMIN)))
+                                        .authProvider(User.AuthProvider.LOCAL)
+                                        .profileComplete(true)
+                                        .subscriptionTier(User.SubscriptionTier.PREMIUM)
+                                        .username(adminUsername)
+                                        .birthDate(LocalDate.of(2000, 1, 1))
                                         .build();
+                        userRepository.save(admin);
+                        log.info("Admin user created: email={}, password=admin123", adminEmail);
+                } catch (Exception e) {
+                        log.error("Failed to seed admin user: {}", e.getMessage());
+                }
+        }
 
-                        Topic t2 = Topic.builder()
-                                        .title("Effective Presentations")
-                                        .description("Master the art of public speaking and slide design.")
-                                        .difficultyLevel(Topic.DifficultyLevel.INTERMEDIATE)
+        private void seedTeacherUser() {
+                String teacherEmail = "teacher@foreignlang.com";
+                String teacherUsername = "teacher";
+
+                try {
+                        if (userRepository.findByEmail(teacherEmail).isPresent()) {
+                                return;
+                        }
+
+                        if (userRepository.findByUsername(teacherUsername).isPresent()) {
+                                log.warn("Username '{}' already exists. Skipping teacher creation.", teacherUsername);
+                                return;
+                        }
+
+                        User teacher = User.builder()
+                                        .email(teacherEmail)
+                                        .passwordHash(passwordEncoder.encode("teacher123"))
+                                        .fullName("Head Teacher")
+                                        .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.TEACHER)))
+                                        .authProvider(User.AuthProvider.LOCAL)
+                                        .profileComplete(true)
+                                        .subscriptionTier(User.SubscriptionTier.PREMIUM)
+                                        .username(teacherUsername)
+                                        .birthDate(LocalDate.of(1995, 5, 20))
                                         .build();
-
-                        Topic t3 = Topic.builder()
-                                        .title("Negotiation Skills")
-                                        .description("Advanced vocabulary and tactics for business deals.")
-                                        .difficultyLevel(Topic.DifficultyLevel.ADVANCED)
-                                        .build();
-
-                        topicRepository.saveAll(List.of(t1, t2, t3));
-
-                        // 2. Create Lessons for "Business Email Writing"
-                        Lesson l1 = Lesson.builder()
-                                        .topic(t1)
-                                        .title("Formal vs Informal Greetings")
-                                        .contentBody("<h3>Understanding the Context</h3><p>In business, knowing when to use 'Dear Mr. Smith' versus 'Hi John' is crucial...</p>")
-                                        .orderIndex(1)
-                                        .build();
-
-                        Lesson l2 = Lesson.builder()
-                                        .topic(t1)
-                                        .title("Structuring a Request")
-                                        .contentBody("<h3>The 3-Part Structure</h3><p>1. The Opening<br>2. The Reason<br>3. The Call to Action</p>")
-                                        .orderIndex(2)
-                                        .build();
-
-                        // 3. Create Lessons for "Effective Presentations"
-                        Lesson l3 = Lesson.builder()
-                                        .topic(t2)
-                                        .title("Opening with a Hook")
-                                        .contentBody("<h3>Grab Their Attention</h3><p>Start with a surprising statistic, a quote, or a story.</p>")
-                                        .orderIndex(1)
-                                        .build();
-
-                        lessonRepository.saveAll(List.of(l1, l2, l3));
-
-                        System.out.println("Seeded Topics and Lessons into Database.");
+                        userRepository.save(teacher);
+                        log.info("Teacher user created: email={}, password=teacher123", teacherEmail);
+                } catch (Exception e) {
+                        log.error("Failed to seed teacher user: {}", e.getMessage());
                 }
         }
 }

@@ -34,7 +34,15 @@ public class UserRESTController {
         String avatar = null;
 
         // 1. Try OAuth2 (Google)
-        if (principal != null) {
+        // 1. Check for UserPrincipal (Unified for OAuth2 and Form Login)
+        if (principal instanceof com.foreignlang.backend.security.UserPrincipal userPrincipal) {
+            com.foreignlang.backend.entity.User user = userPrincipal.getUser();
+            email = user.getEmail();
+            name = user.getFullName();
+            avatar = user.getAvatarUrl();
+        }
+        // 2. Fallback for raw OAuth2User (unlikely with our setup, but safe to keep)
+        else if (principal != null) {
             email = principal.getAttribute("email");
             name = principal.getAttribute("name");
             avatar = principal.getAttribute("picture");
@@ -73,7 +81,7 @@ public class UserRESTController {
             boolean isPremium = subscriptionService.isPremium(user.getId());
             response.put("tier", isPremium ? "PREMIUM" : "FREE");
             response.put("isPremium", isPremium);
-            response.put("role", user.getRole().name());
+            response.put("roles", user.getRoles());
             response.put("profileComplete", user.isProfileComplete());
             response.put("username", user.getUsername());
             response.put("birthDate", user.getBirthDate());

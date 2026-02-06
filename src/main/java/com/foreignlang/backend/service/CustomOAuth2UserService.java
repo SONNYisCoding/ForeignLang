@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Primary;
 
 /**
  * Custom OAuth2 User Service that handles Google OAuth2 login.
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * New users go to Profile Setup page (profileComplete = false).
  */
 @Service
+@Primary // FORCE Spring to use this bean
 @RequiredArgsConstructor
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -26,40 +28,63 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
 
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        log.info("CustomOAuth2UserService BEAN CREATED AND REGISTERED");
+    }
+
     @Override
-    @Transactional
+    // @Transactional - Removed to ensure immediate commit for SuccessHandler
+    // visibility
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String picture = oAuth2User.getAttribute("picture");
-        String googleId = oAuth2User.getAttribute("sub"); // Google's unique user ID
+        try {
+            String email = oAuth2User.getAttribute("email");
+            if (email != null)
+                email = email.toLowerCase(); // Normalize email
 
-        log.info("OAuth2 Login attempt for email: {}", email);
+            String name = oAuth2User.getAttribute("name");
+            String picture = oAuth2User.getAttribute("picture");
+            String googleId = oAuth2User.getAttribute("sub"); // Google's unique user ID
 
-        // Find by Google ID first (for linked accounts), then by email
-        User user = userRepository.findByGoogleId(googleId)
-                .or(() -> userRepository.findByEmail(email))
-                .orElseGet(() -> createNewGoogleUser(email, name, picture, googleId));
+            log.info("OAuth2 Login attempt for email: {}", email);
 
-        // If existing user without Google ID, link it now
-        if (user.getGoogleId() == null) {
-            user.setGoogleId(googleId);
-            if (user.getAuthProvider() == User.AuthProvider.LOCAL) {
-                user.setAuthProvider(User.AuthProvider.BOTH);
+            // Find by Google ID first (for linked accounts), then by email
+            String finalEmail = email; // For lambda
+            User user = userRepository.findByGoogleId(googleId)
+                    .or(() -> userRepository.findByEmail(finalEmail))
+                    .orElseGet(() -> createNewGoogleUser(finalEmail, name, picture, googleId));
+
+            // If existing user without Google ID, link it now
+            if (user.getGoogleId() == null) {
+                user.setGoogleId(googleId);
+                if (user.getAuthProvider() == User.AuthProvider.LOCAL) {
+                    user.setAuthProvider(User.AuthProvider.BOTH);
+                }
             }
+
+            // Update profile info on each login (in case Google profile changed)
+            user.setFullName(name);
+            user.setAvatarUrl(picture);
+
+            log.info("Saving user to DB...");
+            User savedUser = userRepository.saveAndFlush(user);
+            log.info("User saved with ID: {}", savedUser.getId());
+
+            log.info("User {} logged in with roles: {}, profileComplete: {}",
+                    email, user.getRoles(), user.isProfileComplete());
+
+            java.util.Map<String, Object> attributes = new java.util.HashMap<>(oAuth2User.getAttributes());
+            attributes.put("userId", user.getId().toString());
+            attributes.put("profileComplete", user.isProfileComplete());
+
+            return new com.foreignlang.backend.security.UserPrincipal(user, attributes);
+        } catch (Exception e) {
+            log.error("CRITICAL ERROR in CustomOAuth2UserService: {}", e.toString());
+            e.printStackTrace();
+            throw new OAuth2AuthenticationException("Internal Server Error: " + e.getMessage());
         }
-
-        // Update profile info on each login (in case Google profile changed)
-        user.setFullName(name);
-        user.setAvatarUrl(picture);
-        userRepository.save(user);
-
-        log.info("User {} logged in with role: {}, profileComplete: {}",
-                email, user.getRole(), user.isProfileComplete());
-
-        return oAuth2User;
     }
 
     private User createNewGoogleUser(String email, String name, String picture, String googleId) {
@@ -72,15 +97,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .googleId(googleId)
                 .authProvider(User.AuthProvider.GOOGLE)
                 .profileComplete(false) // Needs to complete profile
-                .role(User.Role.GUEST) // GUEST until profile complete
+                .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.GUEST))) // GUEST until profile complete
                 .subscriptionTier(User.SubscriptionTier.FREE)
                 .build();
 
-        User savedUser = userRepository.save(newUser);
+        log.info("Saving new Google user...");
+        User savedUser = userRepository.saveAndFlush(newUser);
+        log.info("New Google user saved with ID: {}", savedUser.getId());
 
         // Create usage quota with 5 bonus uses
         UsageQuota quota = UsageQuota.createForNewUser(savedUser);
-        usageQuotaRepository.save(quota);
+        usageQuotaRepository.saveAndFlush(quota);
+        log.info("Usage quota created and saved.");
 
         log.info("Created new Google user and quota for: {}", email);
 

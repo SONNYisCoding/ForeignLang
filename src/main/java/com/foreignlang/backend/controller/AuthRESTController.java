@@ -12,6 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import com.foreignlang.backend.security.UserPrincipal;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +33,7 @@ public class AuthRESTController {
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     // DTO for registration
     public record RegisterRequest(
@@ -77,7 +84,7 @@ public class AuthRESTController {
                 .email(request.email())
                 .passwordHash(encodedPassword)
                 .fullName(request.fullName() != null ? request.fullName() : "User")
-                .role(User.Role.LEARNER)
+                .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.LEARNER)))
                 .authProvider(User.AuthProvider.LOCAL)
                 .profileComplete(false)
                 .subscriptionTier(User.SubscriptionTier.FREE)
@@ -100,7 +107,8 @@ public class AuthRESTController {
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
-        session.setAttribute("userRole", user.getRole().name());
+        session.setAttribute("userRoles",
+                user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()));
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -112,53 +120,50 @@ public class AuthRESTController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         log.info("Login attempt for email: {}", request.email());
 
-        Optional<User> userOpt = userRepository.findByEmail(request.email());
+        // Use AuthenticationManager to authenticate
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        if (userOpt.isEmpty()) {
-            log.warn("Login failed: User not found");
+            // Set authentication in SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // Get User details
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            User user = userPrincipal.getUser();
+
+            // Create HttpSession (optional if using stateless JWT, but we are using
+            // session)
+            HttpSession session = httpRequest.getSession(true);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userEmail", user.getEmail());
+            session.setAttribute("userRoles",
+                    user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()));
+
+            // IMPORTANT: Hand over session management to Spring Security if needed
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+            log.info("Login successful for user: {}", user.getEmail());
+            log.info("Returning roles: {}", user.getRoles());
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Login successful",
+                    "user", Map.of(
+                            "id", user.getId(),
+                            "email", user.getEmail(),
+                            "fullName", user.getFullName() != null ? user.getFullName() : "",
+                            "roles",
+                            user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()),
+                            "tier", user.getSubscriptionTier().name(),
+                            "profileComplete", user.isProfileComplete())));
+
+        } catch (AuthenticationException e) {
+            log.warn("Login failed: bad credentials");
             return ResponseEntity.status(401).body(Map.of(
                     "error", "Invalid email or password",
                     "code", "INVALID_CREDENTIALS"));
         }
-
-        User user = userOpt.get();
-
-        // Check if user has password (might be Google-only user)
-        if (user.getPasswordHash() == null) {
-            log.warn("Login failed: Google account only");
-            return ResponseEntity.status(401).body(Map.of(
-                    "error", "This account uses Google login. Please sign in with Google.",
-                    "code", "GOOGLE_ONLY_ACCOUNT"));
-        }
-
-        // Verify password
-        boolean matches = passwordEncoder.matches(request.password(), user.getPasswordHash());
-        if (!matches) {
-            log.warn("Login failed: Password mismatch for user {}. Hash in DB: {}", user.getEmail(),
-                    user.getPasswordHash());
-            return ResponseEntity.status(401).body(Map.of(
-                    "error", "Invalid email or password",
-                    "code", "INVALID_CREDENTIALS"));
-        }
-
-        // Create session
-        HttpSession session = httpRequest.getSession(true);
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("userEmail", user.getEmail());
-        session.setAttribute("userRole", user.getRole().name());
-
-        log.info("Login successful for user: {}", user.getEmail());
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Login successful",
-                "user", Map.of(
-                        "id", user.getId(),
-                        "email", user.getEmail(),
-                        "fullName", user.getFullName() != null ? user.getFullName() : "",
-                        "role", user.getRole().name(),
-                        "tier", user.getSubscriptionTier().name(),
-                        "profileComplete", user.isProfileComplete())));
     }
 
     @PostMapping("/profile-setup")
@@ -219,7 +224,7 @@ public class AuthRESTController {
         }
 
         user.setProfileComplete(true);
-        user.setRole(User.Role.LEARNER);
+        user.setRoles(new java.util.HashSet<>(java.util.Set.of(User.Role.LEARNER)));
         userRepository.save(user);
 
         log.info("Profile setup complete for user: {}", userEmail);
@@ -275,7 +280,7 @@ public class AuthRESTController {
                         "id", user.getId(),
                         "email", user.getEmail(),
                         "fullName", user.getFullName() != null ? user.getFullName() : "",
-                        "role", user.getRole().name(),
+                        "roles", user.getRoles(),
                         "tier", user.getSubscriptionTier().name(),
                         "profileComplete", user.isProfileComplete())));
     }

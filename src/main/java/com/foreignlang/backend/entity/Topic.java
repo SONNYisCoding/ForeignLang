@@ -35,6 +35,21 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VocabularyBank> vocabulary;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ContentStatus status = ContentStatus.DRAFT;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @Column(name = "submitted_at")
+    private java.time.LocalDateTime submittedAt;
+
+    @Column(name = "approved_at")
+    private java.time.LocalDateTime approvedAt;
+
     public enum DifficultyLevel {
         BEGINNER, INTERMEDIATE, ADVANCED
     }
