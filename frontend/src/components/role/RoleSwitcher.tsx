@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+
+import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Shield, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

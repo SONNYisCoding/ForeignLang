@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, X, BookOpen, Users, LayoutDashboard, Sparkles, Command, History as HistoryIcon, FileText, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, X, BookOpen, Users, LayoutDashboard, Sparkles, Command, FileText, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 

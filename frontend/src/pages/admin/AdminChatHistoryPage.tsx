@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, MessageSquare, User, Clock, ChevronRight, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageSquare, User, Clock, ChevronRight, X } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 
 interface ChatSession {
@@ -140,8 +140,8 @@ const AdminChatHistoryPage = () => {
                             {messages.map(msg => (
                                 <div key={msg.id} className={`flex ${msg.sender === 'USER' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[70%] p-3 rounded-2xl text-sm ${msg.sender === 'USER'
-                                            ? 'bg-indigo-600 text-white rounded-tr-none'
-                                            : 'bg-white border border-slate-200 text-slate-700 shadow-sm rounded-tl-none'
+                                        ? 'bg-indigo-600 text-white rounded-tr-none'
+                                        : 'bg-white border border-slate-200 text-slate-700 shadow-sm rounded-tl-none'
                                         }`}>
                                         <p>{msg.content}</p>
                                         <p className={`text-[10px] mt-1 opacity-70 ${msg.sender === 'USER' ? 'text-indigo-200' : 'text-slate-400'}`}>

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 const OnboardingModal = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState(0);
-    const { t } = useTranslation();
+    useTranslation();
 
     useEffect(() => {
         const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');

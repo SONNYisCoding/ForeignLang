@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, BookOpen, Star, Mail, Award, MapPin, ArrowLeft } from 'lucide-react';
+import { Users, BookOpen, Star, Mail, Award, ArrowLeft } from 'lucide-react';
 import { SkeletonCard } from '../components/ui/Skeleton';
 
 interface Course {

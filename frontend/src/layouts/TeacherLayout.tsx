@@ -192,7 +192,7 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                         </div>
 
                         {/* Admin link if dual role */}
-                        {user?.role === 'ADMIN' && (
+                        {user?.roles?.includes('ADMIN') && (
                             <Link to="/admin" className="text-sm text-gray-500 hover:text-indigo-600 font-medium">
                                 Admin Panel
                             </Link>

@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

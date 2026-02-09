@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Star, ArrowLeft, CreditCard, Shield, Zap, Crown, Sparkles, BookOpen } from 'lucide-react';
+import { Check, Star, ArrowLeft, Shield, Zap, Crown, Sparkles, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -141,29 +141,7 @@ const UpgradePage = () => {
         setStep('confirm');
     };
 
-    const handleConfirmPayment = async () => {
-        setStep('processing');
 
-        // Simulate payment processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // TODO: Call real payment API
-        try {
-            await fetch('/api/v1/subscription/upgrade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    planId: selectedPlan?.id,
-                    type: selectedPlan?.type
-                })
-            });
-        } catch (error) {
-            console.error('Payment error:', error);
-        }
-
-        setStep('success');
-    };
 
     const formatPrice = (price: number) => {
         return price.toLocaleString('vi-VN');

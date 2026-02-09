@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -72,7 +72,7 @@ const ChatbotWidget = () => {
                     content: userText
                 })
             });
-            const data = await res.json();
+            await res.json();
             // In a real socket app, we wouldn't need this if we listen to events
             // But here we might wait for a bot reply or poll.
             // For now, let's just wait a bit and reload history or manually append if the backend returns the bot reply immediately (it doesn't in current impl, bot reply is async-ish)
