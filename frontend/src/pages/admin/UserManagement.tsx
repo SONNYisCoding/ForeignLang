@@ -269,6 +269,13 @@ const UserManagement = () => {
                                                     >
                                                         Ban User
                                                     </button>
+                                                    <div className="border-t border-slate-100 my-1"></div>
+                                                    <a
+                                                        href={`/admin/chat-history?userId=${user.id}`}
+                                                        className="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-slate-50 flex items-center gap-2"
+                                                    >
+                                                        View Chat History
+                                                    </a>
                                                 </div>
                                             )}
                                         </td>

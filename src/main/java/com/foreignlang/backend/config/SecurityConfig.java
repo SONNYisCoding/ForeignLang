@@ -146,6 +146,7 @@ public class SecurityConfig {
                                                                                                          // check
                                                 .requestMatchers("/api/v1/teachers/**").permitAll() // Public Teacher
                                                                                                     // Profiles
+                                                .requestMatchers("/api/v1/payment/**").permitAll() // SePay Webhook
 
                                                 // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")

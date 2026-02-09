@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, BookOpen, Settings, LogOut,
     Menu, X, FileText, ChevronDown,
-    BarChart3, UserCog, CheckSquare, Shield, Globe, User as UserIcon
+    BarChart3, UserCog, CheckSquare, Shield, Globe, User as UserIcon, MessageSquare
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,6 +57,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             title: 'User Management',
             items: [
                 { name: 'Users', path: '/admin/users', icon: Users },
+                { name: 'Chat History', path: '/admin/chat-history', icon: MessageSquare },
                 { name: 'Groups', path: '/admin/groups', icon: UserCog },
             ]
         },

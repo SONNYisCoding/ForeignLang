@@ -91,6 +91,18 @@
             "keepItUp": "🔥 Tuyệt vời, tiếp tục nhé!",
             "startToday": "Bắt đầu chuỗi ngày học hôm nay!",
             "nextMilestone": "Mốc tiếp theo"
+        },
+        "transfer": {
+            "title": "Thanh toán qua Ngân hàng",
+            "subtitle": "Quét mã QR để thanh toán tự động",
+            "bank": "Ngân hàng",
+            "accountName": "Chủ tài khoản",
+            "accountNumber": "Số tài khoản",
+            "amount": "Số tiền",
+            "content": "Nội dung",
+            "autoActivation": "Hệ thống sẽ tự động kích hoạt gói sau 1-3 phút.",
+            "iHavePaid": "Tôi đã chuyển khoản",
+            "chooseOther": "← Chọn gói khác"
         }
     },
     "generator": {

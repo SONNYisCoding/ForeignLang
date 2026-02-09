@@ -30,6 +30,7 @@ const SkillAssessment = lazy(() => import('./pages/onboarding/SkillAssessment'))
 // Admin & Teacher Pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const AdminChatHistoryPage = lazy(() => import('./pages/admin/AdminChatHistoryPage'));
 const GroupManagement = lazy(() => import('./pages/admin/GroupManagement'));
 const ApprovalPage = lazy(() => import('./pages/admin/ApprovalPage'));
 const TeacherDashboard = lazy(() => import('./pages/teacher/TeacherDashboard'));
@@ -108,6 +109,7 @@ function App() {
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+                <Route path="/admin/chat-history" element={<AdminRoute><AdminChatHistoryPage /></AdminRoute>} />
                 <Route path="/admin/groups" element={<AdminRoute><GroupManagement /></AdminRoute>} />
                 <Route path="/admin/approval" element={<AdminRoute><ApprovalPage /></AdminRoute>} />
                 <Route path="/admin/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />

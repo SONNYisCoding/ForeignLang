@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Star, ArrowLeft, CreditCard, Shield, Zap, Crown, Sparkles, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 type Step = 'select' | 'confirm' | 'processing' | 'success';
 type PlanType = 'subscription' | 'credits';
@@ -20,6 +22,7 @@ interface Plan {
 }
 
 const UpgradePage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [step, setStep] = useState<Step>('select');
@@ -39,6 +42,8 @@ const UpgradePage = () => {
             })
             .catch(() => navigate('/login?redirect=/upgrade'));
     }, [navigate]);
+
+    const { user } = useAuth(); // Get user ID for SePay content
 
     // Pre-select plan from URL params
     useEffect(() => {
@@ -196,8 +201,8 @@ const UpgradePage = () => {
                     {['select', 'confirm', 'success'].map((s, i) => (
                         <div key={s} className="flex items-center gap-2">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step === s || ['select', 'confirm', 'processing', 'success'].indexOf(step) > i
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-200 text-gray-500'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-gray-200 text-gray-500'
                                 }`}>
                                 {i + 1}
                             </div>
@@ -224,8 +229,8 @@ const UpgradePage = () => {
                                     <button
                                         onClick={() => setActiveTab('subscription')}
                                         className={`px-6 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${activeTab === 'subscription'
-                                                ? 'bg-white text-indigo-600 shadow-sm'
-                                                : 'text-gray-500 hover:text-gray-700'
+                                            ? 'bg-white text-indigo-600 shadow-sm'
+                                            : 'text-gray-500 hover:text-gray-700'
                                             }`}
                                     >
                                         <BookOpen size={16} />
@@ -234,8 +239,8 @@ const UpgradePage = () => {
                                     <button
                                         onClick={() => setActiveTab('credits')}
                                         className={`px-6 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${activeTab === 'credits'
-                                                ? 'bg-white text-sky-600 shadow-sm'
-                                                : 'text-gray-500 hover:text-gray-700'
+                                            ? 'bg-white text-sky-600 shadow-sm'
+                                            : 'text-gray-500 hover:text-gray-700'
                                             }`}
                                     >
                                         <Zap size={16} />
@@ -251,8 +256,8 @@ const UpgradePage = () => {
                                         key={plan.id}
                                         onClick={() => handleSelectPlan(plan)}
                                         className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all hover:shadow-xl ${plan.recommended
-                                                ? 'border-indigo-600 bg-white shadow-lg'
-                                                : 'border-gray-200 bg-white hover:border-indigo-300'
+                                            ? 'border-indigo-600 bg-white shadow-lg'
+                                            : 'border-gray-200 bg-white hover:border-indigo-300'
                                             }`}
                                     >
                                         {plan.recommended && (
@@ -289,8 +294,8 @@ const UpgradePage = () => {
                                             ))}
                                         </ul>
                                         <button className={`w-full py-3 rounded-xl font-bold transition-all ${plan.recommended
-                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                                : 'bg-gray-100 hover:bg-indigo-100 text-indigo-700'
+                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                            : 'bg-gray-100 hover:bg-indigo-100 text-indigo-700'
                                             }`}>
                                             Chọn gói này
                                         </button>
@@ -300,8 +305,8 @@ const UpgradePage = () => {
                         </motion.div>
                     )}
 
-                    {/* Step 2: Confirm */}
-                    {step === 'confirm' && selectedPlan && (
+                    {/* Step 2: Pay with SePay / VietQR */}
+                    {step === 'confirm' && selectedPlan && isAuthenticated && (
                         <motion.div
                             key="confirm"
                             initial={{ opacity: 0, x: 20 }}
@@ -310,49 +315,69 @@ const UpgradePage = () => {
                             className="max-w-lg mx-auto bg-white rounded-2xl shadow-xl p-8"
                         >
                             <div className="text-center mb-6">
-                                <CreditCard className="mx-auto text-indigo-600 mb-4" size={48} />
-                                <h2 className="text-2xl font-bold text-gray-900">Xác nhận thanh toán</h2>
+                                <span className="inline-block p-3 rounded-full bg-blue-50 text-blue-600 mb-4">
+                                    <Zap size={32} />
+                                </span>
+                                <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.transfer.title')}</h2>
+                                <p className="text-gray-500 text-sm mt-1">{t('dashboard.transfer.subtitle')}</p>
                             </div>
 
-                            <div className="bg-indigo-50 rounded-xl p-4 mb-6">
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="font-medium text-gray-700">{selectedPlan.name}</span>
-                                    <span className="text-xl font-bold text-indigo-600">
-                                        {formatPrice(selectedPlan.price)}{selectedPlan.currency}
-                                    </span>
+                            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 mb-6 border border-indigo-100 relative overflow-hidden">
+                                { /* Dynamic QR */}
+                                <div className="text-center">
+                                    <img
+                                        src={`https://qr.sepay.vn/img?acc=1903698765432&bank=MBBank&amount=${selectedPlan.price}&des=FLPRO ${user?.id || "USER_ID"}`}
+                                        alt="VietQR"
+                                        className="w-48 h-48 mx-auto rounded-xl shadow-sm border-4 border-white mb-4"
+                                    />
                                 </div>
-                                <p className="text-sm text-gray-500">{selectedPlan.description}</p>
-                                {selectedPlan.bonus && (
-                                    <div className="mt-2 text-sm text-yellow-600 flex items-center gap-1">
-                                        <Sparkles size={14} /> {selectedPlan.bonus}
+
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between border-b border-indigo-100 pb-2">
+                                        <span className="text-gray-500">{t('dashboard.transfer.bank')}</span>
+                                        <span className="font-bold text-gray-900">MB Bank</span>
                                     </div>
-                                )}
+                                    <div className="flex justify-between border-b border-indigo-100 pb-2">
+                                        <span className="text-gray-500">{t('dashboard.transfer.accountName')}</span>
+                                        <span className="font-bold text-gray-900">FOREIGNLANG INC</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-indigo-100 pb-2">
+                                        <span className="text-gray-500">{t('dashboard.transfer.accountNumber')}</span>
+                                        <span className="font-bold text-indigo-600 font-mono tracking-wider">1903698765432</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-indigo-100 pb-2">
+                                        <span className="text-gray-500">{t('dashboard.transfer.amount')}</span>
+                                        <span className="font-bold text-red-600 text-lg">{formatPrice(selectedPlan.price)}{selectedPlan.currency}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-500">{t('dashboard.transfer.content')}</span>
+                                        <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded font-mono font-bold text-xs">
+                                            FLPRO {user?.id}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                                <Shield size={16} className="text-green-500" />
-                                <span>Thanh toán an toàn SSL 256-bit</span>
+                            <div className="flex items-center gap-2 text-xs text-center text-gray-400 justify-center mb-6">
+                                <Shield size={14} />
+                                {t('dashboard.transfer.autoActivation')}
                             </div>
 
                             <div className="space-y-3">
                                 <button
-                                    onClick={handleConfirmPayment}
-                                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                                    onClick={() => setStep('success')} // Simulate success for now, in real life check status via API
+                                    className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 animate-pulse"
                                 >
-                                    <Zap size={20} />
-                                    Thanh toán {formatPrice(selectedPlan.price)}{selectedPlan.currency}
+                                    <Check size={20} />
+                                    {t('dashboard.transfer.iHavePaid')}
                                 </button>
                                 <button
                                     onClick={() => setStep('select')}
                                     className="w-full py-3 text-gray-500 hover:text-gray-700 font-medium"
                                 >
-                                    ← Đổi gói khác
+                                    {t('dashboard.transfer.chooseOther')}
                                 </button>
                             </div>
-
-                            <p className="text-xs text-gray-400 text-center mt-6">
-                                Bằng việc thanh toán, bạn đồng ý với Điều khoản sử dụng và Chính sách bảo mật.
-                            </p>
                         </motion.div>
                     )}
 

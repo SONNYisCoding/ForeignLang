@@ -115,4 +115,34 @@ public class SubscriptionService {
 
         log.info("Cancelled subscription {} for user {}", subscriptionId, subscription.getUser().getEmail());
     }
+
+    /**
+     * Fulfill order from SePay Webhook
+     */
+    @Transactional
+    public void fulfillOrder(String content, long amount) {
+        // Expected content format: "FLPRO <userId>" or "CREDITS <userId>"
+        // Robust parsing: Look for UUID pattern
+        String uuidPattern = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(uuidPattern);
+        java.util.regex.Matcher matcher = pattern.matcher(content);
+
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("No User ID found in transaction content: " + content);
+        }
+
+        String userIdStr = matcher.group();
+        UUID userId = UUID.fromString(userIdStr);
+
+        // Determine Package
+        if (amount >= 79000) {
+            createSubscription(userId, Subscription.PlanType.QUARTERLY, "SePay-" + amount);
+        } else if (amount >= 29000) {
+            createSubscription(userId, Subscription.PlanType.MONTHLY, "SePay-" + amount);
+        } else {
+            // Assume 5k or similar = Credits? For now, just log or add small credits
+            log.warn("Amount {} too small for subscription. Manual check required for user {}", amount, userId);
+            // TODO: Add credit purchase logic here if needed
+        }
+    }
 }

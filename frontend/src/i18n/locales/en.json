@@ -88,9 +88,21 @@
             "cta": "View Plans"
         },
         "streak": {
-            "keepItUp": "🔥 Keep it up!",
+            "keepItUp": "🔥 Awesome, keep it up!",
             "startToday": "Start your streak today!",
             "nextMilestone": "Next milestone"
+        },
+        "transfer": {
+            "title": "Bank Transfer",
+            "subtitle": "Scan QR code for automatic payment",
+            "bank": "Bank",
+            "accountName": "Account Name",
+            "accountNumber": "Account Number",
+            "amount": "Amount",
+            "content": "Content",
+            "autoActivation": "System will automatically activate your plan in 1-3 minutes.",
+            "iHavePaid": "I Have Paid",
+            "chooseOther": "← Choose another plan"
         }
     },
     "generator": {

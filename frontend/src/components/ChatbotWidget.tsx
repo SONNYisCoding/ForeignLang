@@ -1,32 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ChatbotWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        { id: 1, text: "Hi there! 👋 How can I help you improve your English today?", sender: 'bot' }
-    ]);
+    const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState("");
+    const [sessionId, setSessionId] = useState<number | null>(null);
 
-    const handleSend = (e: React.FormEvent) => {
+    // Initialize logic
+    useEffect(() => {
+        if (isOpen && !sessionId) {
+            initSession();
+        }
+    }, [isOpen]);
+
+    const initSession = async () => {
+        let guestId = localStorage.getItem('guest_chat_id');
+        if (!guestId) {
+            guestId = Math.random().toString(36).substring(7);
+            localStorage.setItem('guest_chat_id', guestId);
+        }
+
+        try {
+            const res = await fetch('/api/v1/chat/session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ guestId }),
+            });
+            const data = await res.json();
+            setSessionId(data.id);
+
+            // Load history
+            loadHistory(data.id);
+        } catch (err) {
+            console.error("Failed to init chat session", err);
+        }
+    };
+
+    const loadHistory = async (sid: number) => {
+        try {
+            const res = await fetch(`/api/v1/chat/history/${sid}`);
+            const data = await res.json();
+            setMessages(data.map((m: any) => ({
+                id: m.id,
+                text: m.content,
+                sender: m.sender.toLowerCase()
+            })));
+        } catch (err) {
+            console.error("Failed to load history", err);
+        }
+    };
+
+    const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!input.trim()) return;
+        if (!input.trim() || !sessionId) return;
 
-        // User message
-        const userMsg = { id: Date.now(), text: input, sender: 'user' };
-        setMessages(prev => [...prev, userMsg]);
+        const userText = input;
         setInput("");
 
-        // Mock response
-        setTimeout(() => {
-            const botMsg = {
-                id: Date.now() + 1,
-                text: "Thanks for your message! Our AI support agent is currently offline, but you can explore our specific topics in the Dashboard!",
-                sender: 'bot'
-            };
-            setMessages(prev => [...prev, botMsg]);
-        }, 1000);
+        // Optimistic update
+        setMessages(prev => [...prev, { id: Date.now(), text: userText, sender: 'user' }]);
+
+        try {
+            const res = await fetch('/api/v1/chat/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    sender: 'USER',
+                    content: userText
+                })
+            });
+            const data = await res.json();
+            // In a real socket app, we wouldn't need this if we listen to events
+            // But here we might wait for a bot reply or poll.
+            // For now, let's just wait a bit and reload history or manually append if the backend returns the bot reply immediately (it doesn't in current impl, bot reply is async-ish)
+
+            // Reload history after a short delay to catch the bot reply
+            setTimeout(() => loadHistory(sessionId), 1500);
+
+        } catch (err) {
+            console.error("Failed to send message", err);
+        }
     };
 
     return (
@@ -64,6 +120,11 @@ const ChatbotWidget = () => {
 
                         {/* Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                            {messages.length === 0 && (
+                                <div className="text-center text-gray-400 text-sm mt-10">
+                                    Say hello! 👋
+                                </div>
+                            )}
                             {messages.map((msg) => (
                                 <div
                                     key={msg.id}
