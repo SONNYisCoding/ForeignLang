@@ -24,15 +24,24 @@ public class NotificationController {
     private final UserRepository userRepository;
 
     private User getAuthenticatedUser(OAuth2User principal, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        // 1. Check for UserPrincipal (Unified representation)
+        if (principal instanceof com.foreignlang.backend.security.UserPrincipal userPrincipal) {
+            return userPrincipal.getUser();
+        }
+
         String email = null;
+        // 2. Fallback for raw OAuth2User
         if (principal != null) {
             email = principal.getAttribute("email");
-        } else {
+        }
+        // 3. Manual Session Fallback
+        else {
             jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
             if (session != null) {
                 email = (String) session.getAttribute("userEmail");
             }
         }
+
         if (email == null)
             return null;
         return userRepository.findByEmail(email).orElse(null);

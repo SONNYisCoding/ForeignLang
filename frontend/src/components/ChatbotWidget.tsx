@@ -44,7 +44,7 @@ const ChatbotWidget = () => {
                         <div className="bg-indigo-600 p-4 flex items-center justify-between text-white">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg overflow-hidden">
-                                    <img src="/mascot/main.png" alt="Assistant" className="w-full h-full object-cover" />
+                                    <img src="/mascot/logofl.png" alt="Mascot" className="w-full h-full object-contain" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-sm">ForeignLang Assistant</h3>

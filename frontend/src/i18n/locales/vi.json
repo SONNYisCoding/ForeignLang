@@ -11,6 +11,12 @@
         "error": "Lỗi",
         "success": "Thành công"
     },
+    "roles": {
+        "switchDashboard": "Chuyển Dashboard",
+        "learner": "Học viên",
+        "teacher": "Giáo viên",
+        "admin": "Quản trị viên"
+    },
     "auth": {
         "login": "Đăng nhập",
         "register": "Đăng ký",
@@ -27,7 +33,18 @@
         "createAccount": "Tạo tài khoản mới",
         "createAccountSub": "Tham gia ngay để bắt đầu hành trình của bạn!",
         "orContinueWith": "Hoặc tiếp tục với",
-        "googleLogin": "Đăng nhập bằng Google"
+        "googleLogin": "Đăng nhập bằng Google",
+        "loginSuccess": "Đăng nhập thành công",
+        "registerSuccess": "Đăng ký thành công",
+        "logoutSuccess": "Đăng xuất thành công",
+        "forgotPasswordSuccess": "Quên mật khẩu thành công",
+        "resetPasswordSuccess": "Đặt lại mật khẩu thành công"
+    },
+    "notifications": {
+        "title": "Thông báo",
+        "markAllRead": "Đánh dấu đã đọc",
+        "viewDetails": "Xem chi tiết",
+        "empty": "Chưa có thông báo nào"
     },
     "dashboard": {
         "overview": "Tổng quan",
@@ -387,6 +404,43 @@
             "joinedDate": "Ngày tham gia",
             "actions": "Thao tác",
             "viewProfile": "Xem hồ sơ"
+        }
+    },
+    "history": {
+        "title": "Lịch sử Hoạt động",
+        "subtitle": "Theo dõi toàn bộ hoạt động của bạn",
+        "tabs": {
+            "email": "Email AI",
+            "education": "Học tập",
+            "payments": "Thanh toán"
+        },
+        "email": {
+            "empty": "Chưa có email nào được tạo",
+            "select": "Chọn email để xem chi tiết",
+            "copy": "Sao chép",
+            "copied": "Đã sao chép",
+            "tone": "Giọng văn",
+            "language": "Ngôn ngữ"
+        },
+        "education": {
+            "empty": "Chưa có lịch sử học tập",
+            "course": "Khóa học",
+            "progress": "Tiến độ",
+            "lastAccessed": "Truy cập gần nhất",
+            "status": "Trạng thái",
+            "completed": "Hoàn thành",
+            "inProgress": "Đang học"
+        },
+        "payments": {
+            "empty": "Chưa có lịch sử thanh toán",
+            "invoice": "Mã hóa đơn",
+            "amount": "Số tiền",
+            "date": "Ngày",
+            "status": "Trạng thái",
+            "method": "Phương thức",
+            "paid": "Thành công",
+            "pending": "Đang xử lý",
+            "failed": "Thất bại"
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.foreignlang.backend.controller;
 
 import com.foreignlang.backend.entity.User;
+import com.foreignlang.backend.entity.EmailHistory;
+import com.foreignlang.backend.repository.EmailHistoryRepository;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.service.GeminiService;
 import com.foreignlang.backend.service.UsageQuotaService;
@@ -25,6 +27,8 @@ public class EmailGenerationController {
     private final GeminiService geminiService;
     private final UserRepository userRepository;
     private final UsageQuotaService usageQuotaService;
+    private final EmailHistoryRepository emailHistoryRepository;
+    private final com.foreignlang.backend.service.StreakService streakService;
 
     /**
      * Generate email using AI
@@ -39,9 +43,24 @@ public class EmailGenerationController {
             // Get authenticated user
             String userEmail = getUserEmail(httpRequest, principal);
             if (userEmail == null) {
-                return ResponseEntity.status(401).body(Map.of(
-                        "error", "Please login to use AI email generation",
-                        "code", "UNAUTHORIZED"));
+                Map<String, Object> debugInfo = new java.util.HashMap<>();
+                debugInfo.put("error", "Please login to use AI email generation");
+                debugInfo.put("code", "UNAUTHORIZED");
+                debugInfo.put("principal", principal != null ? principal.getClass().getName() : "NULL");
+                debugInfo.put("session",
+                        httpRequest.getSession(false) != null ? httpRequest.getSession(false).getId() : "NULL");
+
+                // Debug session attributes if session exists
+                if (httpRequest.getSession(false) != null) {
+                    java.util.Enumeration<String> attrNames = httpRequest.getSession(false).getAttributeNames();
+                    java.util.List<String> attrs = new java.util.ArrayList<>();
+                    while (attrNames.hasMoreElements()) {
+                        attrs.add(attrNames.nextElement());
+                    }
+                    debugInfo.put("sessionAttributes", attrs);
+                }
+
+                return ResponseEntity.status(401).body(debugInfo);
             }
 
             Optional<User> userOpt = userRepository.findByEmail(userEmail);
@@ -81,6 +100,21 @@ public class EmailGenerationController {
 
             // Consume quota
             usageQuotaService.consumeRequest(user.getId());
+
+            // Update streak
+            streakService.updateStreak(user);
+
+            // Save to history
+            EmailHistory history = new EmailHistory(
+                    user,
+                    result.subject(),
+                    result.body(),
+                    request.prompt(),
+                    request.tone(),
+                    request.language(),
+                    request.emailType(),
+                    request.recipientType());
+            emailHistoryRepository.save(history);
 
             // Return generated email
             return ResponseEntity.ok(Map.of(
@@ -145,18 +179,71 @@ public class EmailGenerationController {
      * Get user email from session or OAuth principal
      */
     private String getUserEmail(HttpServletRequest request, OAuth2User principal) {
-        // Try OAuth2 principal first
+        // 1. Try UserPrincipal (covers both OAuth2 and Form Login if unified)
+        if (principal instanceof com.foreignlang.backend.security.UserPrincipal userPrincipal) {
+            return userPrincipal.getUser().getEmail();
+        }
+
+        // 2. Try generic OAuth2User attributes (fallback)
         if (principal != null) {
             return principal.getAttribute("email");
         }
 
-        // Fallback to session
+        // 3. Fallback to session (Legacy/Manual)
         HttpSession session = request.getSession(false);
         if (session != null) {
             return (String) session.getAttribute("userEmail");
         }
 
         return null;
+    }
+
+    /**
+     * Get email generation history
+     */
+    @GetMapping("/history")
+    public ResponseEntity<?> getHistory(
+            HttpServletRequest httpRequest,
+            @AuthenticationPrincipal OAuth2User principal) {
+
+        String userEmail = getUserEmail(httpRequest, principal);
+        if (userEmail == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("error", "User not found"));
+        }
+
+        User user = userOpt.get();
+        java.util.List<EmailHistory> historyList = emailHistoryRepository
+                .findByUserIdOrderByCreatedAtDesc(user.getId());
+
+        // Map to DTO to avoid exposing User entity (and password hash)
+        java.util.List<EmailHistoryResponse> response = historyList.stream()
+                .map(h -> new EmailHistoryResponse(
+                        h.getId(),
+                        h.getSubject(),
+                        h.getBody(),
+                        h.getPrompt(),
+                        h.getTone(),
+                        h.getLanguage(),
+                        h.getCreatedAt()))
+                .collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Response DTO
+    public record EmailHistoryResponse(
+            java.util.UUID id,
+            String subject,
+            String body,
+            String prompt,
+            String tone,
+            String language,
+            java.time.LocalDateTime createdAt) {
     }
 
     // Request DTO

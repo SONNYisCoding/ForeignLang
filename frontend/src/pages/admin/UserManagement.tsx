@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Search, Filter, MoreVertical, Shield, User, GraduationCap, CheckCircle, XCircle } from 'lucide-react';
@@ -183,7 +184,7 @@ const UserManagement = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -239,7 +240,14 @@ const UserManagement = () => {
                                                         return (
                                                             <button
                                                                 key={role}
-                                                                onClick={() => toggleRole(user, role)}
+                                                                onClick={() => {
+                                                                    // Prevent changing ADMIN role status if user is currently ADMIN
+                                                                    if (role === 'ADMIN' && hasRole) {
+                                                                        showError("Cannot remove Admin role");
+                                                                        return;
+                                                                    }
+                                                                    toggleRole(user, role)
+                                                                }}
                                                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${hasRole ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-slate-700'
                                                                     }`}
                                                             >

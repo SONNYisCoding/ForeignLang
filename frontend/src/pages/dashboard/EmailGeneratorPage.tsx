@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Send, Copy, RefreshCw, Sparkles, Check, Briefcase, MessageSquare, Zap } from 'lucide-react';
+import { Send, Copy, RefreshCw, Check, Briefcase, MessageSquare, Zap, History, Wand2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../contexts/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 // DTOs matching backend
 interface EmailGenerateRequest {
@@ -25,6 +26,7 @@ const EmailGeneratorPage = () => {
     const { t, i18n } = useTranslation();
     const { showSuccess, showError } = useToast();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const [result, setResult] = useState<EmailGenerateResponse | null>(null);
     const [copied, setCopied] = useState(false);
     const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
@@ -101,7 +103,9 @@ const EmailGeneratorPage = () => {
             } else if (response.status === 401) {
                 // Redirect will be handled by Layout or protected route effectively,
                 // but explicit check helps.
-                window.location.href = '/login';
+                // window.location.href = '/login';
+                showError("Session expired or unauthorized (401). Check console for details.");
+                console.error("401 Unauthorized received from backend. Response body:", data);
             } else {
                 console.error('Error:', data);
                 showError(data.error || 'Generation failed');
@@ -125,6 +129,7 @@ const EmailGeneratorPage = () => {
     const [showAdModal, setShowAdModal] = useState(false);
     const [adTimer, setAdTimer] = useState(5);
     const [adFinished, setAdFinished] = useState(false);
+
 
     const handleWatchAd = () => {
         setShowAdModal(true);
@@ -216,38 +221,39 @@ const EmailGeneratorPage = () => {
                 </div>
             )}
 
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <div className="p-2 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-200">
-                        <Sparkles className="text-white" size={24} />
-                    </div>
-                    {t('generator.title')}
-                </h1>
-                <div className="text-gray-500 mt-2 text-lg ml-14 flex items-center gap-4">
-                    {t('generator.subtitle')}
-                    {remainingCredits !== null && (
-                        <div className="flex items-center gap-2">
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium border flex items-center gap-2 ${remainingCredits > 0
-                                ? 'bg-indigo-50 text-indigo-700 border-indigo-100'
-                                : 'bg-red-50 text-red-700 border-red-100'
-                                }`}>
-                                <span>{remainingCredits} {remainingCredits === 1 ? 'credit' : 'credits'} left</span>
-                                <span className="text-xs opacity-75 border-l pl-2 border-indigo-200">
-                                    {quotaDetails.free} Free • {quotaDetails.sub} Sub • {quotaDetails.purchased} Extra
-                                </span>
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Wand2 className="w-8 h-8 text-blue-600" />
+                        AI Email Generator
+                    </h1>
+                    <p className="mt-2 text-gray-500 dark:text-gray-400">
+                        Create professional emails in seconds
+                    </p>
+                    <div className="mt-4 flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium border flex items-center gap-2 ${remainingCredits !== null && remainingCredits > 0
+                            ? 'bg-indigo-50 text-indigo-700 border-indigo-100'
+                            : 'bg-red-50 text-red-700 border-red-100'
+                            }`}>
+                            <span>{remainingCredits ?? 0} credits left</span>
+                            <button onClick={handleWatchAd} className="ml-1 p-0.5 hover:bg-indigo-100 rounded-full text-indigo-500 transition-colors" title="Watch Ad for +1 Credit">
+                                <Zap size={14} className="fill-indigo-500" />
+                            </button>
+                            <span className="text-xs opacity-75 border-l pl-2 border-indigo-200">
+                                {quotaDetails.free} Free • {quotaDetails.sub} Sub • {quotaDetails.purchased} Extra
                             </span>
-                            {remainingCredits < 2 && (
-                                <button
-                                    onClick={handleWatchAd}
-                                    className="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors flex items-center gap-1"
-                                >
-                                    <Zap size={12} fill="currentColor" /> {t('generator.getMore') || 'Get More'}
-                                </button>
-                            )}
-                        </div>
-                    )}
+                        </span>
+                    </div>
                 </div>
+                <button
+                    onClick={() => navigate('/dashboard/history')}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                    <History className="w-4 h-4" />
+                    History
+                </button>
             </div>
+
 
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Input Section */}
@@ -417,7 +423,7 @@ const EmailGeneratorPage = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

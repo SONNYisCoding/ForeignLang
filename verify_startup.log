@@ -1,0 +1,341 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.foreignlang:backend >-----------------------
+[INFO] Building ForeignLang 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.2:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 6 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory C:\Users\LeTran\FPT University\2026_SPRING\EXE101\ForeignLang\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1 source file with javac [debug release 21] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:3.2.2:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.2:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.2)
+
+2026-02-09T07:45:29.860+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.backend.ForeignLangApplication       : Starting ForeignLangApplication using Java 22.0.2 with PID 4232 (C:\Users\LeTran\FPT University\2026_SPRING\EXE101\ForeignLang\target\classes started by letran in C:\Users\LeTran\FPT University\2026_SPRING\EXE101\ForeignLang)
+2026-02-09T07:45:29.862+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.backend.ForeignLangApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-02-09T07:45:29.937+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-09T07:45:29.938+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-09T07:45:30.167+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .s.b.d.c.l.DockerComposeLifecycleManager : Using Docker Compose file 'C:\Users\LeTran\FPT University\2026_SPRING\EXE101\ForeignLang\compose.yaml'
+2026-02-09T07:45:32.009+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .s.b.d.c.l.DockerComposeLifecycleManager : There are already Docker Compose services running, skipping startup
+2026-02-09T07:45:32.673+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-09T07:45:32.750+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 71 ms. Found 12 JPA repository interfaces.
+2026-02-09T07:45:33.336+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-09T07:45:33.352+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-09T07:45:33.353+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-02-09T07:45:33.390+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-09T07:45:33.391+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1373 ms
+2026-02-09T07:45:33.527+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-09T07:45:33.587+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-02-09T07:45:33.621+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-09T07:45:33.850+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-09T07:45:33.879+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-09T07:45:34.036+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@e1661e2
+2026-02-09T07:45:34.038+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-09T07:45:34.079+07:00  WARN 4232 --- [ForeignLang] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-09T07:45:35.126+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table if exists users 
+       add column last_activity_date date
+Hibernate: 
+    alter table if exists users 
+       add column learning_goal varchar(255)
+Hibernate: 
+    create index idx_email_created_at 
+       on email_history (created_at)
+Hibernate: 
+    create index idx_email_type 
+       on email_history (email_type)
+Hibernate: 
+    create index idx_lesson_order 
+       on lessons (order_index)
+Hibernate: 
+    create index idx_topic_status 
+       on topics (status)
+Hibernate: 
+    create index idx_topic_difficulty 
+       on topics (difficulty_level)
+Hibernate: 
+    create index idx_topic_title 
+       on topics (title)
+2026-02-09T07:45:35.428+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-09T07:45:35.757+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.b.service.CustomOAuth2UserService    : CustomOAuth2UserService BEAN CREATED AND REGISTERED
+2026-02-09T07:45:35.764+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.b.service.CustomOidcUserService      : CustomOidcUserService BEAN CREATED AND REGISTERED
+2026-02-09T07:45:35.968+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-09T07:45:36.631+07:00  WARN 4232 --- [ForeignLang] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-09T07:45:36.856+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@63ec6cf4, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@18ebed93, org.springframework.security.web.context.SecurityContextHolderFilter@8d900cd, org.springframework.security.web.header.HeaderWriterFilter@215b2eca, org.springframework.web.filter.CorsFilter@1a758dab, org.springframework.security.web.csrf.CsrfFilter@56297395, org.springframework.security.web.authentication.logout.LogoutFilter@37bf9c41, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter@4185a75b, org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter@13e22fda, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2a6cf56a, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@29a99216, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@754c1d2c, org.springframework.security.web.access.ExceptionTranslationFilter@43139992, org.springframework.security.web.access.intercept.AuthorizationFilter@28e67115]
+2026-02-09T07:45:37.092+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-02-09T07:45:37.122+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-02-09T07:45:37.128+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.backend.ForeignLangApplication       : Started ForeignLangApplication in 7.703 seconds (process running for 8.616)
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        uq1_0.id,
+        uq1_0.ad_uses_today,
+        uq1_0.bonus_uses,
+        uq1_0.daily_free_uses,
+        uq1_0.free_credits,
+        uq1_0.last_ad_reset,
+        uq1_0.last_free_reset,
+        uq1_0.last_reset_date,
+        uq1_0.last_sub_reset,
+        uq1_0.purchased_credits,
+        uq1_0.subscription_credits,
+        uq1_0.user_id,
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        r1_0.user_id,
+        r1_0.role,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        usage_quotas uq1_0 
+    join
+        users u1_0 
+            on u1_0.id=uq1_0.user_id 
+    left join
+        user_roles r1_0 
+            on u1_0.id=r1_0.user_id 
+    where
+        uq1_0.user_id=?
+Hibernate: 
+    select
+        r1_0.user_id,
+        r1_0.role 
+    from
+        user_roles r1_0 
+    where
+        r1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        uq1_0.id,
+        uq1_0.ad_uses_today,
+        uq1_0.bonus_uses,
+        uq1_0.daily_free_uses,
+        uq1_0.free_credits,
+        uq1_0.last_ad_reset,
+        uq1_0.last_free_reset,
+        uq1_0.last_reset_date,
+        uq1_0.last_sub_reset,
+        uq1_0.purchased_credits,
+        uq1_0.subscription_credits,
+        uq1_0.user_id,
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        r1_0.user_id,
+        r1_0.role,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        usage_quotas uq1_0 
+    join
+        users u1_0 
+            on u1_0.id=uq1_0.user_id 
+    left join
+        user_roles r1_0 
+            on u1_0.id=r1_0.user_id 
+    where
+        uq1_0.user_id=?
+Hibernate: 
+    select
+        r1_0.user_id,
+        r1_0.role 
+    from
+        user_roles r1_0 
+    where
+        r1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        uq1_0.id,
+        uq1_0.ad_uses_today,
+        uq1_0.bonus_uses,
+        uq1_0.daily_free_uses,
+        uq1_0.free_credits,
+        uq1_0.last_ad_reset,
+        uq1_0.last_free_reset,
+        uq1_0.last_reset_date,
+        uq1_0.last_sub_reset,
+        uq1_0.purchased_credits,
+        uq1_0.subscription_credits,
+        uq1_0.user_id,
+        u1_0.id,
+        u1_0.auth_provider,
+        u1_0.avatar_url,
+        u1_0.bio,
+        u1_0.birth_date,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.items_generated,
+        u1_0.full_name,
+        u1_0.google_id,
+        u1_0.last_activity_date,
+        u1_0.learning_goal,
+        u1_0.password_hash,
+        u1_0.proficiency_level,
+        u1_0.profile_complete,
+        r1_0.user_id,
+        r1_0.role,
+        u1_0.specialization,
+        u1_0.streak_days,
+        u1_0.subscription_tier,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        usage_quotas uq1_0 
+    join
+        users u1_0 
+            on u1_0.id=uq1_0.user_id 
+    left join
+        user_roles r1_0 
+            on u1_0.id=r1_0.user_id 
+    where
+        uq1_0.user_id=?
+Hibernate: 
+    select
+        r1_0.user_id,
+        r1_0.role 
+    from
+        user_roles r1_0 
+    where
+        r1_0.user_id=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        topics t1_0
+2026-02-09T07:45:37.324+07:00  INFO 4232 --- [ForeignLang] [  restartedMain] c.f.backend.seeder.ContentDataSeeder     : Data already seeded, skipping...
+2026-02-09T07:45:43.022+07:00  INFO 4232 --- [ForeignLang] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-09T07:45:43.023+07:00  INFO 4232 --- [ForeignLang] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-09T07:45:43.024+07:00  INFO 4232 --- [ForeignLang] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms

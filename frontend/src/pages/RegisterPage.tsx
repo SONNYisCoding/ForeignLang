@@ -149,7 +149,7 @@ const RegisterPage = () => {
                 <div className="absolute top-6 left-6 z-20">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform overflow-hidden">
-                            <img src="/mascot/main.png" alt="ForeignLang" className="w-full h-full object-cover" />
+                            <img src="/mascot/logofl.png" alt="ForeignLang" className="w-full h-full object-cover" />
                         </div>
                         <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-sky-500 hidden sm:block">
                             ForeignLang

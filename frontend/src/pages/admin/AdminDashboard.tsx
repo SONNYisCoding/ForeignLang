@@ -29,7 +29,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await fetch('/api/v1/admin/stats');
+                const response = await fetch('/api/v1/admin/stats', { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     setStats({

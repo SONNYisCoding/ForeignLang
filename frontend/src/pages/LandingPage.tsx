@@ -3,16 +3,24 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight, Globe, BookOpen, Sparkles, Play, ChevronDown, Check,
-    Trophy, Star, ChevronRight
+    Trophy, Star, ChevronRight, Facebook, Twitter, Instagram, Linkedin, Mail, Send, Menu, X
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AuthModal from '../components/AuthModal';
 import ChatbotWidget from '../components/ChatbotWidget';
 
+import TypewriterEffect from '../components/ui/TypewriterEffect';
+
 const LandingPage = () => {
     const { t, i18n } = useTranslation();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Calculate delay based on first part length
+    const heroTitle = t('landing.hero.title');
+    const heroHighlight = t('landing.hero.titleHighlight');
+    const firstPartDelay = heroTitle.length * 50; // 50ms per char
 
     const handleFeatureClick = () => {
         setIsAuthModalOpen(true);
@@ -36,10 +44,20 @@ const LandingPage = () => {
             <nav className="fixed w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
-                        <Link to="/" className="flex items-center gap-2">
-                            <img src="/mascot/main.png" alt="ForeignLang Mascot" className="w-10 h-10 rounded-xl" />
-                            <span className="text-xl font-bold text-gray-900 tracking-tight">ForeignLang</span>
-                        </Link>
+                        <div className="flex items-center gap-4">
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                            >
+                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+
+                            <Link to="/" className="flex items-center gap-2">
+                                <img src="/mascot/main.png" alt="ForeignLang Mascot" className="w-10 h-10 rounded-xl" />
+                                <span className="text-xl font-bold text-gray-900 tracking-tight hidden sm:block">ForeignLang</span>
+                            </Link>
+                        </div>
 
                         <div className="hidden md:flex items-center gap-8">
                             <a href="#features" className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">{t('landing.nav.features')}</a>
@@ -96,15 +114,78 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </div>
+                {/* Mobile Menu Dropdown */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="md:hidden overflow-hidden bg-white border-b border-gray-100"
+                        >
+                            <div className="px-4 pt-2 pb-6 space-y-2">
+                                <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">{t('landing.nav.features')}</a>
+                                <a href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">How It Works</a>
+                                <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">{t('landing.nav.pricing')}</Link>
+                                <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">{t('landing.nav.about')}</Link>
+                                <div className="border-t border-gray-100 my-2 pt-2">
+                                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">{t('landing.nav.login')}</Link>
+                                    <div className="px-3 py-2 flex items-center gap-4">
+                                        <button onClick={() => changeLanguage('en')} className={`text-sm font-medium ${i18n.language === 'en' ? 'text-indigo-600' : 'text-gray-500'}`}>English</button>
+                                        <div className="h-4 w-px bg-gray-300"></div>
+                                        <button onClick={() => changeLanguage('vi')} className={`text-sm font-medium ${i18n.language === 'vi' ? 'text-indigo-600' : 'text-gray-500'}`}>Tiếng Việt</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
 
             {/* Hero Section - Premium */}
             <section className="pt-28 pb-16 lg:pt-36 lg:pb-24 relative overflow-hidden">
                 {/* Animated Background */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute top-20 right-10 w-72 h-72 bg-indigo-100 rounded-full blur-3xl opacity-60 animate-pulse"></div>
-                    <div className="absolute bottom-20 left-10 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-50"></div>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <motion.div
+                        animate={{
+                            scale: [1, 1.2, 1],
+                            rotate: [0, 90, 0],
+                            x: [0, 100, 0],
+                            y: [0, -50, 0]
+                        }}
+                        transition={{
+                            duration: 20,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }}
+                        className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100/60 rounded-full blur-[100px]"
+                    />
+                    <motion.div
+                        animate={{
+                            scale: [1, 1.5, 1],
+                            rotate: [0, -60, 0],
+                            x: [0, -100, 0],
+                            y: [0, 100, 0]
+                        }}
+                        transition={{
+                            duration: 25,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }}
+                        className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-sky-100/50 rounded-full blur-[120px]"
+                    />
+                    <motion.div
+                        animate={{
+                            opacity: [0.3, 0.6, 0.3],
+                            scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                            duration: 10,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-indigo-50/40 to-purple-50/40 rounded-full blur-[100px]"
+                    />
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -116,10 +197,15 @@ const LandingPage = () => {
                             </span>
 
                             {/* Main Headline */}
-                            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6">
-                                {t('landing.hero.title')} <br className="hidden sm:block" />
+                            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6 min-h-[160px] sm:min-h-[120px]">
+                                <TypewriterEffect text={heroTitle} hideCursorOnComplete={true} />
+                                <br className="hidden sm:block" />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-500 to-sky-400">
-                                    {t('landing.hero.titleHighlight')}
+                                    <TypewriterEffect
+                                        text={heroHighlight}
+                                        startDelay={firstPartDelay + 300}
+                                        cursorColor="bg-sky-400"
+                                    />
                                 </span>
                             </h1>
 
@@ -132,9 +218,17 @@ const LandingPage = () => {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                                 <Link
                                     to="/register"
-                                    className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white font-bold rounded-full shadow-xl shadow-indigo-200 transition-all hover:scale-105 flex items-center justify-center gap-2 text-lg"
+                                    className="relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white font-bold rounded-full shadow-xl shadow-indigo-200 transition-all hover:scale-105 flex items-center justify-center gap-2 text-lg group"
                                 >
-                                    {t('landing.hero.ctaPrimary')} <ArrowRight size={20} />
+                                    <motion.div
+                                        className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg]"
+                                        initial={{ x: '-150%' }}
+                                        animate={{ x: '150%' }}
+                                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+                                    />
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        {t('landing.hero.ctaPrimary')} <ArrowRight size={20} />
+                                    </span>
                                 </Link>
                                 <a
                                     href="#how-it-works"
@@ -167,8 +261,19 @@ const LandingPage = () => {
                             {/* Hero Mascot */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                transition={{ delay: 0.4, duration: 0.6 }}
+                                animate={{
+                                    opacity: 1,
+                                    scale: 1,
+                                    y: [0, -15, 0]
+                                }}
+                                transition={{
+                                    duration: 0.6,
+                                    y: {
+                                        duration: 4,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }
+                                }}
                                 className="mt-12"
                             >
                                 <img
@@ -542,43 +647,98 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="bg-gray-900 text-gray-300 py-16">
+            {/* Footer - Premium */}
+            <footer className="bg-slate-900 text-white py-16 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                        <div className="col-span-1 md:col-span-1">
-                            <div className="flex items-center gap-2 mb-4">
-                                <img src="/mascot/main.png" alt="ForeignLang Mascot" className="w-10 h-10 rounded-xl" />
-                                <span className="text-xl font-bold text-white">ForeignLang</span>
+                    {/* Newsletter Section */}
+                    <div className="mb-16 p-8 bg-slate-800/50 rounded-3xl border border-slate-700/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
+                            <div>
+                                <h3 className="text-2xl font-bold mb-2">Subscribe to our newsletter</h3>
+                                <p className="text-slate-400">Get the latest updates, tips, and special offers directly to your inbox.</p>
                             </div>
-                            <p className="text-sm text-gray-400">{t('landing.footer.desc')}</p>
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                                    <input
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500 transition-colors"
+                                    />
+                                </div>
+                                <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2">
+                                    Subscribe <Send size={18} />
+                                </button>
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                        {/* Brand Column */}
+                        <div className="col-span-1 md:col-span-1">
+                            <Link to="/" className="flex items-center gap-2 mb-6">
+                                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 p-1">
+                                    <img src="/mascot/logofl.png" alt="Mascot" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">ForeignLang</span>
+                            </Link>
+                            <p className="text-slate-400 text-sm mb-6 leading-relaxed text-justify">
+                                Empower your communication with AI-driven tools. Write perfect emails, learn languages faster, and boost your professional confidence.
+                            </p>
+                            {/* Social Icons */}
+                            <div className="flex gap-4">
+                                {[
+                                    { icon: Facebook, href: "#" },
+                                    { icon: Twitter, href: "#" },
+                                    { icon: Instagram, href: "#" },
+                                    { icon: Linkedin, href: "#" }
+                                ].map((social, index) => (
+                                    <a
+                                        key={index}
+                                        href={social.href}
+                                        className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all transform hover:-translate-y-1"
+                                    >
+                                        <social.icon size={20} />
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Links Columns */}
                         <div>
-                            <h4 className="text-white font-bold mb-4">{t('landing.footer.product')}</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li><a href="#features" className="hover:text-white transition-colors">{t('landing.nav.features')}</a></li>
-                                <li><Link to="/pricing" className="hover:text-white transition-colors">{t('landing.nav.pricing')}</Link></li>
-                                <li><a href="#" className="hover:text-white transition-colors">{t('dashboard.templates')}</a></li>
+                            <h4 className="text-white font-bold mb-6 text-lg">Product</h4>
+                            <ul className="space-y-4 text-sm text-slate-400">
+                                <li><a href="#features" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Features</a></li>
+                                <li><Link to="/pricing" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Pricing</Link></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Templates</a></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Integrations</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-white font-bold mb-4">{t('landing.footer.company')}</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li><Link to="/about" className="hover:text-white transition-colors">{t('landing.nav.about')}</Link></li>
-                                <li><a href="#" className="hover:text-white transition-colors">{t('landing.footer.careers')}</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">{t('landing.footer.contact')}</a></li>
+                            <h4 className="text-white font-bold mb-6 text-lg">Company</h4>
+                            <ul className="space-y-4 text-sm text-slate-400">
+                                <li><Link to="/about" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> About Us</Link></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Careers</a></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Blog</a></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Contact</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-white font-bold mb-4">{t('landing.footer.legal')}</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li><a href="#" className="hover:text-white transition-colors">{t('landing.footer.privacy')}</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">{t('landing.footer.terms')}</a></li>
+                            <h4 className="text-white font-bold mb-6 text-lg">Legal</h4>
+                            <ul className="space-y-4 text-sm text-slate-400">
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Privacy Policy</a></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Terms of Service</a></li>
+                                <li><a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-2"><ChevronRight size={14} /> Cookie Policy</a></li>
                             </ul>
                         </div>
                     </div>
-                    <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
-                        {t('landing.footer.copyright')}
+
+                    <div className="pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+                        <p>{t('landing.footer.copyright')} © {new Date().getFullYear()} ForeignLang. All rights reserved.</p>
+                        <div className="flex items-center gap-6">
+                            <span className="flex items-center gap-1">Made with <span className="text-red-500">❤️</span> by our Team</span>
+                        </div>
                     </div>
                 </div>
             </footer>

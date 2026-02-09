@@ -17,6 +17,7 @@ public class TopicRESTController {
     private final TopicRepository topicRepository;
 
     @GetMapping
+    @org.springframework.cache.annotation.Cacheable("topics")
     public ResponseEntity<List<Topic>> getAllTopics() {
         return ResponseEntity.ok(topicRepository.findAll());
     }

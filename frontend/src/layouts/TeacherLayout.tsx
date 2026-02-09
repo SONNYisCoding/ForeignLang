@@ -8,22 +8,18 @@ import {
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from '../components/NotificationDropdown';
+import RoleSwitcher from '../components/role/RoleSwitcher';
+import { useAuth } from '../contexts/AuthContext';
 
 interface TeacherLayoutProps {
     children: React.ReactNode;
 }
 
-interface User {
-    name: string;
-    email: string;
-    role: string;
-}
-
 const TeacherLayout = ({ children }: TeacherLayoutProps) => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
+    const { user, logout } = useAuth(); // Use global auth
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const langDropdownRef = useRef<HTMLDivElement>(null);
@@ -31,31 +27,6 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // ... (User fetch logic remains same)
-        fetch('/api/v1/user/me', { credentials: 'include' })
-            .then(res => {
-                if (res.status === 401) {
-                    navigate('/login');
-                    return null;
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data) {
-                    const roles = data.roles || [];
-                    if (!roles.includes('TEACHER') && !roles.includes('ADMIN')) {
-                        navigate('/dashboard');
-                        return;
-                    }
-                    setUser({
-                        name: data.name || data.fullName || 'Teacher',
-                        email: data.email,
-                        role: 'TEACHER'
-                    });
-                }
-            })
-            .catch(err => console.error('Failed to fetch user:', err));
-
         // Click outside for lang dropdown
         const handleClickOutside = (event: MouseEvent) => {
             if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
@@ -64,12 +35,11 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [navigate, i18n]);
+    }, [i18n]);
 
-
-    const handleLogout = () => {
-        fetch('/api/v1/auth/logout', { method: 'POST' })
-            .then(() => navigate('/login'));
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
     };
 
     const isActive = (path: string) => location.pathname === path;
@@ -92,7 +62,7 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                 </button>
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg overflow-hidden">
-                        <img src="/mascot/main.png" alt="Logo" className="w-full h-full object-cover" />
+                        <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover" />
                     </div>
                     <span className="text-gray-800 font-bold">Teacher Portal</span>
                 </div>
@@ -112,85 +82,65 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                 )}
             </AnimatePresence>
 
+
+
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full bg-white z-50 transition-all duration-300 shadow-xl border-r border-gray-100
+                fixed top-0 left-0 h-full bg-[#F0F4F9] z-50 transition-all duration-300 border-r border-transparent shadow-sm
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
+                ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}
             `}>
-                {/* Sidebar Header */}
-                <div className="flex flex-col p-4 border-b border-gray-100">
-                    {/* Logo Area */}
-                    <Link to="/teacher" className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} transition-all duration-300 mb-6`}>
-                        <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-lg ring-1 ring-gray-100">
-                            <img src="/mascot/main.png" alt="Logo" className="w-full h-full object-cover" />
-                        </div>
-                        <AnimatePresence>
-                            {!isCollapsed && (
-                                <motion.div
-                                    initial={{ opacity: 0, width: 0 }}
-                                    animate={{ opacity: 1, width: 'auto' }}
-                                    exit={{ opacity: 0, width: 0 }}
-                                    className="overflow-hidden whitespace-nowrap"
-                                >
-                                    <span className="font-extrabold text-sm tracking-[0.2em] text-gray-400 uppercase">
-                                        Teaching
-                                    </span>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </Link>
-
-                    {/* Menu Toggle */}
-                    <button
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-3'} w-full py-2.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 group`}
-                        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                    >
-                        <Menu size={20} className="shrink-0 transition-colors" />
-                        <AnimatePresence>
-                            {!isCollapsed && (
-                                <motion.span
-                                    initial={{ opacity: 0, width: 0 }}
-                                    animate={{ opacity: 1, width: 'auto' }}
-                                    exit={{ opacity: 0, width: 0 }}
-                                    className="font-medium text-sm whitespace-nowrap overflow-hidden"
-                                >
-                                    Menu
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
-                    </button>
-
-                    {/* Mobile Close */}
-                    <div className="lg:hidden absolute top-4 right-4">
-                        <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-gray-600">
-                            <X size={24} />
+                <div className="flex flex-col p-4">
+                    <div className="flex items-center gap-3 mb-6 pl-2">
+                        <button
+                            onClick={() => setIsCollapsed(!isCollapsed)}
+                            className="p-2 -ml-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors"
+                            title={isCollapsed ? "Expand" : "Collapse"}
+                        >
+                            <Menu size={24} />
                         </button>
-                    </div>
-                </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-2">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setIsSidebarOpen(false)}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(item.path)
-                                    ? 'bg-gradient-to-r from-indigo-500 to-teal-500 text-white shadow-lg shadow-indigo-200'
-                                    : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
-                                    } ${isCollapsed ? 'justify-center' : ''}`}
-                                title={isCollapsed ? item.name : undefined}
-                            >
-                                <Icon size={20} />
-                                {!isCollapsed && <span className="font-medium">{item.name}</span>}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                        <Link to="/teacher" className={`flex items-center gap-3 overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                            <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 ring-1 ring-gray-100 shadow-sm">
+                                <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover" />
+                            </div>
+                            <span className="font-bold text-lg text-gray-800 tracking-tight whitespace-nowrap font-sans">Teacher Portal</span>
+                        </Link>
+
+                        {!isCollapsed && (
+                            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 rounded-full">
+                                <X size={24} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 space-y-1">
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            // Check active state
+                            const active = isActive(item.path);
+
+                            return (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={() => setIsSidebarOpen(false)}
+                                    className={`flex items-center gap-4 px-4 py-3 rounded-full transition-all font-medium relative group
+                                    ${active
+                                            ? 'bg-[#D3E3FD] text-[#041E49]'
+                                            : 'text-gray-600 hover:bg-[#E8EAED] hover:text-gray-900'}
+                                    ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : ''}
+                                `}
+                                    title={isCollapsed ? item.name : undefined}
+                                >
+                                    <Icon size={22} className={`min-w-[22px] shrink-0`} />
+                                    {!isCollapsed && <span className="whitespace-nowrap truncate">{item.name}</span>}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                </div>
             </aside>
 
             {/* Main Content */}
@@ -253,7 +203,7 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                             <button className="flex items-center gap-3 focus:outline-none">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-semibold text-gray-900 leading-none mb-1">{user?.name || 'Teacher'}</p>
-                                    <p className="text-xs text-gray-500">{user?.role || 'Educator'}</p>
+                                    <p className="text-xs text-gray-500">{user?.roles?.[0] || 'Educator'}</p>
                                 </div>
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center text-white font-bold shadow-md">
                                     {user?.name?.charAt(0) || 'T'}
@@ -273,6 +223,10 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                                             <p className="font-semibold text-gray-900 truncate">{user?.name}</p>
                                             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                                         </div>
+
+                                        {user?.roles && (
+                                            <RoleSwitcher roles={user.roles} currentRole="TEACHER" />
+                                        )}
 
                                         <Link to="/teacher/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                             <UserIcon size={18} className="text-gray-400" />

@@ -1,6 +1,7 @@
 package com.foreignlang.backend.controller;
 
 import com.foreignlang.backend.dto.ProfileUpdateRequest;
+import com.foreignlang.backend.entity.UsageQuota;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.service.SubscriptionService;
@@ -25,6 +26,7 @@ public class UserRESTController {
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
     private final SubscriptionService subscriptionService;
+    private final com.foreignlang.backend.service.StreakService streakService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal OAuth2User principal,
@@ -86,29 +88,39 @@ public class UserRESTController {
             response.put("username", user.getUsername());
             response.put("birthDate", user.getBirthDate());
             response.put("emailsGenerated", user.getEmailsGenerated());
-            response.put("streak", user.getStreakDays());
+            response.put("streak", streakService.getEffectiveStreak(user));
+            response.put("bio", user.getBio());
+            response.put("specialization", user.getSpecialization());
+            response.put("learningGoal", user.getLearningGoal());
+            response.put("authProvider", user.getAuthProvider());
 
-            usageQuotaRepository.findByUserId(user.getId()).ifPresent(quota -> {
-                quota.checkAndResetQuotas(isPremium);
-                int remaining = quota.getRemainingUses(isPremium);
+            UsageQuota quota = usageQuotaRepository.findByUserId(user.getId())
+                    .orElseGet(() -> {
+                        UsageQuota newQuota = UsageQuota.createForNewUser(user);
+                        return usageQuotaRepository.save(newQuota);
+                    });
 
-                int purchased = quota.getPurchasedCredits() != null ? quota.getPurchasedCredits() : 0;
-                int free = quota.getFreeCredits() != null ? quota.getFreeCredits() : 0;
-                int sub = quota.getSubscriptionCredits() != null ? quota.getSubscriptionCredits() : 0;
-                int adUses = quota.getAdUsesToday() != null ? quota.getAdUsesToday() : 0;
+            quota.checkAndResetQuotas(isPremium);
+            usageQuotaRepository.save(quota); // Save potential reset
 
-                response.put("purchasedCredits", purchased);
-                response.put("freeCredits", free);
-                response.put("subscriptionCredits", sub);
+            int remaining = quota.getRemainingUses(isPremium);
 
-                response.put("adsRemaining", 3 - adUses);
-                response.put("usageRemaining", remaining);
+            int purchased = quota.getPurchasedCredits() != null ? quota.getPurchasedCredits() : 0;
+            int free = quota.getFreeCredits() != null ? quota.getFreeCredits() : 0;
+            int sub = quota.getSubscriptionCredits() != null ? quota.getSubscriptionCredits() : 0;
+            int adUses = quota.getAdUsesToday() != null ? quota.getAdUsesToday() : 0;
 
-                // For display purposes, maybe show Total Limit if not premium
-                int totalLimit = isPremium ? -1 : (purchased + 2 + sub);
-                // Note: Hardcoded 2 for weekly limit visual if needed, but dynamic is better
-                response.put("usageLimit", totalLimit);
-            });
+            response.put("purchasedCredits", purchased);
+            response.put("freeCredits", free);
+            response.put("subscriptionCredits", sub);
+
+            response.put("adsRemaining", 3 - adUses);
+            response.put("usageRemaining", remaining);
+
+            // For display purposes, maybe show Total Limit if not premium
+            int totalLimit = isPremium ? -1 : (purchased + 2 + sub);
+            // Note: Hardcoded 2 for weekly limit visual if needed, but dynamic is better
+            response.put("usageLimit", totalLimit);
         });
 
         return ResponseEntity.ok(response);
@@ -152,6 +164,18 @@ public class UserRESTController {
             }
             if (request.birthDate() != null) {
                 user.setBirthDate(request.birthDate());
+            }
+            if (request.bio() != null) {
+                user.setBio(request.bio());
+            }
+            if (request.specialization() != null) {
+                user.setSpecialization(request.specialization());
+            }
+            if (request.learningGoal() != null) {
+                user.setLearningGoal(request.learningGoal());
+            }
+            if (request.proficiencyLevel() != null) {
+                user.setProficiencyLevel(request.proficiencyLevel());
             }
 
             user.setProfileComplete(true); // Mark profile as complete on update if logic deems it

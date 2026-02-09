@@ -113,7 +113,20 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(csrf -> csrf.disable())
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(
+                                                                org.springframework.security.web.csrf.CookieCsrfTokenRepository
+                                                                                .withHttpOnlyFalse())
+                                                .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
+                                                                "/api/v1/auth/logout")) // Optional: Ignore auth
+                                                                                        // endpoints if issues arise,
+                                                                                        // but better to support XSRF
+                                .headers(headers -> headers
+                                                .frameOptions(frame -> frame.deny()) // Prevent Clickjacking
+                                                .xssProtection(xss -> xss.disable()) // Modern browsers ignore this, CSP
+                                                                                     // is better
+                                                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                                                "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';")))
                                 .authorizeHttpRequests(auth -> auth
                                                 // Auth API - completely open
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
@@ -131,6 +144,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/notifications/**").permitAll() // Allow manual
                                                                                                          // session
                                                                                                          // check
+                                                .requestMatchers("/api/v1/teachers/**").permitAll() // Public Teacher
+                                                                                                    // Profiles
 
                                                 // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")
@@ -156,7 +171,7 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutSuccessUrl("http://localhost:5173/")
                                                 .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID"))
+                                                .deleteCookies("JSESSIONID", "XSRF-TOKEN"))
                                 // For API endpoints, return 401 instead of redirect
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
@@ -177,9 +192,9 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Add production domain here
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

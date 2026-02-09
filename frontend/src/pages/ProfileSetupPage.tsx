@@ -53,8 +53,8 @@ const ProfileSetupPage = () => {
                 return;
             }
 
-            // Success - redirect to dashboard
-            navigate('/dashboard');
+            // Success - redirect to skill assessment
+            navigate('/assessment');
         } catch (err) {
             setError(t('common.error'));
             setLoading(false);

@@ -4,10 +4,12 @@ import { Mail, Lock, CheckCircle, ArrowRight, Globe, Eye, EyeOff, ChevronDown } 
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +52,9 @@ const LoginPage = () => {
             const data = await res.json();
 
             if (res.ok) {
+                // Refresh global auth state immediately
+                await refreshUser();
+
                 console.log('Login response user:', data.user);
                 // Check if profile is complete (handled by backend response)
                 if (data.user && !data.user.profileComplete) {
@@ -58,11 +63,8 @@ const LoginPage = () => {
                     const roles = data.user?.roles || [];
                     console.log('Detected roles:', roles);
                     toast.success(t('auth.loginSuccess'));
-                    // DEBUG ALERT
-                    // alert(`Login Success! Roles: ${JSON.stringify(roles)}`);
 
                     if (roles.includes('ADMIN')) {
-                        console.log('Redirecting to ADMIN');
                         navigate('/admin');
                     } else if (roles.includes('TEACHER')) {
                         navigate('/teacher');
@@ -71,10 +73,10 @@ const LoginPage = () => {
                     }
                 }
             } else {
-                setError(data.error || 'Login failed');
+                setError(data.error || 'Login failed. Please check your credentials.');
             }
         } catch (err) {
-            setError('Network error occurred');
+            setError('Network error. Please try again later.');
         } finally {
             setLoading(false);
         }
@@ -137,7 +139,7 @@ const LoginPage = () => {
                 <div className="absolute top-6 left-6 z-20">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform overflow-hidden">
-                            <img src="/mascot/main.png" alt="ForeignLang" className="w-full h-full object-cover" />
+                            <img src="/mascot/logofl.png" alt="ForeignLang" className="w-full h-full object-cover" />
                         </div>
                         <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-sky-500 hidden sm:block">
                             ForeignLang

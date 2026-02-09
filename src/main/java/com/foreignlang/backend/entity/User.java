@@ -43,6 +43,14 @@ public class User {
     @Column(name = "google_id", unique = true)
     private String googleId; // Google OAuth sub ID
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    private String specialization;
+
+    @Column(name = "learning_goal")
+    private String learningGoal;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false)
     @Builder.Default
@@ -66,6 +74,9 @@ public class User {
     @Column(name = "streak_days", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default
     private int streakDays = 0;
+
+    @Column(name = "last_activity_date")
+    private LocalDate lastActivityDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "subscription_tier", nullable = false)

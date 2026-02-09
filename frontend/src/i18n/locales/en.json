@@ -11,6 +11,12 @@
         "error": "Error",
         "success": "Success"
     },
+    "roles": {
+        "switchDashboard": "Switch Dashboard",
+        "learner": "Learner",
+        "teacher": "Teacher",
+        "admin": "Admin"
+    },
     "auth": {
         "login": "Login",
         "register": "Register",
@@ -28,7 +34,11 @@
         "createAccountSub": "Join us and start your journey today!",
         "orContinueWith": "Or continue with",
         "googleLogin": "Continue with Google",
-        "loginSuccess": "Login successful!"
+        "loginSuccess": "Login successful!",
+        "registerSuccess": "Registration successful!",
+        "logoutSuccess": "Logout successful!",
+        "forgotPasswordSuccess": "Forgot password successful!",
+        "resetPasswordSuccess": "Reset password successful!"
     },
     "notifications": {
         "title": "Notifications",
@@ -394,6 +404,43 @@
             "joinedDate": "Joined Date",
             "actions": "Actions",
             "viewProfile": "View Profile"
+        }
+    },
+    "history": {
+        "title": "My History",
+        "subtitle": "Track your activity across the platform",
+        "tabs": {
+            "email": "AI Emails",
+            "education": "Learning",
+            "payments": "Billing"
+        },
+        "email": {
+            "empty": "No emails generated yet",
+            "select": "Select an email to view details",
+            "copy": "Copy",
+            "copied": "Copied",
+            "tone": "Tone",
+            "language": "Language"
+        },
+        "education": {
+            "empty": "No learning history yet",
+            "course": "Course",
+            "progress": "Progress",
+            "lastAccessed": "Last Accessed",
+            "status": "Status",
+            "completed": "Completed",
+            "inProgress": "In Progress"
+        },
+        "payments": {
+            "empty": "No payment history yet",
+            "invoice": "Invoice ID",
+            "amount": "Amount",
+            "date": "Date",
+            "status": "Status",
+            "method": "Method",
+            "paid": "Paid",
+            "pending": "Pending",
+            "failed": "Failed"
         }
     }
 }

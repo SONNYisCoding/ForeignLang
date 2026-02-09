@@ -62,9 +62,23 @@ const questions: Question[] = [
 const SkillAssessment = () => {
     const navigate = useNavigate();
     const { showSuccess, showError } = useToast();
+    const [learningGoal, setLearningGoal] = useState<string>('');
+    const [showGoalSelection, setShowGoalSelection] = useState(true);
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, setAnswers] = useState<Record<number, number>>({});
     const [submitting, setSubmitting] = useState(false);
+
+    const goals = [
+        { id: 'career', label: 'Career Advancement', icon: '💼' },
+        { id: 'travel', label: 'Travel & Culture', icon: '✈️' },
+        { id: 'school', label: 'School & Exams', icon: '🎓' },
+        { id: 'hobby', label: 'Just for Fun', icon: '🎮' }
+    ];
+
+    const handleGoalSelect = (goalId: string) => {
+        setLearningGoal(goalId);
+        setTimeout(() => setShowGoalSelection(false), 500);
+    };
 
     const handleAnswer = (score: number) => {
         setAnswers({ ...answers, [questions[currentStep].id]: score });
@@ -85,15 +99,13 @@ const SkillAssessment = () => {
         fetch('/api/v1/assessment/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ score: totalScore }),
+            body: JSON.stringify({ score: totalScore, learningGoal }),
             credentials: 'include'
         })
             .then(res => res.json())
             .then(data => {
                 showSuccess(`Assessment Complete! You are: ${data.level}`);
-                // Navigate to dashboard or result page
-                // For now, redirect to dashboard as profile is complete
-                setTimeout(() => navigate('/learner'), 1500);
+                setTimeout(() => navigate('/dashboard'), 1500);
             })
             .catch(err => {
                 console.error(err);
@@ -101,6 +113,35 @@ const SkillAssessment = () => {
                 setSubmitting(false);
             });
     };
+
+    if (showGoalSelection) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden p-8">
+                    <div className="text-center mb-8">
+                        <Brain size={48} className="mx-auto mb-4 text-indigo-600" />
+                        <h1 className="text-2xl font-bold mb-2">What's your main goal?</h1>
+                        <p className="text-slate-500">We'll personalize your learning path.</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        {goals.map((goal) => (
+                            <button
+                                key={goal.id}
+                                onClick={() => handleGoalSelect(goal.id)}
+                                className={`p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 ${learningGoal === goal.id
+                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                                    : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <span className="text-2xl">{goal.icon}</span>
+                                <span className="font-medium text-lg">{goal.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const progress = ((currentStep + 1) / questions.length) * 100;
     const currentQuestion = questions[currentStep];
