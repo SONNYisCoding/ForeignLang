@@ -34,6 +34,9 @@ public class SecurityConfig {
         private final com.foreignlang.backend.service.CustomOidcUserService customOidcUserService;
         private final UserRepository userRepository;
 
+        @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
+        private String frontendUrl;
+
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder(12);
@@ -77,7 +80,7 @@ public class SecurityConfig {
                                                 user.getId(), user.getEmail(), user.isProfileComplete());
 
                                 if (!user.isProfileComplete()) {
-                                        response.sendRedirect("http://localhost:5173/profile-setup");
+                                        response.sendRedirect(frontendUrl + "/profile-setup");
                                         return;
                                 }
 
@@ -88,17 +91,17 @@ public class SecurityConfig {
 
                                 if (roles.contains(com.foreignlang.backend.entity.User.Role.ADMIN)) {
                                         log.info("Redirecting to ADMIN dashboard");
-                                        response.sendRedirect("http://localhost:5173/admin");
+                                        response.sendRedirect(frontendUrl + "/admin");
                                 } else if (roles.contains(com.foreignlang.backend.entity.User.Role.TEACHER)) {
                                         log.info("Redirecting to TEACHER dashboard");
-                                        response.sendRedirect("http://localhost:5173/teacher");
+                                        response.sendRedirect(frontendUrl + "/teacher");
                                 } else {
                                         log.info("Redirecting to LEARNER dashboard");
-                                        response.sendRedirect("http://localhost:5173/dashboard");
+                                        response.sendRedirect(frontendUrl + "/dashboard");
                                 }
                         } else {
                                 log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
-                                response.sendRedirect("http://localhost:5173/login?error=auth_principal_failure");
+                                response.sendRedirect(frontendUrl + "/login?error=auth_principal_failure");
                         }
                 };
 
@@ -168,9 +171,9 @@ public class SecurityConfig {
                                                                 .userService(customOAuth2UserService)
                                                                 .oidcUserService(customOidcUserService))
                                                 .successHandler(oAuth2SuccessHandler())
-                                                .failureUrl("http://localhost:5173/?error=true"))
+                                                .failureUrl(frontendUrl + "/?error=true"))
                                 .logout(logout -> logout
-                                                .logoutSuccessUrl("http://localhost:5173/")
+                                                .logoutSuccessUrl(frontendUrl + "/")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "XSRF-TOKEN"))
                                 // For API endpoints, return 401 instead of redirect
@@ -183,7 +186,7 @@ public class SecurityConfig {
                                                                 response.getWriter()
                                                                                 .write("{\"error\":\"Unauthorized\"}");
                                                         } else {
-                                                                response.sendRedirect("http://localhost:5173/");
+                                                                response.sendRedirect(frontendUrl + "/");
                                                         }
                                                 }));
 
@@ -193,7 +196,7 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Add production domain here
+                configuration.setAllowedOrigins(List.of(frontendUrl)); // Add production domain here
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);

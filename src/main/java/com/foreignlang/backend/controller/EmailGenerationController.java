@@ -43,24 +43,9 @@ public class EmailGenerationController {
             // Get authenticated user
             String userEmail = getUserEmail(httpRequest, principal);
             if (userEmail == null) {
-                Map<String, Object> debugInfo = new java.util.HashMap<>();
-                debugInfo.put("error", "Please login to use AI email generation");
-                debugInfo.put("code", "UNAUTHORIZED");
-                debugInfo.put("principal", principal != null ? principal.getClass().getName() : "NULL");
-                debugInfo.put("session",
-                        httpRequest.getSession(false) != null ? httpRequest.getSession(false).getId() : "NULL");
-
-                // Debug session attributes if session exists
-                if (httpRequest.getSession(false) != null) {
-                    java.util.Enumeration<String> attrNames = httpRequest.getSession(false).getAttributeNames();
-                    java.util.List<String> attrs = new java.util.ArrayList<>();
-                    while (attrNames.hasMoreElements()) {
-                        attrs.add(attrNames.nextElement());
-                    }
-                    debugInfo.put("sessionAttributes", attrs);
-                }
-
-                return ResponseEntity.status(401).body(debugInfo);
+                return ResponseEntity.status(401).body(Map.of(
+                        "error", "Please login to use AI email generation",
+                        "code", "UNAUTHORIZED"));
             }
 
             Optional<User> userOpt = userRepository.findByEmail(userEmail);
@@ -125,10 +110,9 @@ public class EmailGenerationController {
                     "isPremium", isPremium));
         } catch (Exception e) {
             log.error("Unhandled exception in generateEmail", e);
-            e.printStackTrace(); // Print to console for server logs
             return ResponseEntity.status(500).body(Map.of(
-                    "error", "Internal Server Error: " + e.getMessage(),
-                    "trace", e.toString()));
+                    "error", "An internal error occurred. Please try again later.",
+                    "code", "INTERNAL_ERROR"));
         }
     }
 

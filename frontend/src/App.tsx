@@ -24,6 +24,8 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const UpgradePage = lazy(() => import('./pages/dashboard/UpgradePage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const TopicDetailPage = lazy(() => import('./pages/TopicDetailPage'));
+const TopicsPage = lazy(() => import('./pages/TopicsPage'));
+const LessonPage = lazy(() => import('./pages/LessonPage'));
 const TeacherProfilePage = lazy(() => import('./pages/TeacherProfilePage'));
 const SkillAssessment = lazy(() => import('./pages/onboarding/SkillAssessment'));
 
@@ -102,7 +104,9 @@ function App() {
                 <Route path="/dashboard/history" element={<DashboardRoute><EmailHistoryPage /></DashboardRoute>} />
                 <Route path="/dashboard/templates" element={<DashboardRoute><TemplatesPage /></DashboardRoute>} />
                 <Route path="/dashboard/vocabulary" element={<DashboardRoute><VocabularyPage /></DashboardRoute>} />
-                <Route path="/dashboard/topics" element={<DashboardRoute><div className="p-8 text-center text-gray-500">Topic Learning - Coming Soon</div></DashboardRoute>} />
+                <Route path="/dashboard/topics" element={<DashboardRoute><TopicsPage /></DashboardRoute>} />
+                <Route path="/dashboard/topics/:id" element={<DashboardRoute><TopicDetailPage /></DashboardRoute>} />
+                <Route path="/dashboard/topics/:topicId/lessons/:lessonId" element={<DashboardRoute><LessonPage /></DashboardRoute>} />
                 <Route path="/dashboard/profile" element={<DashboardRoute><ProfilePage /></DashboardRoute>} />
                 <Route path="/dashboard/settings" element={<DashboardRoute><SettingsPage /></DashboardRoute>} />
 

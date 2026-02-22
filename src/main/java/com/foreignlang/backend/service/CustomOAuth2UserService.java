@@ -81,8 +81,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new com.foreignlang.backend.security.UserPrincipal(user, attributes);
         } catch (Exception e) {
-            log.error("CRITICAL ERROR in CustomOAuth2UserService: {}", e.toString());
-            e.printStackTrace();
+            log.error("CRITICAL ERROR in CustomOAuth2UserService", e);
             throw new OAuth2AuthenticationException("Internal Server Error: " + e.getMessage());
         }
     }

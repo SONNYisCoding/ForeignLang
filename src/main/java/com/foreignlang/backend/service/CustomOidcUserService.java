@@ -41,8 +41,7 @@ public class CustomOidcUserService extends OidcUserService {
         try {
             return processUser(oidcUser);
         } catch (Exception e) {
-            log.error("CRITICAL ERROR in CustomOidcUserService: {}", e.toString());
-            e.printStackTrace();
+            log.error("CRITICAL ERROR in CustomOidcUserService", e);
             throw new OAuth2AuthenticationException("Internal Server Error: " + e.getMessage());
         }
     }

@@ -44,14 +44,12 @@ public class PaymentController {
 
         log.info("Received SePay Webhook: {}", request);
 
-        // 1. Validate Token (Simple check if you use 'Apikey <token>' standard or just
-        // Bearer)
-        // SePay might send it differently, but usually we check a configured secret.
-        // For simplicity in this step, we just log it. In production, VERIFY this!
-        // if (!("Apikey " + sepayWebhookToken).equals(authorization)) {
-        // log.warn("Invalid SePay Webhook Token");
-        // return ResponseEntity.status(401).body("Unauthorized");
-        // }
+        // 1. Validate SePay Webhook Token
+        String expectedToken = "Apikey " + sepayWebhookToken;
+        if (authorization == null || !expectedToken.equals(authorization)) {
+            log.warn("Invalid SePay Webhook Token. Received: {}", authorization);
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
 
         try {
             // 2. Process the order

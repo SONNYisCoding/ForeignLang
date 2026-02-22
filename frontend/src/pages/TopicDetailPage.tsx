@@ -27,7 +27,7 @@ const TopicDetailPage = () => {
         import('axios').then(async (axiosModule) => {
             const axios = axiosModule.default;
             try {
-                const response = await axios.get(`http://localhost:8080/api/v1/topics/${id}`, { withCredentials: true });
+                const response = await axios.get(`/api/v1/topics/${id}`, { withCredentials: true });
                 setTopic(response.data);
                 setLoading(false);
             } catch (err) {
@@ -59,7 +59,7 @@ const TopicDetailPage = () => {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Topic not found</h2>
-                    <Link to="/dashboard" className="text-indigo-600 hover:underline">← Back to Dashboard</Link>
+                    <Link to="/dashboard/topics" className="text-indigo-600 hover:underline">← Back to Topics</Link>
                 </div>
             </div>
         );
@@ -70,9 +70,9 @@ const TopicDetailPage = () => {
             {/* Header */}
             <header className="bg-white border-b border-gray-200">
                 <div className="max-w-5xl mx-auto px-6 py-6">
-                    <Link to="/dashboard" className="inline-flex items-center text-gray-500 hover:text-indigo-600 mb-4 transition">
+                    <Link to="/dashboard/topics" className="inline-flex items-center text-gray-500 hover:text-indigo-600 mb-4 transition">
                         <ArrowLeft size={18} className="mr-2" />
-                        Back to Dashboard
+                        Back to Topics
                     </Link>
                     <div className="flex items-start justify-between">
                         <div>
@@ -98,9 +98,10 @@ const TopicDetailPage = () => {
                         {topic.lessons
                             .sort((a, b) => a.orderIndex - b.orderIndex)
                             .map((lesson, index) => (
-                                <div
+                                <Link
+                                    to={`/dashboard/topics/${id}/lessons/${lesson.id}`}
                                     key={lesson.id}
-                                    className="bg-white rounded-xl p-6 border border-gray-200 hover:border-indigo-300 hover:shadow-md transition cursor-pointer group"
+                                    className="bg-white rounded-xl p-6 border border-gray-200 hover:border-indigo-300 hover:shadow-md transition cursor-pointer group block"
                                 >
                                     <div className="flex items-start gap-4">
                                         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
@@ -130,7 +131,7 @@ const TopicDetailPage = () => {
                                             </button>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))
                         }
                     </div>

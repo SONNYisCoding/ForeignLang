@@ -3,8 +3,11 @@ package com.foreignlang.backend.controller;
 import com.foreignlang.backend.entity.ChatMessage;
 import com.foreignlang.backend.entity.ChatSession;
 import com.foreignlang.backend.security.UserPrincipal;
+import com.foreignlang.backend.service.AiService;
+import com.foreignlang.backend.service.AiPersonaHandler;
 import com.foreignlang.backend.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +18,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/chat")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final ChatService chatService;
+    private final AiService aiService;
 
     @PostMapping("/session")
     public ResponseEntity<ChatSession> startSession(
@@ -38,17 +43,17 @@ public class ChatController {
 
         ChatMessage savedMsg = chatService.saveMessage(sessionId, sender, content);
 
-        // Simple Mock Bot Reply Logic
+        // Generate AI response when user sends a message
         if ("USER".equals(sender)) {
-            // In a real app, call AI Service here
-            new Thread(() -> {
-                try {
-                    Thread.sleep(1000);
-                    chatService.saveMessage(sessionId, "BOT", "I received your message: " + content);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            try {
+                String aiResponse = aiService.getResponse(
+                        AiPersonaHandler.PersonaType.CONSULTANT, null, content);
+                chatService.saveMessage(sessionId, "BOT", aiResponse);
+            } catch (Exception e) {
+                log.error("Failed to generate AI chat response", e);
+                chatService.saveMessage(sessionId, "BOT",
+                        "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.");
+            }
         }
 
         return ResponseEntity.ok(savedMsg);
