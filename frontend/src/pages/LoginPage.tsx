@@ -283,7 +283,7 @@ const LoginPage = () => {
                             <div className="mt-6">
                                 <motion.a
                                     whileHover={{ y: -2, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-                                    href="http://localhost:8080/oauth2/authorization/google"
+                                    href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/google`}
                                     className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-gray-200 rounded-2xl bg-white text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                                 >
                                     <svg viewBox="0 0 24 24" className="w-6 h-6" aria-hidden="true">

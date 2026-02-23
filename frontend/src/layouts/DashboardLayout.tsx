@@ -8,6 +8,7 @@ import ThemeToggle from '../components/ui/ThemeToggle';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import SearchModal from '../components/SearchModal';
 import { useAuth } from '../contexts/AuthContext';
+import ChatbotWidget from '../components/ChatbotWidget';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -289,6 +290,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     {children}
                 </div>
             </main>
+
+            {/* AI Chatbot Widget */}
+            <ChatbotWidget />
         </div>
     );
 };

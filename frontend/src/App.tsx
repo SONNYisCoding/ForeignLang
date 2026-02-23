@@ -95,6 +95,7 @@ function App() {
                 {/* Semi-Protected Routes (Auth required but no specific role, or handled internally) */}
                 <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
                 <Route path="/assessment" element={<ProtectedRoute><SkillAssessment /></ProtectedRoute>} />
+                <Route path="/onboarding/assessment" element={<ProtectedRoute><SkillAssessment /></ProtectedRoute>} />
                 <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
                 <Route path="/topics/:id" element={<TopicDetailPage />} />
 

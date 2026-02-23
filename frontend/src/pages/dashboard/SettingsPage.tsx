@@ -290,7 +290,7 @@ const SettingsPage = () => {
                                                 </span>
                                             ) : (
                                                 <a
-                                                    href="http://localhost:8080/oauth2/authorization/google"
+                                                    href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/google`}
                                                     className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                                                 >
                                                     Connect

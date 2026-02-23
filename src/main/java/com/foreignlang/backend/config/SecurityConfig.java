@@ -121,9 +121,12 @@ public class SecurityConfig {
                                                                 org.springframework.security.web.csrf.CookieCsrfTokenRepository
                                                                                 .withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
-                                                                "/api/v1/auth/logout")) // Optional: Ignore auth
-                                                                                        // endpoints if issues arise,
-                                                                                        // but better to support XSRF
+                                                                "/api/v1/auth/logout", "/api/v1/chat/**",
+                                                                "/api/v1/assessment/**")) // Optional:
+                                                                                          // Ignore
+                                                                                          // auth
+                                // endpoints if issues arise,
+                                // but better to support XSRF
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.deny()) // Prevent Clickjacking
                                                 .xssProtection(xss -> xss.disable()) // Modern browsers ignore this, CSP
@@ -150,6 +153,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/teachers/**").permitAll() // Public Teacher
                                                                                                     // Profiles
                                                 .requestMatchers("/api/v1/payment/**").permitAll() // SePay Webhook
+                                                .requestMatchers("/api/v1/chat/**").permitAll() // Chatbot (guest +
+                                                                                                // user)
 
                                                 // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")

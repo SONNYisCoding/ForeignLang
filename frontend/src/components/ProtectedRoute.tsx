@@ -32,6 +32,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
         return <Navigate to="/" replace />; // Or /unauthorized
     }
 
+    // Force onboarding if profile not complete (skip for admin/teacher)
+    const isAdminOrTeacher = user.roles.some(r => r === 'ADMIN' || r === 'TEACHER');
+    if (!user.profileComplete && !isAdminOrTeacher && !location.pathname.startsWith('/onboarding')) {
+        return <Navigate to="/onboarding/assessment" replace />;
+    }
+
     return <>{children}</>;
 };
 

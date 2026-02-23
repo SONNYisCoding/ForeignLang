@@ -255,6 +255,7 @@ const LandingPage = () => {
                                         <Star size={24} className="text-yellow-400 fill-yellow-400" />
                                         {t('landing.hero.stats.rating')}
                                     </div>
+                                    <div className="text-sm text-gray-500">{t('landing.hero.stats.ratingLabel')}</div>
                                 </div>
                             </div>
 
