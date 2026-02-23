@@ -53,16 +53,17 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     <div className="space-y-4">
                         <button
                             onClick={() => navigate('/login')}
-                            className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-[1.02]"
+                            className="w-full relative group overflow-hidden py-3.5 px-4 bg-indigo-600 outline-none text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5"
                         >
-                            <LogIn size={20} />
-                            {t('authModal.login')}
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] transition-transform"></span>
+                            <LogIn size={20} className="relative z-10" />
+                            <span className="relative z-10">{t('authModal.login')}</span>
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full py-3.5 px-4 bg-white border-2 border-gray-100 hover:border-gray-200 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all hover:bg-gray-50"
+                            className="w-full py-3.5 px-4 bg-white border-2 border-gray-100 hover:border-indigo-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all hover:bg-gray-50 hover:text-indigo-600 group"
                         >
-                            <UserPlus size={20} />
+                            <UserPlus size={20} className="group-hover:scale-110 transition-transform" />
                             {t('authModal.createAccount')}
                         </button>
                     </div>

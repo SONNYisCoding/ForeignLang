@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import UiverseLoader from './ui/UiverseLoader';
 
 interface ChatMessage {
     id: number;
@@ -184,8 +185,8 @@ const ChatbotWidget = () => {
                                 >
                                     <div
                                         className={`max-w-[80%] p-3 text-sm leading-relaxed ${msg.sender === 'user'
-                                                ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-sm'
-                                                : 'bg-white border border-gray-100 text-gray-700 shadow-sm rounded-2xl rounded-tl-sm'
+                                            ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-sm'
+                                            : 'bg-white border border-gray-100 text-gray-700 shadow-sm rounded-2xl rounded-tl-sm'
                                             }`}
                                         style={{ whiteSpace: 'pre-wrap' }}
                                     >
@@ -237,9 +238,9 @@ const ChatbotWidget = () => {
                             <button
                                 type="submit"
                                 disabled={isTyping || !input.trim()}
-                                className="p-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-[44px] h-[44px]"
                             >
-                                {isTyping ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                {isTyping ? <div className="scale-50 -ml-2"><UiverseLoader /></div> : <Send size={18} />}
                             </button>
                         </form>
                     </motion.div>

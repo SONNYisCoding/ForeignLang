@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from '../components/NotificationDropdown';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import { useAuth } from '../contexts/AuthContext';
+import SidebarToggle from '../components/ui/SidebarToggle';
 
 interface TeacherLayoutProps {
     children: React.ReactNode;
@@ -18,7 +19,7 @@ interface TeacherLayoutProps {
 const TeacherLayout = ({ children }: TeacherLayoutProps) => {
     const { i18n } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const { user, logout } = useAuth(); // Use global auth
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -86,32 +87,32 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full bg-[#F0F4F9] z-50 transition-all duration-300 border-r border-transparent shadow-sm
+                fixed top-0 left-0 h-[100dvh] bg-[#F0F4F9] z-50 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border-r border-transparent shadow-sm overflow-x-hidden
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}
+                ${isCollapsed ? 'w-64 lg:w-20' : 'w-64 lg:w-72'}
             `}>
-                <div className="flex flex-col p-4">
+                <div className="flex flex-col p-4 w-full">
                     <div className="flex items-center gap-3 mb-6 pl-2">
-                        <button
-                            onClick={() => setIsCollapsed(!isCollapsed)}
-                            className="p-2 -ml-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors"
-                            title={isCollapsed ? "Expand" : "Collapse"}
-                        >
-                            <Menu size={24} />
-                        </button>
+                        <div className="hidden lg:block -ml-2">
+                            <SidebarToggle
+                                isCollapsed={isCollapsed}
+                                toggle={() => setIsCollapsed(!isCollapsed)}
+                                title={isCollapsed ? "Expand" : "Collapse"}
+                            />
+                        </div>
 
-                        <Link to="/teacher" className={`flex items-center gap-3 overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                        <Link to="/teacher" className="flex items-center gap-3 overflow-hidden">
                             <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 ring-1 ring-gray-100 shadow-sm">
                                 <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover" />
                             </div>
-                            <span className="font-bold text-lg text-gray-800 tracking-tight whitespace-nowrap font-sans">Teacher Portal</span>
+                            <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-36 opacity-100'}`}>
+                                <span className="font-bold text-lg text-gray-800 tracking-tight whitespace-nowrap font-sans">Teacher Portal</span>
+                            </div>
                         </Link>
 
-                        {!isCollapsed && (
-                            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 rounded-full">
-                                <X size={24} />
-                            </button>
-                        )}
+                        <button onClick={() => setIsSidebarOpen(false)} className={`lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-opacity ${isCollapsed ? 'opacity-0 pointer-events-none w-0 h-0 p-0' : 'opacity-100'}`}>
+                            <X size={24} />
+                        </button>
                     </div>
 
                     {/* Navigation */}
@@ -135,7 +136,9 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                                     title={isCollapsed ? item.name : undefined}
                                 >
                                     <Icon size={22} className={`min-w-[22px] shrink-0`} />
-                                    {!isCollapsed && <span className="whitespace-nowrap truncate">{item.name}</span>}
+                                    <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-40 opacity-100'}`}>
+                                        <span className="whitespace-nowrap">{item.name}</span>
+                                    </div>
                                 </Link>
                             );
                         })}

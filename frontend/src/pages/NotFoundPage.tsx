@@ -2,8 +2,16 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const NotFoundPage = () => {
+    const { user } = useAuth();
+
+    // Determine the correct dashboard path based on role
+    let dashboardPath = '/dashboard';
+    if (user?.roles?.includes('ADMIN')) dashboardPath = '/admin';
+    if (user?.roles?.includes('TEACHER')) dashboardPath = '/teacher';
+
     return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
             <motion.div
@@ -58,7 +66,7 @@ const NotFoundPage = () => {
                     className="flex flex-col sm:flex-row gap-3 justify-center"
                 >
                     <Link
-                        to="/dashboard"
+                        to={dashboardPath}
                         className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                     >
                         <Home size={20} />

@@ -9,6 +9,7 @@ import RoleSwitcher from '../components/role/RoleSwitcher';
 import SearchModal from '../components/SearchModal';
 import { useAuth } from '../contexts/AuthContext';
 import ChatbotWidget from '../components/ChatbotWidget';
+import SidebarToggle from '../components/ui/SidebarToggle';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -18,7 +19,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
     const { user, logout } = useAuth(); // Use Auth Context
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
@@ -72,49 +73,58 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed lg:sticky top-0 left-0 z-50 h-screen bg-[#F0F4F9] dark:bg-slate-900 border-r border-transparent dark:border-slate-800
-                transform transition-all duration-300 ease-in-out flex flex-col
+                fixed lg:sticky top-0 left-0 z-50 h-[100dvh] bg-[#F0F4F9] dark:bg-slate-900 border-r border-transparent dark:border-slate-800
+                transform transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-x-hidden
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-                ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}
+                ${isCollapsed ? 'w-64 lg:w-20' : 'w-64 lg:w-72'}
             `}>
-                <div className="flex flex-col h-full">
-                    <div className="flex flex-col p-4">
+                <div className="flex flex-col h-full w-full">
+                    <div className="flex flex-col p-4 w-full">
                         <div className="flex items-center gap-3 mb-6 pl-2">
-                            <button
-                                onClick={() => setIsCollapsed(!isCollapsed)}
-                                className="hidden lg:block p-2 -ml-2 text-gray-500 hover:bg-gray-200 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full transition-colors"
-                                title={isCollapsed ? "Expand" : "Collapse"}
-                            >
-                                <Menu size={24} />
-                            </button>
+                            <div className="hidden lg:block -ml-2">
+                                <SidebarToggle
+                                    isCollapsed={isCollapsed}
+                                    toggle={() => setIsCollapsed(!isCollapsed)}
+                                    title={isCollapsed ? "Expand" : "Collapse"}
+                                />
+                            </div>
 
-                            <Link to="/dashboard" className={`flex items-center gap-3 overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                            <Link to="/dashboard" className="flex items-center gap-3 overflow-hidden">
                                 <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 ring-1 ring-gray-100 shadow-sm">
                                     <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover" />
                                 </div>
-                                <span className="font-bold text-lg text-gray-800 dark:text-white tracking-tight whitespace-nowrap font-sans">ForeignLang</span>
+                                <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-32 opacity-100'}`}>
+                                    <span className="font-bold text-lg text-gray-800 dark:text-white tracking-tight whitespace-nowrap font-sans">ForeignLang</span>
+                                </div>
                             </Link>
 
-                            {!isCollapsed && (
-                                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full">
-                                    <X size={24} />
-                                </button>
-                            )}
+                            <button onClick={() => setIsSidebarOpen(false)} className={`lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full transition-opacity ${isCollapsed ? 'opacity-0 pointer-events-none w-0 h-0 p-0' : 'opacity-100'}`}>
+                                <X size={24} />
+                            </button>
                         </div>
 
                         {/* Search Trigger */}
                         <button
                             onClick={() => setIsSearchOpen(true)}
-                            className={`group flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white rounded-full transition-all mb-6 shadow-sm border border-gray-200/60 dark:border-slate-700 ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : 'w-full'
+                            className={`group flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition-all mb-6 shadow-sm border border-gray-200/60 dark:border-slate-700/50 mx-2 ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : ''
                                 }`}
                             title="Search (Ctrl+K)"
                         >
-                            <Search size={20} className="shrink-0" />
-                            {!isCollapsed && <span className="font-medium truncate">Search...</span>}
+                            <div className="flex items-center gap-3">
+                                <Search size={18} className="shrink-0 group-hover:text-indigo-500 transition-colors" />
+                                <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-24 opacity-100'}`}>
+                                    <span className="font-medium text-sm whitespace-nowrap">Search...</span>
+                                </div>
+                            </div>
+                            <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-8 opacity-100'}`}>
+                                <kbd className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-gray-400 bg-gray-100 dark:bg-slate-900/50 rounded flex-shrink-0">
+                                    <span className="text-xs">⌘</span>K
+                                </kbd>
+                            </div>
                         </button>
 
                         {/* Navigation */}
-                        <nav className="flex-1 space-y-1">
+                        <nav className="flex-1 space-y-1.5 px-2">
                             {navItems.map((item) => {
                                 // Check active state
                                 const active = isActive(item.path);
@@ -124,16 +134,27 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setIsSidebarOpen(false)}
-                                        className={`flex items-center gap-4 px-4 py-3 rounded-full transition-all font-medium relative group
+                                        className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors font-medium relative group
                                         ${active
-                                                ? 'bg-[#D3E3FD] dark:bg-indigo-900/50 text-[#041E49] dark:text-indigo-300' // Indigo Theme for Learner
-                                                : 'text-gray-600 dark:text-slate-400 hover:bg-[#E8EAED] dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'}
+                                                ? 'text-[#041E49] dark:text-indigo-300'
+                                                : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'}
                                         ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : ''}
                                     `}
                                         title={isCollapsed ? item.name : undefined}
                                     >
-                                        <item.icon size={22} className={`min-w-[22px] shrink-0`} />
-                                        {!isCollapsed && <span className="whitespace-nowrap truncate">{item.name}</span>}
+                                        {active && (
+                                            <motion.div
+                                                layoutId="activeNavIndicator"
+                                                className="absolute inset-0 bg-[#D3E3FD] dark:bg-indigo-900/50 rounded-2xl border border-indigo-100 dark:border-indigo-800/50"
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            />
+                                        )}
+                                        <div className="relative z-10 flex items-center gap-4 w-full">
+                                            <item.icon size={22} className="min-w-[22px] shrink-0" />
+                                            <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-40 opacity-100'}`}>
+                                                <span className="whitespace-nowrap">{item.name}</span>
+                                            </div>
+                                        </div>
                                     </Link>
                                 )
                             })}
@@ -164,14 +185,23 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 transition-all duration-300">
-                <header className="bg-white/90 dark:bg-slate-900/90 border-b border-gray-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm/50 backdrop-blur-xl">
+                <header className="bg-white/80 dark:bg-slate-900/80 border-b border-gray-200/50 dark:border-slate-800/80 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm/30 backdrop-blur-xl">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-xl transition-colors">
                             <Menu size={24} />
                         </button>
-                        <h1 className="text-xl font-bold text-gray-800 dark:text-white hidden sm:block">
-                            {navItems.find(i => isActive(i.path))?.name || 'Dashboard'}
-                        </h1>
+                        <div className="hidden sm:flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 dark:text-slate-400 font-medium px-2 py-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-lg">Pages</span>
+                            <span className="text-gray-300 dark:text-slate-600">/</span>
+                            <motion.h1
+                                key={location.pathname}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="text-lg font-bold text-gray-900 dark:text-white"
+                            >
+                                {navItems.find(i => isActive(i.path))?.name || 'Dashboard'}
+                            </motion.h1>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -242,41 +272,55 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                             <AnimatePresence>
                                 {isProfileDropdownOpen && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 py-2 z-50 origin-top-right"
+                                        initial={{ opacity: 0, y: 15, scale: 0.95, filter: 'blur(10px)' }}
+                                        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(5px)' }}
+                                        transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+                                        className="absolute right-0 top-full mt-3 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 dark:shadow-black/40 border border-white/20 dark:border-slate-700/50 py-3 z-50 origin-top-right overflow-hidden"
                                     >
-                                        <div className="px-4 py-3 border-b border-gray-50 dark:border-slate-700 mb-2">
-                                            <p className="font-semibold text-gray-900 dark:text-white truncate">{user?.name}</p>
-                                            <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{user?.email}</p>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
+
+                                        <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 mb-2 relative z-10">
+                                            <p className="font-bold text-gray-900 dark:text-white truncate">{user?.name}</p>
+                                            <p className="text-sm text-gray-500 dark:text-slate-400 truncate">{user?.email}</p>
                                         </div>
 
                                         {user?.roles && (
-                                            <RoleSwitcher roles={user.roles} currentRole="LEARNER" />
+                                            <div className="relative z-10">
+                                                <RoleSwitcher roles={user.roles} currentRole="LEARNER" />
+                                            </div>
                                         )}
 
-                                        <Link to="/dashboard/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                            <UserIcon size={18} className="text-gray-400 dark:text-slate-500" />
-                                            {t('dashboard.myProfile')}
-                                        </Link>
-                                        <Link to="/dashboard/settings" className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                            <Settings size={18} className="text-gray-400 dark:text-slate-500" />
-                                            {t('dashboard.settings')}
-                                        </Link>
-                                        <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                            <HelpCircle size={18} className="text-gray-400 dark:text-slate-500" />
-                                            {t('dashboard.help')}
-                                        </button>
+                                        <div className="px-2 space-y-1 relative z-10">
+                                            <Link to="/dashboard/profile" className="group flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all">
+                                                <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 text-gray-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                    <UserIcon size={16} />
+                                                </div>
+                                                <span className="transform transition-transform group-hover:translate-x-1">{t('dashboard.myProfile')}</span>
+                                            </Link>
+                                            <Link to="/dashboard/settings" className="group flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white transition-all">
+                                                <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 text-gray-500 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                                                    <Settings size={16} />
+                                                </div>
+                                                <span className="transform transition-transform group-hover:translate-x-1">{t('dashboard.settings')}</span>
+                                            </Link>
+                                            <button className="w-full group flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white transition-all text-left">
+                                                <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 text-gray-500 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                                                    <HelpCircle size={16} />
+                                                </div>
+                                                <span className="transform transition-transform group-hover:translate-x-1">{t('dashboard.help')}</span>
+                                            </button>
+                                        </div>
 
-                                        <div className="mt-2 pt-2 border-t border-gray-50 dark:border-slate-700 px-2">
+                                        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-slate-800 px-3 relative z-10">
                                             <button
                                                 onClick={handleLogout}
-                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors font-medium"
+                                                className="group w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                                             >
-                                                <LogOut size={18} />
-                                                {t('dashboard.logout')}
+                                                <div className="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/10 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
+                                                    <LogOut size={16} />
+                                                </div>
+                                                <span className="transform transition-transform group-hover:translate-x-1">{t('dashboard.logout')}</span>
                                             </button>
                                         </div>
                                     </motion.div>

@@ -1,12 +1,20 @@
 package com.foreignlang.backend.controller;
 
 import com.foreignlang.backend.entity.VocabularyBank;
+import com.foreignlang.backend.entity.User;
+import com.foreignlang.backend.entity.UserVocabulary;
 import com.foreignlang.backend.repository.VocabularyBankRepository;
+import com.foreignlang.backend.repository.UserRepository;
+import com.foreignlang.backend.repository.UserVocabularyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -19,6 +27,8 @@ import java.util.UUID;
 public class VocabularyBankController {
 
     private final VocabularyBankRepository vocabularyBankRepository;
+    private final UserRepository userRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
 
     /**
      * Get all vocabulary for a specific topic
@@ -96,5 +106,72 @@ public class VocabularyBankController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Mark a vocabulary entry as mastered by the current user
+     */
+    @PostMapping("/{id}/master")
+    public ResponseEntity<?> masterVocabulary(@PathVariable UUID id,
+            @AuthenticationPrincipal OAuth2User principal,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+
+        User user = getAuthenticatedUser(principal, httpRequest);
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        Optional<VocabularyBank> vocabOpt = vocabularyBankRepository.findById(id);
+        if (vocabOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        VocabularyBank vocab = vocabOpt.get();
+
+        UserVocabulary userVocab = userVocabularyRepository.findByUserAndVocabulary(user, vocab)
+                .orElse(UserVocabulary.builder()
+                        .user(user)
+                        .vocabulary(vocab)
+                        .isMastered(false)
+                        .build());
+
+        // Toggle mastery or just set to true (for now just toggle)
+        userVocab.setMastered(!userVocab.isMastered());
+        userVocabularyRepository.save(userVocab);
+
+        return ResponseEntity.ok(Map.of("isMastered", userVocab.isMastered(), "vocabularyId", id));
+    }
+
+    /**
+     * Get IDs of all vocabulary mastered by the current user
+     */
+    @GetMapping("/mastered")
+    public ResponseEntity<?> getMasteredVocabularyIds(@AuthenticationPrincipal OAuth2User principal,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+
+        User user = getAuthenticatedUser(principal, httpRequest);
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        List<UUID> masteredIds = userVocabularyRepository.findMasteredVocabularyIdsByUser(user);
+        return ResponseEntity.ok(masteredIds);
+    }
+
+    private User getAuthenticatedUser(OAuth2User principal, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        String email = null;
+        if (principal instanceof com.foreignlang.backend.security.UserPrincipal userPrincipal) {
+            return userPrincipal.getUser();
+        } else if (principal != null) {
+            email = principal.getAttribute("email");
+        } else {
+            jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                email = (String) session.getAttribute("userEmail");
+            }
+        }
+        if (email == null)
+            return null;
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

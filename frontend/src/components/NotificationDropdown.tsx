@@ -86,12 +86,12 @@ const NotificationDropdown = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                className="relative p-2 text-gray-400 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-gray-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl transition-all active:scale-95"
                 title={t('notifications.title')}
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900" />
                 )}
             </button>
 
@@ -102,49 +102,49 @@ const NotificationDropdown = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden"
+                        className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[1.5rem] shadow-2xl border border-gray-100/50 dark:border-slate-800/50 z-50 overflow-hidden origin-top-right"
                     >
-                        <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
-                            <h3 className="font-semibold text-slate-800">{t('notifications.title')}</h3>
+                        <div className="flex items-center justify-between p-5 border-b border-gray-100/50 dark:border-slate-800/50 relative z-10">
+                            <h3 className="font-black text-gray-900 dark:text-white tracking-tight text-lg">{t('notifications.title')}</h3>
                             {unreadCount > 0 && (
                                 <button
                                     onClick={markAllAsRead}
-                                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg transition-colors"
                                 >
-                                    <Check size={12} /> {t('notifications.markAllRead')}
+                                    <Check size={14} /> {t('notifications.markAllRead')}
                                 </button>
                             )}
                         </div>
 
-                        <div className="max-h-[400px] overflow-y-auto">
+                        <div className="max-h-[400px] overflow-y-auto scrollbar-hide relative z-10">
                             {notifications.length > 0 ? (
-                                <div className="divide-y divide-slate-100">
+                                <div className="divide-y divide-gray-50 dark:divide-slate-800/50">
                                     {notifications.map((notification) => (
                                         <div
                                             key={notification.id}
-                                            className={`p-4 hover:bg-slate-50 transition-colors ${!notification.read ? 'bg-indigo-50/30' : ''}`}
+                                            className={`p-5 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${!notification.read ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : ''}`}
                                             onClick={() => !notification.read && markAsRead(notification.id)}
                                         >
-                                            <div className="flex gap-3">
+                                            <div className="flex gap-4">
                                                 <div className="mt-1 flex-shrink-0">
                                                     {getIcon(notification.type)}
                                                 </div>
-                                                <div className="flex-1 space-y-1">
+                                                <div className="flex-1 space-y-1.5">
                                                     <div className="flex justify-between items-start">
-                                                        <p className={`text-sm font-medium ${!notification.read ? 'text-slate-900' : 'text-slate-700'}`}>
+                                                        <p className={`text-sm font-bold ${!notification.read ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-slate-300'}`}>
                                                             {notification.title}
                                                         </p>
-                                                        <span className="text-xs text-slate-400 whitespace-nowrap ml-2">
+                                                        <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 whitespace-nowrap ml-3 uppercase tracking-wider">
                                                             {new Date(notification.createdAt).toLocaleDateString()}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm text-slate-500 line-clamp-2">
+                                                    <p className={`text-sm line-clamp-2 ${!notification.read ? 'text-gray-600 dark:text-slate-300 font-medium' : 'text-gray-500 dark:text-slate-400'}`}>
                                                         {notification.message}
                                                     </p>
                                                     {notification.actionLink && (
                                                         <Link
                                                             to={notification.actionLink}
-                                                            className="inline-block mt-2 text-xs font-medium text-indigo-600 hover:underline"
+                                                            className="inline-block mt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline"
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
                                                             {t('notifications.viewDetails')} →
@@ -152,16 +152,19 @@ const NotificationDropdown = () => {
                                                     )}
                                                 </div>
                                                 {!notification.read && (
-                                                    <div className="mt-2 w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0" />
+                                                    <div className="mt-2 w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0 shadow-sm shadow-indigo-500/50" />
                                                 )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 text-center text-slate-500">
-                                    <Bell size={32} className="mx-auto mb-3 text-slate-300" />
-                                    <p>{t('notifications.empty')}</p>
+                                <div className="p-10 text-center flex flex-col items-center justify-center">
+                                    <div className="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-slate-600 shadow-inner">
+                                        <Bell size={28} />
+                                    </div>
+                                    <p className="font-bold text-gray-500 dark:text-slate-400">{t('notifications.empty')}</p>
+                                    <p className="text-sm font-medium text-gray-400 dark:text-slate-500 mt-1">Check back later for updates</p>
                                 </div>
                             )}
                         </div>

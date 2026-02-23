@@ -1,0 +1,49 @@
+.uiverse-hamburger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.uiverse-hamburger input {
+    display: none;
+}
+
+.uiverse-hamburger svg {
+    height: 2em;
+    transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    color: #64748b;
+    /* text-slate-500 */
+}
+
+.dark .uiverse-hamburger svg {
+    color: #94a3b8;
+    /* dark:text-slate-400 */
+}
+
+.uiverse-hamburger:hover svg {
+    color: #4f46e5;
+}
+
+.line {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.5;
+    transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+        stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.line-top-bottom {
+    stroke-dasharray: 12 63;
+}
+
+.uiverse-hamburger input:checked+svg {
+    transform: rotate(-45deg);
+}
+
+.uiverse-hamburger input:checked+svg .line-top-bottom {
+    stroke-dasharray: 20 300;
+    stroke-dashoffset: -32.42;
+}

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { User, Globe, Moon, Save, Shield, Award } from 'lucide-react';
+import { User, Globe, Moon, Save, Shield, Award, Camera, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 interface UserProfile {
     fullName: string;
@@ -89,9 +90,18 @@ const SettingsPage = () => {
     const isTeacher = profileData.roles.includes('TEACHER');
 
     return (
-        <div className="max-w-4xl mx-auto pb-12">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('dashboard.settings')}</h1>
-            <p className="text-gray-500 mb-8">Manage your account settings and preferences.</p>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto pb-12 relative"
+        >
+            {/* Background ambient effect */}
+            <div className="fixed top-0 left-0 right-0 h-96 bg-gradient-to-b from-indigo-50/50 dark:from-indigo-900/10 to-transparent pointer-events-none -z-10" />
+
+            <div className="mb-8">
+                <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">{t('dashboard.settings')}</h1>
+                <p className="text-gray-500 dark:text-slate-400">Manage your account settings and preferences.</p>
+            </div>
 
             <div className="grid grid-cols-12 gap-8">
                 {/* Sidebar Tabs */}
@@ -100,14 +110,14 @@ const SettingsPage = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
+                            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all
                                 ${activeTab === tab.id
-                                    ? 'bg-indigo-50 text-indigo-700 shadow-sm'
-                                    : 'text-gray-600 hover:bg-gray-50'
+                                    ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-400 shadow-sm border border-indigo-500/10'
+                                    : 'text-gray-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-gray-900 dark:hover:text-white border border-transparent'
                                 }
                             `}
                         >
-                            <tab.icon size={18} />
+                            <tab.icon size={18} className={activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-slate-500'} />
                             {tab.label}
                         </button>
                     ))}
@@ -115,65 +125,76 @@ const SettingsPage = () => {
 
                 {/* Content Area */}
                 <div className="col-span-12 md:col-span-9">
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2rem] border border-gray-100/50 dark:border-slate-800/50 shadow-2xl overflow-hidden relative"
+                    >
 
                         {/* PROFILE TAB */}
                         {activeTab === 'profile' && (
-                            <div className="p-6 md:p-8 space-y-6">
+                            <div className="p-6 md:p-8 space-y-8 relative z-10">
                                 {isFetching ? (
-                                    <div className="animate-pulse space-y-4">
-                                        <div className="h-20 w-20 bg-gray-200 rounded-full"></div>
-                                        <div className="h-10 bg-gray-200 rounded"></div>
-                                        <div className="h-10 bg-gray-200 rounded"></div>
+                                    <div className="animate-pulse space-y-6">
+                                        <div className="h-24 w-24 bg-gray-200 dark:bg-slate-700 rounded-full"></div>
+                                        <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded-xl"></div>
+                                        <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded-xl"></div>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-2xl font-bold text-indigo-600 border-4 border-white shadow-md overflow-hidden">
+                                        <div className="flex items-center gap-5 p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full pointer-events-none" />
+                                            <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center border border-indigo-200 dark:border-indigo-800 shadow-inner group">
                                                 {profileData.avatarUrl ? (
                                                     <img src={profileData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    profileData.fullName.charAt(0)
+                                                    <span className="text-4xl font-black text-indigo-600 dark:text-indigo-400 uppercase">{profileData.fullName.charAt(0)}</span>
                                                 )}
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                    <Camera size={24} className="text-white" />
+                                                </div>
                                             </div>
-                                            <div>
-                                                <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-3">
+                                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white">{profileData.fullName}</h3>
+                                                    {isTeacher && (
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 dark:bg-indigo-500/20 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 shadow-sm">
+                                                            Teacher Account
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <button className="self-start px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 shadow-sm transition-all active:scale-95">
                                                     Change Avatar
                                                 </button>
-                                                {isTeacher && (
-                                                    <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                                        Teacher Account
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                                                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Full Name</label>
                                                 <input
                                                     type="text"
                                                     value={profileData.fullName}
                                                     onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                                    className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                                                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Email</label>
                                                 <input
                                                     type="email"
                                                     value={profileData.email}
                                                     disabled
-                                                    className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed"
+                                                    className="w-full px-4 py-3.5 bg-gray-100/80 dark:bg-slate-800/80 border border-gray-200/50 dark:border-slate-700/50 rounded-2xl text-gray-500 dark:text-slate-500 cursor-not-allowed font-medium"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Learning Goal</label>
+                                                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Learning Goal</label>
                                                 <select
                                                     value={profileData.learningGoal}
                                                     onChange={(e) => setProfileData({ ...profileData, learningGoal: e.target.value })}
-                                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                                    className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium appearance-none"
                                                 >
                                                     <option value="">Select a goal</option>
                                                     <option value="career">Career Advancement</option>
@@ -184,39 +205,43 @@ const SettingsPage = () => {
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-2">Proficiency Level</label>
+                                                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Proficiency Level</label>
                                                 <input
                                                     type="text"
                                                     value={profileData.proficiencyLevel}
                                                     disabled
-                                                    className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed"
+                                                    className="w-full px-4 py-3.5 bg-gray-100/80 dark:bg-slate-800/80 border border-gray-200/50 dark:border-slate-700/50 rounded-2xl text-gray-500 dark:text-slate-500 cursor-not-allowed font-medium uppercase text-center max-w-[120px]"
                                                 />
                                             </div>
 
                                             {isTeacher && (
                                                 <>
                                                     <div className="col-span-full">
-                                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Specialization</label>
-                                                        <div className="relative">
-                                                            <Award className="absolute left-3 top-3 text-gray-400" size={18} />
+                                                        <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Specialization</label>
+                                                        <div className="relative group">
+                                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                                <Award className="text-gray-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                                                            </div>
                                                             <input
                                                                 type="text"
                                                                 value={profileData.specialization}
                                                                 onChange={(e) => setProfileData({ ...profileData, specialization: e.target.value })}
                                                                 placeholder="e.g. Business English, IELTS Preparation"
-                                                                className="w-full pl-10 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                                                className="w-full pl-11 px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium"
                                                             />
                                                         </div>
                                                     </div>
                                                     <div className="col-span-full">
-                                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Bio</label>
-                                                        <textarea
-                                                            value={profileData.bio}
-                                                            onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                                                            rows={4}
-                                                            placeholder="Tell students about your experience and teaching style..."
-                                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
-                                                        />
+                                                        <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Bio</label>
+                                                        <div className="relative">
+                                                            <textarea
+                                                                value={profileData.bio}
+                                                                onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                                                                rows={4}
+                                                                placeholder="Tell students about your experience and teaching style..."
+                                                                className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium resize-none shadow-inner"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </>
                                             )}
@@ -228,72 +253,80 @@ const SettingsPage = () => {
 
                         {/* PREFERENCES TAB */}
                         {activeTab === 'preferences' && (
-                            <div className="p-6 md:p-8 space-y-8">
+                            <div className="p-6 md:p-8 space-y-10 relative z-10">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <Globe size={20} className="text-indigo-600" />
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                            <Globe size={22} className="text-indigo-600 dark:text-indigo-400" />
+                                        </div>
                                         Language
                                     </h3>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-5">
                                         <button
                                             onClick={() => i18n.changeLanguage('en')}
-                                            className={`p-4 rounded-xl border-2 text-left transition-all relative ${i18n.language === 'en' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 hover:border-gray-200'}`}
+                                            className={`p-5 rounded-2xl border-2 text-left transition-all relative ${i18n.language === 'en' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 dark:border-indigo-500 shadow-md shadow-indigo-500/10' : 'border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 hover:border-gray-300 dark:hover:border-slate-600'}`}
                                         >
-                                            <span className="block font-medium text-gray-900">English</span>
-                                            <span className="text-sm text-gray-500">English</span>
-                                            {i18n.language === 'en' && <div className="absolute top-4 right-4 text-indigo-600">●</div>}
+                                            <span className={`block font-bold text-lg ${i18n.language === 'en' ? 'text-indigo-900 dark:text-indigo-100' : 'text-gray-900 dark:text-white'}`}>English</span>
+                                            <span className={`text-sm font-medium mt-1 block ${i18n.language === 'en' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400'}`}>English</span>
+                                            {i18n.language === 'en' && <div className="absolute top-5 right-5 w-3 h-3 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
                                         </button>
                                         <button
                                             onClick={() => i18n.changeLanguage('vi')}
-                                            className={`p-4 rounded-xl border-2 text-left transition-all relative ${i18n.language === 'vi' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 hover:border-gray-200'}`}
+                                            className={`p-5 rounded-2xl border-2 text-left transition-all relative ${i18n.language === 'vi' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 dark:border-indigo-500 shadow-md shadow-indigo-500/10' : 'border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 hover:border-gray-300 dark:hover:border-slate-600'}`}
                                         >
-                                            <span className="block font-medium text-gray-900">Tiếng Việt</span>
-                                            <span className="text-sm text-gray-500">Vietnamese</span>
-                                            {i18n.language === 'vi' && <div className="absolute top-4 right-4 text-indigo-600">●</div>}
+                                            <span className={`block font-bold text-lg ${i18n.language === 'vi' ? 'text-indigo-900 dark:text-indigo-100' : 'text-gray-900 dark:text-white'}`}>Tiếng Việt</span>
+                                            <span className={`text-sm font-medium mt-1 block ${i18n.language === 'vi' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400'}`}>Vietnamese</span>
+                                            {i18n.language === 'vi' && <div className="absolute top-5 right-5 w-3 h-3 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-gray-100">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <Moon size={20} className="text-indigo-600" />
+                                <div className="pt-8 border-t border-gray-100 dark:border-slate-800/80">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                            <Moon size={22} className="text-indigo-600 dark:text-indigo-400" />
+                                        </div>
                                         Appearance
                                     </h3>
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center text-gray-500 italic">
-                                        Dark mode is coming soon!
+                                    <div className="p-6 bg-gradient-to-r from-gray-50 to-white dark:from-slate-800/50 dark:to-slate-900/50 rounded-2xl border border-gray-200/50 dark:border-slate-700/50 text-center shadow-inner relative overflow-hidden">
+                                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                                        <span className="font-bold text-gray-600 dark:text-slate-300 text-lg">Dark mode is supported via system settings 🕶️</span>
+                                        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-2">The application adapts to your OS theme automatically.</p>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-gray-100">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <Shield size={20} className="text-indigo-600" />
+                                <div className="pt-8 border-t border-gray-100 dark:border-slate-800/80">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                            <Shield size={22} className="text-indigo-600 dark:text-indigo-400" />
+                                        </div>
                                         Connected Accounts
                                     </h3>
-                                    <div className="p-4 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center p-2 shadow-sm">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" />
+                                    <div className="p-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-14 h-14 bg-white border-2 border-gray-100 dark:border-slate-700 rounded-2xl flex items-center justify-center p-2.5 shadow-sm bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="w-full h-full object-contain drop-shadow-sm" />
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900">Google</p>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Google</p>
+                                                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
                                                     {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE'
-                                                        ? 'Connected'
-                                                        : 'Not connected'}
+                                                        ? 'Securely connected to Google account'
+                                                        : 'Connect to log in with Google'}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div>
+                                        <div className="w-full sm:w-auto self-end sm:self-center">
                                             {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' ? (
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    Linked
+                                                <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
+                                                    <Check size={16} className="mr-1.5" /> Linked
                                                 </span>
                                             ) : (
                                                 <a
                                                     href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/google`}
-                                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                                    className="w-full sm:w-auto inline-flex justify-center px-6 py-2.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95 text-center"
                                                 >
-                                                    Connect
+                                                    Connect Google
                                                 </a>
                                             )}
                                         </div>
@@ -304,21 +337,26 @@ const SettingsPage = () => {
 
                         {/* SECURITY TAB */}
                         {activeTab === 'security' && (
-                            <div className="p-6 md:p-8 space-y-6">
+                            <div className="p-6 md:p-8 space-y-8 relative z-10">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
-                                    <div className="space-y-4 max-w-md">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                            <Shield size={22} className="text-indigo-600 dark:text-indigo-400" />
+                                        </div>
+                                        Change Password
+                                    </h3>
+                                    <div className="space-y-6 max-w-xl">
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
-                                            <input type="password" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Current Password</label>
+                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
-                                            <input type="password" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">New Password</label>
+                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password</label>
-                                            <input type="password" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none" />
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Confirm New Password</label>
+                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
                                         </div>
                                     </div>
                                 </div>
@@ -326,14 +364,17 @@ const SettingsPage = () => {
                         )}
 
                         {/* Submit Button Area */}
-                        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
+                        <div className="bg-gray-50/50 dark:bg-slate-900/80 px-6 py-5 border-t border-gray-100 dark:border-slate-800/80 flex justify-end relative z-10 backdrop-blur-md">
                             <button
                                 onClick={handleSave}
                                 disabled={isLoading}
-                                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
+                                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-600/30 flex items-center gap-2.5 disabled:opacity-70 disabled:active:scale-100"
                             >
                                 {isLoading ? (
-                                    <>Saving...</>
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Saving...
+                                    </>
                                 ) : (
                                     <>
                                         <Save size={18} />
@@ -343,10 +384,10 @@ const SettingsPage = () => {
                             </button>
                         </div>
 
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

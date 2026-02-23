@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Brain, PenTool, BarChart3, Sparkles, Loader2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, Brain, PenTool, BarChart3, Sparkles } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import Confetti from '../../components/ui/Confetti';
+import UiverseLoader from '../../components/ui/UiverseLoader';
 
 interface Question {
     id: number;
@@ -81,6 +84,7 @@ type WizardPhase = 'goal' | 'quiz' | 'writing' | 'analyzing' | 'results';
 const SkillAssessment = () => {
     const navigate = useNavigate();
     const { showSuccess, showError } = useToast();
+    const { refreshUser } = useAuth();
 
     const [phase, setPhase] = useState<WizardPhase>('goal');
     const [learningGoal, setLearningGoal] = useState('');
@@ -129,6 +133,10 @@ const SkillAssessment = () => {
             if (!res.ok) throw new Error('Failed');
             const data = await res.json();
             setResult({ level: data.level, totalScore: mcqScore, mcqScore, aiScore: 0, grammar: 0, vocabulary: 0, coherence: 0, tone: 0, feedback: 'Writing challenge was skipped. You can retake the assessment later for a more accurate result.' });
+
+            // Refresh user to update profileComplete status locally
+            await refreshUser();
+
             setTimeout(() => setPhase('results'), 1000);
         } catch {
             showError('Failed to submit. Please try again.');
@@ -157,6 +165,9 @@ const SkillAssessment = () => {
 
             const data: AssessmentResult = await res.json();
             setResult(data);
+
+            // Refresh user to update profileComplete status locally
+            await refreshUser();
 
             // Brief delay for animation
             setTimeout(() => setPhase('results'), 1500);
@@ -187,6 +198,7 @@ const SkillAssessment = () => {
     // ─────────────── RENDER ───────────────
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 dark:from-slate-950 dark:to-indigo-950 flex items-center justify-center p-4">
+            <Confetti active={phase === 'results'} />
             <div className="w-full max-w-lg">
                 {/* Progress bar (hidden on goal and results) */}
                 {phase !== 'goal' && phase !== 'results' && (
@@ -352,13 +364,9 @@ const SkillAssessment = () => {
                         <motion.div key="analyzing" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                             className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-12 text-center"
                         >
-                            <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="w-16 h-16 mx-auto mb-6"
-                            >
-                                <Loader2 size={64} className="text-indigo-600 dark:text-indigo-400" />
-                            </motion.div>
+                            <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center scale-150">
+                                <UiverseLoader />
+                            </div>
                             <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Analyzing Your Writing...</h2>
                             <p className="text-slate-500 dark:text-slate-400">Our AI is evaluating grammar, vocabulary, coherence, and tone.</p>
 

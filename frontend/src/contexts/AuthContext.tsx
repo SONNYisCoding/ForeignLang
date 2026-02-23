@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             await fetch('/api/v1/auth/logout', { method: 'POST' });
             setUser(null);
+            sessionStorage.removeItem('dashboardIntroShown');
             window.location.href = '/login';
         } catch (error) {
             console.error('Logout failed', error);

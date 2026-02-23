@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, X, BookOpen, Users, LayoutDashboard, Sparkles, Command, FileText, Loader2 } from 'lucide-react';
+import { Search, X, BookOpen, Users, LayoutDashboard, Sparkles, Command, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import UiverseLoader from './ui/UiverseLoader';
 
 interface SearchResultItem {
     id: string;
@@ -129,7 +130,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                                 onChange={(e) => setQuery(e.target.value)}
                             />
                             <div className="flex items-center gap-2">
-                                {loading && <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />}
+                                {loading && <div className="scale-50 mr-2"><UiverseLoader /></div>}
                                 <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-xs text-gray-400 font-sans">
                                     <span className="text-xs">ESC</span>
                                 </kbd>

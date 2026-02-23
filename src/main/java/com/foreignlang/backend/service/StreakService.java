@@ -31,6 +31,11 @@ public class StreakService {
 
         user.setLastActivityDate(today);
         userRepository.save(user);
+
+        // Notify Gamification (Dependency via ApplicationEventPublisher or direct call
+        // if refactored)
+        // Note: For simplicity and avoiding circular dependency, GamificationService
+        // handles the milestone logic itself
     }
 
     public int getEffectiveStreak(User user) {

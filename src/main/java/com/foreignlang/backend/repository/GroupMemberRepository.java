@@ -13,4 +13,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, UUID> 
     boolean existsByGroupIdAndLearnerId(UUID groupId, UUID learnerId);
 
     long countByGroup_Teacher_Id(UUID teacherId);
+
+    java.util.List<GroupMember> findByGroup(com.foreignlang.backend.entity.StudentGroup group);
 }

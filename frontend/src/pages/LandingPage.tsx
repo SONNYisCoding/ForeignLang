@@ -81,21 +81,22 @@ const LandingPage = () => {
                                 <AnimatePresence>
                                     {isLangDropdownOpen && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                                            initial={{ opacity: 0, y: 10, filter: 'blur(10px)' }}
+                                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                            exit={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
+                                            transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+                                            className="absolute right-0 mt-2 w-40 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 border border-white/20 py-2 z-50 overflow-hidden"
                                         >
                                             <button
                                                 onClick={() => changeLanguage('en')}
-                                                className="w-full px-4 py-2 text-left text-sm hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 flex items-center justify-between"
+                                                className="w-full px-4 py-2.5 text-left text-sm hover:bg-indigo-50/80 text-gray-700 hover:text-indigo-600 flex items-center justify-between transition-colors font-medium border-b border-transparent hover:border-indigo-100"
                                             >
                                                 <span>English</span>
                                                 {i18n.language === 'en' && <Check size={16} className="text-indigo-600" />}
                                             </button>
                                             <button
                                                 onClick={() => changeLanguage('vi')}
-                                                className="w-full px-4 py-2 text-left text-sm hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 flex items-center justify-between"
+                                                className="w-full px-4 py-2.5 text-left text-sm hover:bg-indigo-50/80 text-gray-700 hover:text-indigo-600 flex items-center justify-between transition-colors font-medium border-t border-transparent hover:border-indigo-100"
                                             >
                                                 <span>Tiếng Việt</span>
                                                 {i18n.language === 'vi' && <Check size={16} className="text-indigo-600" />}
@@ -105,11 +106,34 @@ const LandingPage = () => {
                                 </AnimatePresence>
                             </div>
 
-                            <Link to="/login" className="hidden sm:block px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
-                                {t('landing.nav.login')}
+                            <Link
+                                to="/login"
+                                className="hidden sm:flex relative items-center justify-center px-5 py-2 text-sm font-bold text-gray-700 transition-colors group overflow-hidden rounded-full"
+                            >
+                                <span className="absolute inset-0 bg-indigo-50 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 ease-out rounded-full z-0"></span>
+                                <span className="relative z-10 group-hover:text-indigo-600 transition-colors">{t('landing.nav.login')}</span>
                             </Link>
-                            <Link to="/register" className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white text-sm font-semibold rounded-full shadow-lg shadow-indigo-200 transition-all hover:scale-105">
-                                {t('landing.nav.getStarted')}
+                            <Link
+                                to="/register"
+                                className="group relative inline-block w-48 h-auto cursor-pointer outline-none bg-transparent align-middle"
+                            >
+                                {/* Vòng tròn nền chứa Gradient & Shadow (mở rộng khi hover) */}
+                                <span
+                                    className="relative block w-12 h-12 rounded-full transition-all duration-[450ms] ease-[cubic-bezier(0.65,0,0.076,1)] group-hover:w-full bg-gradient-to-r from-indigo-600 to-sky-500 shadow-lg shadow-indigo-200"
+                                    aria-hidden="true"
+                                >
+                                    {/* Icon mũi tên (Màu trắng để nổi bật trên nền gradient) */}
+                                    <span
+                                        className="absolute top-0 bottom-0 left-[0.625rem] m-auto w-[1.125rem] h-[0.125rem] bg-transparent transition-all duration-[450ms] ease-[cubic-bezier(0.65,0,0.076,1)] group-hover:bg-white group-hover:translate-x-[1rem] before:absolute before:content-[''] before:-top-[0.29rem] before:right-[0.0625rem] before:w-[0.625rem] before:h-[0.625rem] before:border-t-[2px] before:border-r-[2px] before:border-white before:rotate-45"
+                                    ></span>
+                                </span>
+
+                                {/* Chữ hiển thị (Màu indigo lúc đầu, chuyển sang trắng khi background tràn qua) */}
+                                <span
+                                    className="absolute inset-0 flex items-center justify-center pl-[1.85rem] font-bold text-sm uppercase tracking-wide transition-all duration-[450ms] ease-[cubic-bezier(0.65,0,0.076,1)] text-indigo-600 group-hover:text-white"
+                                >
+                                    {t('landing.nav.getStarted')}
+                                </span>
                             </Link>
                         </div>
                     </div>
@@ -218,7 +242,7 @@ const LandingPage = () => {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                                 <Link
                                     to="/register"
-                                    className="relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white font-bold rounded-full shadow-xl shadow-indigo-200 transition-all hover:scale-105 flex items-center justify-center gap-2 text-lg group"
+                                    className="relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white font-bold rounded-full shadow-xl shadow-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/50 hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group"
                                 >
                                     <motion.div
                                         className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg]"
@@ -227,14 +251,17 @@ const LandingPage = () => {
                                         transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
                                     />
                                     <span className="relative z-10 flex items-center gap-2">
-                                        {t('landing.hero.ctaPrimary')} <ArrowRight size={20} />
+                                        {t('landing.hero.ctaPrimary')} <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                     </span>
                                 </Link>
                                 <a
                                     href="#how-it-works"
-                                    className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-gray-200 hover:border-indigo-200 text-gray-700 font-semibold rounded-full hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
+                                    className="relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-full hover:bg-indigo-50 transition-all hover:-translate-y-1 flex items-center justify-center gap-2 group shadow-sm hover:shadow-lg hover:shadow-indigo-500/10 hover:border-indigo-200"
                                 >
-                                    <Play size={20} fill="currentColor" className="text-indigo-500" /> {t('landing.hero.ctaSecondary')}
+                                    <span className="absolute inset-0 bg-indigo-50 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 ease-out rounded-full z-0"></span>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <Play size={20} fill="currentColor" className="text-indigo-500 group-hover:scale-110 transition-transform duration-300" /> {t('landing.hero.ctaSecondary')}
+                                    </span>
                                 </a>
                             </div>
 
@@ -313,12 +340,13 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white p-8 rounded-3xl shadow-xl border border-indigo-100 hover:shadow-2xl transition-all group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-indigo-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20 group overflow-hidden"
                         >
-                            <div className="text-5xl mb-4">🤖</div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.ai.title')}</h3>
-                            <p className="text-gray-600 mb-4">{t('landing.usp.cards.ai.desc')}</p>
-                            <div className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-bold rounded-full">
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative text-5xl mb-4 transform group-hover:scale-110 origin-left transition-transform duration-300">🤖</div>
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.ai.title')}</h3>
+                            <p className="relative text-gray-600 mb-4">{t('landing.usp.cards.ai.desc')}</p>
+                            <div className="relative inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-sm font-bold rounded-full group-hover:bg-indigo-100 transition-colors">
                                 {t('landing.usp.cards.ai.highlight')}
                             </div>
                         </motion.div>
@@ -329,12 +357,13 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white p-8 rounded-3xl shadow-xl border border-sky-100 hover:shadow-2xl transition-all group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-purple-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/20 group overflow-hidden"
                         >
-                            <div className="text-5xl mb-4">📚</div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.learn.title')}</h3>
-                            <p className="text-gray-600 mb-4">{t('landing.usp.cards.learn.desc')}</p>
-                            <div className="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-sm font-bold rounded-full">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative text-5xl mb-4 transform group-hover:scale-110 origin-left transition-transform duration-300">📚</div>
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.learn.title')}</h3>
+                            <p className="relative text-gray-600 mb-4">{t('landing.usp.cards.learn.desc')}</p>
+                            <div className="relative inline-block px-3 py-1 bg-purple-50 text-purple-700 text-sm font-bold rounded-full group-hover:bg-purple-100 transition-colors">
                                 {t('landing.usp.cards.learn.highlight')}
                             </div>
                         </motion.div>
@@ -345,12 +374,13 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white p-8 rounded-3xl shadow-xl border border-orange-100 hover:shadow-2xl transition-all group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-orange-500/20 group overflow-hidden"
                         >
-                            <div className="text-5xl mb-4">💼</div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.business.title')}</h3>
-                            <p className="text-gray-600 mb-4">{t('landing.usp.cards.business.desc')}</p>
-                            <div className="inline-block px-3 py-1 bg-orange-100 text-orange-700 text-sm font-bold rounded-full">
+                            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative text-5xl mb-4 transform group-hover:scale-110 origin-left transition-transform duration-300">💼</div>
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-2">{t('landing.usp.cards.business.title')}</h3>
+                            <p className="relative text-gray-600 mb-4">{t('landing.usp.cards.business.desc')}</p>
+                            <div className="relative inline-block px-3 py-1 bg-orange-50 text-orange-700 text-sm font-bold rounded-full group-hover:bg-orange-100 transition-colors">
                                 {t('landing.usp.cards.business.highlight')}
                             </div>
                         </motion.div>
@@ -368,38 +398,41 @@ const LandingPage = () => {
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50/80">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">{t('landing.usp.comparison.feature')}</th>
                                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-500">{t('landing.usp.comparison.chatgpt')}</th>
                                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-500">{t('landing.usp.comparison.grammarly')}</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-indigo-600">{t('landing.usp.comparison.foreignlang')}</th>
+                                        <th className="px-6 py-4 text-center text-sm font-bold text-indigo-600 relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-indigo-50/50 pointer-events-none"></div>
+                                            <span className="relative z-10">{t('landing.usp.comparison.foreignlang')}</span>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    <tr>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{t('landing.usp.comparison.aiGen')}</td>
+                                    <tr className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-700">{t('landing.usp.comparison.aiGen')}</td>
                                         <td className="px-6 py-4 text-center text-green-500">✓</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
-                                        <td className="px-6 py-4 text-center text-green-500 font-bold">✓</td>
+                                        <td className="px-6 py-4 text-center text-indigo-600 font-bold bg-indigo-50/30 group-hover:bg-indigo-50/60 transition-colors">✓</td>
                                     </tr>
-                                    <tr className="bg-gray-50">
-                                        <td className="px-6 py-4 text-sm text-gray-700">{t('landing.usp.comparison.learning')}</td>
+                                    <tr className="bg-gray-50/30 group hover:bg-gray-50/80 transition-colors">
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-700">{t('landing.usp.comparison.learning')}</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
-                                        <td className="px-6 py-4 text-center text-green-500 font-bold">✓</td>
+                                        <td className="px-6 py-4 text-center text-indigo-600 font-bold bg-indigo-50/30 group-hover:bg-indigo-50/60 transition-colors">✓</td>
                                     </tr>
-                                    <tr>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{t('landing.usp.comparison.templates')}</td>
+                                    <tr className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-700">{t('landing.usp.comparison.templates')}</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
-                                        <td className="px-6 py-4 text-center text-green-500 font-bold">✓</td>
+                                        <td className="px-6 py-4 text-center text-indigo-600 font-bold bg-indigo-50/30 group-hover:bg-indigo-50/60 transition-colors">✓</td>
                                     </tr>
-                                    <tr className="bg-gray-50">
-                                        <td className="px-6 py-4 text-sm text-gray-700">{t('landing.usp.comparison.businessFocus')}</td>
+                                    <tr className="bg-gray-50/30 group hover:bg-gray-50/80 transition-colors">
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-700">{t('landing.usp.comparison.businessFocus')}</td>
                                         <td className="px-6 py-4 text-center text-gray-300">✗</td>
-                                        <td className="px-6 py-4 text-center text-yellow-500">~</td>
-                                        <td className="px-6 py-4 text-center text-green-500 font-bold">✓</td>
+                                        <td className="px-6 py-4 text-center text-yellow-500 font-semibold">~</td>
+                                        <td className="px-6 py-4 text-center text-indigo-600 font-bold bg-indigo-50/30 group-hover:bg-indigo-50/60 transition-colors rounded-br-3xl">✓</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -435,9 +468,9 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            className="text-center relative"
+                            className="text-center relative group"
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-indigo-200">
+                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-indigo-200 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300">
                                 1
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.howItWorks.step1.title')}</h3>
@@ -450,9 +483,9 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="text-center relative"
+                            className="text-center relative group"
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-sky-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-indigo-200">
+                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-sky-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-indigo-200 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300">
                                 2
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.howItWorks.step2.title')}</h3>
@@ -465,9 +498,9 @@ const LandingPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="text-center relative"
+                            className="text-center relative group"
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-sky-200">
+                            <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg shadow-sky-200 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300">
                                 3
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{t('landing.howItWorks.step3.title')}</h3>
@@ -489,15 +522,16 @@ const LandingPage = () => {
                         {/* Feature 1: AI Email Gen */}
                         <motion.div
                             whileHover={{ y: -8, scale: 1.02 }}
-                            className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-indigo-200 transition-all cursor-pointer group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-indigo-200 transition-all cursor-pointer group overflow-hidden"
                             onClick={handleFeatureClick}
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-blue-200">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:shadow-indigo-500/40 transition-all shadow-lg shadow-blue-200">
                                 <Sparkles size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('landing.features.emailGen.title')}</h3>
-                            <p className="text-gray-600 mb-6">{t('landing.features.emailGen.desc')}</p>
-                            <div className="flex items-center text-indigo-600 font-semibold group-hover:gap-3 transition-all">
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-3">{t('landing.features.emailGen.title')}</h3>
+                            <p className="relative text-gray-600 mb-6">{t('landing.features.emailGen.desc')}</p>
+                            <div className="relative flex items-center text-indigo-600 font-semibold group-hover:gap-3 transition-all">
                                 <span>{t('landing.features.emailGen.click')}</span>
                                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </div>
@@ -506,15 +540,16 @@ const LandingPage = () => {
                         {/* Feature 2: Templates */}
                         <motion.div
                             whileHover={{ y: -8, scale: 1.02 }}
-                            className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-sky-200 transition-all cursor-pointer group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-sky-200 transition-all cursor-pointer group overflow-hidden"
                             onClick={handleFeatureClick}
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-sky-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-200">
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-sky-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative w-16 h-16 bg-gradient-to-br from-indigo-500 to-sky-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:shadow-sky-500/40 transition-all shadow-lg shadow-indigo-200">
                                 <BookOpen size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('landing.features.templates.title')}</h3>
-                            <p className="text-gray-600 mb-6">{t('landing.features.templates.desc')}</p>
-                            <div className="flex items-center text-sky-600 font-semibold group-hover:gap-3 transition-all">
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-3">{t('landing.features.templates.title')}</h3>
+                            <p className="relative text-gray-600 mb-6">{t('landing.features.templates.desc')}</p>
+                            <div className="relative flex items-center text-sky-600 font-semibold group-hover:gap-3 transition-all">
                                 <span>Coming Soon</span>
                                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </div>
@@ -523,15 +558,16 @@ const LandingPage = () => {
                         {/* Feature 3: Progress Tracking */}
                         <motion.div
                             whileHover={{ y: -8, scale: 1.02 }}
-                            className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-green-200 transition-all cursor-pointer group"
+                            className="relative bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-green-200 transition-all cursor-pointer group overflow-hidden"
                             onClick={handleFeatureClick}
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-green-200">
+                            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="relative w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:shadow-green-500/40 transition-all shadow-lg shadow-green-200">
                                 <Trophy size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('landing.features.tracking.title')}</h3>
-                            <p className="text-gray-600 mb-6">{t('landing.features.tracking.desc')}</p>
-                            <div className="flex items-center text-green-600 font-semibold group-hover:gap-3 transition-all">
+                            <h3 className="relative text-xl font-bold text-gray-900 mb-3">{t('landing.features.tracking.title')}</h3>
+                            <p className="relative text-gray-600 mb-6">{t('landing.features.tracking.desc')}</p>
+                            <div className="relative flex items-center text-green-600 font-semibold group-hover:gap-3 transition-all">
                                 <span>Coming Soon</span>
                                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </div>
@@ -639,9 +675,12 @@ const LandingPage = () => {
                         <p className="text-xl text-indigo-100 mb-8">{t('landing.cta.subtitle')}</p>
                         <Link
                             to="/register"
-                            className="inline-flex items-center gap-2 px-10 py-5 bg-white text-indigo-600 font-bold rounded-full shadow-2xl hover:scale-105 transition-all text-lg"
+                            className="group relative inline-flex items-center justify-center overflow-hidden w-full sm:w-auto px-10 py-5 bg-white text-indigo-600 font-bold rounded-full shadow-2xl shadow-indigo-900/40 hover:shadow-indigo-900/60 hover:-translate-y-1 hover:scale-105 transition-all text-lg"
                         >
-                            {t('landing.cta.button')} <ArrowRight size={24} />
+                            <span className="absolute inset-0 bg-indigo-50 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 ease-out rounded-full z-0"></span>
+                            <span className="relative z-10 flex items-center gap-2">
+                                {t('landing.cta.button')} <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                            </span>
                         </Link>
                         <p className="text-indigo-200 mt-6 text-sm">{t('landing.cta.note')}</p>
                     </motion.div>

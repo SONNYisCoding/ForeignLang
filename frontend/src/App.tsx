@@ -1,11 +1,12 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from 'sonner';
-import Skeleton from './components/ui/Skeleton';
 import ProtectedRoute from './components/ProtectedRoute';
+import AnimatedRoutes from './components/ui/AnimatedRoutes';
+import PageTransition from './components/ui/PageTransition';
 
 // Lazy Load Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -65,15 +66,30 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => (
   </ProtectedRoute>
 );
 
-// Loading Fallback
+import UiverseLoader from './components/ui/UiverseLoader';
+
+// Loading Fallback Component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
-    <div className="space-y-4 w-full max-w-md px-4">
-      <Skeleton className="h-12 w-3/4 mx-auto" />
-      <Skeleton className="h-64 w-full rounded-xl" />
-    </div>
+  <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+    <UiverseLoader />
+    <span className="mt-6 text-sm font-semibold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase animate-pulse">Loading Workspace...</span>
   </div>
 );
+
+// Professional Best Practice: Delayed Loader
+// Prevents the loader from flashing on screen if the internet is fast (loads under 250ms).
+const DelayedPageLoader = () => {
+  const [show, setShow] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShow(true), 250);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!show) return null;
+
+  return <PageLoader />;
+};
 
 function App() {
   return (
@@ -82,56 +98,56 @@ function App() {
         <Toaster position="bottom-right" richColors />
         <ThemeProvider>
           <Router>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+            <Suspense fallback={<DelayedPageLoader />}>
+              <AnimatedRoutes>
                 {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/teachers/:id" element={<TeacherProfilePage />} />
+                <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+                <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+                <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
+                <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
+                <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+                <Route path="/teachers/:id" element={<PageTransition><TeacherProfilePage /></PageTransition>} />
 
                 {/* Semi-Protected Routes (Auth required but no specific role, or handled internally) */}
-                <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
-                <Route path="/assessment" element={<ProtectedRoute><SkillAssessment /></ProtectedRoute>} />
-                <Route path="/onboarding/assessment" element={<ProtectedRoute><SkillAssessment /></ProtectedRoute>} />
-                <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
-                <Route path="/topics/:id" element={<TopicDetailPage />} />
+                <Route path="/profile-setup" element={<ProtectedRoute><PageTransition><ProfileSetupPage /></PageTransition></ProtectedRoute>} />
+                <Route path="/assessment" element={<ProtectedRoute><PageTransition><SkillAssessment /></PageTransition></ProtectedRoute>} />
+                <Route path="/onboarding/assessment" element={<ProtectedRoute><PageTransition><SkillAssessment /></PageTransition></ProtectedRoute>} />
+                <Route path="/upgrade" element={<ProtectedRoute><PageTransition><UpgradePage /></PageTransition></ProtectedRoute>} />
+                <Route path="/topics/:id" element={<PageTransition><TopicDetailPage /></PageTransition>} />
 
                 {/* Dashboard Routes (Learner) */}
-                <Route path="/dashboard" element={<DashboardRoute><DashboardPage /></DashboardRoute>} />
-                <Route path="/dashboard/generator" element={<DashboardRoute><EmailGeneratorPage /></DashboardRoute>} />
-                <Route path="/dashboard/history" element={<DashboardRoute><EmailHistoryPage /></DashboardRoute>} />
-                <Route path="/dashboard/templates" element={<DashboardRoute><TemplatesPage /></DashboardRoute>} />
-                <Route path="/dashboard/vocabulary" element={<DashboardRoute><VocabularyPage /></DashboardRoute>} />
-                <Route path="/dashboard/topics" element={<DashboardRoute><TopicsPage /></DashboardRoute>} />
-                <Route path="/dashboard/topics/:id" element={<DashboardRoute><TopicDetailPage /></DashboardRoute>} />
-                <Route path="/dashboard/topics/:topicId/lessons/:lessonId" element={<DashboardRoute><LessonPage /></DashboardRoute>} />
-                <Route path="/dashboard/profile" element={<DashboardRoute><ProfilePage /></DashboardRoute>} />
-                <Route path="/dashboard/settings" element={<DashboardRoute><SettingsPage /></DashboardRoute>} />
+                <Route path="/dashboard" element={<DashboardRoute><PageTransition><DashboardPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/generator" element={<DashboardRoute><PageTransition><EmailGeneratorPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/history" element={<DashboardRoute><PageTransition><EmailHistoryPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/templates" element={<DashboardRoute><PageTransition><TemplatesPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/vocabulary" element={<DashboardRoute><PageTransition><VocabularyPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/topics" element={<DashboardRoute><PageTransition><TopicsPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/topics/:id" element={<DashboardRoute><PageTransition><TopicDetailPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/topics/:topicId/lessons/:lessonId" element={<DashboardRoute><PageTransition><LessonPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/profile" element={<DashboardRoute><PageTransition><ProfilePage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard/settings" element={<DashboardRoute><PageTransition><SettingsPage /></PageTransition></DashboardRoute>} />
 
                 {/* Admin Routes */}
-                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="/admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
-                <Route path="/admin/chat-history" element={<AdminRoute><AdminChatHistoryPage /></AdminRoute>} />
-                <Route path="/admin/groups" element={<AdminRoute><GroupManagement /></AdminRoute>} />
-                <Route path="/admin/approval" element={<AdminRoute><ApprovalPage /></AdminRoute>} />
-                <Route path="/admin/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
+                <Route path="/admin" element={<AdminRoute><PageTransition><AdminDashboard /></PageTransition></AdminRoute>} />
+                <Route path="/admin/users" element={<AdminRoute><PageTransition><UserManagement /></PageTransition></AdminRoute>} />
+                <Route path="/admin/chat-history" element={<AdminRoute><PageTransition><AdminChatHistoryPage /></PageTransition></AdminRoute>} />
+                <Route path="/admin/groups" element={<AdminRoute><PageTransition><GroupManagement /></PageTransition></AdminRoute>} />
+                <Route path="/admin/approval" element={<AdminRoute><PageTransition><ApprovalPage /></PageTransition></AdminRoute>} />
+                <Route path="/admin/settings" element={<AdminRoute><PageTransition><SettingsPage /></PageTransition></AdminRoute>} />
 
                 {/* Teacher Routes */}
-                <Route path="/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
-                <Route path="/teacher/lessons" element={<TeacherRoute><TeacherLessons /></TeacherRoute>} />
-                <Route path="/teacher/lessons/new" element={<TeacherRoute><LessonEditor /></TeacherRoute>} />
-                <Route path="/teacher/lessons/:id/edit" element={<TeacherRoute><LessonEditor /></TeacherRoute>} />
-                <Route path="/teacher/students" element={<TeacherRoute><TeacherStudents /></TeacherRoute>} />
-                <Route path="/teacher/analytics" element={<TeacherRoute><TeacherAnalytics /></TeacherRoute>} />
-                <Route path="/teacher/settings" element={<TeacherRoute><SettingsPage /></TeacherRoute>} />
-                <Route path="/teacher/profile" element={<TeacherRoute><ProfilePage /></TeacherRoute>} />
+                <Route path="/teacher" element={<TeacherRoute><PageTransition><TeacherDashboard /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/lessons" element={<TeacherRoute><PageTransition><TeacherLessons /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/lessons/new" element={<TeacherRoute><PageTransition><LessonEditor /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/lessons/:id/edit" element={<TeacherRoute><PageTransition><LessonEditor /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/students" element={<TeacherRoute><PageTransition><TeacherStudents /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/analytics" element={<TeacherRoute><PageTransition><TeacherAnalytics /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/settings" element={<TeacherRoute><PageTransition><SettingsPage /></PageTransition></TeacherRoute>} />
+                <Route path="/teacher/profile" element={<TeacherRoute><PageTransition><ProfilePage /></PageTransition></TeacherRoute>} />
 
                 {/* 404 */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
+                <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
+              </AnimatedRoutes>
             </Suspense>
           </Router>
         </ThemeProvider >
