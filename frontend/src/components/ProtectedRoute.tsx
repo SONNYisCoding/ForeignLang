@@ -29,7 +29,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     }
 
     if (allowedRoles && !allowedRoles.some(role => user.roles.includes(role))) {
-        return <Navigate to="/" replace />; // Or /unauthorized
+        // Redirect to the user's own role-based dashboard, not landing page
+        let fallback = '/';
+        if (user.roles.includes('ADMIN')) fallback = '/admin';
+        else if (user.roles.includes('TEACHER')) fallback = '/teacher';
+        return <Navigate to={fallback} replace />;
     }
 
     // Force onboarding if profile not complete (skip for admin/teacher)

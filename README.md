@@ -45,6 +45,12 @@ The application automatically seeds initial data on startup:
     -   Sample Content (Topics, Lessons, Vocabulary).
     -   **Note**: Seeding is skipped if data already exists to prevent duplication.
 
+## Security Features
+- **Rate Limiting**: AI endpoints (`/api/v1/email/generate`, `/api/v1/chat/`) are protected against spam and abuse using Bucket4j (limit: 5 req/min per user/IP).
+- **CORS Configuration**: Strict Cross-Origin Resource Sharing policy explicitly allowing only the configured frontend application.
+- **API Documentation & Health**: Swagger UI (`/swagger-ui`) and Spring Boot Actuator (`/actuator`) are strictly secured and accessible only by users with the `ADMIN` role.
+- **Global Error Handling**: Internal server errors are sanitized before reaching the client to prevent Java stack-trace information leaks.
+
 ## Deployment (Render)
 1.  **Backend**: Deploy as a Web Service using the `Dockerfile`.
 2.  **Frontend**: Deploy as a Static Site (`npm run build`, publish `dist`).

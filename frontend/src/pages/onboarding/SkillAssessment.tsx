@@ -458,7 +458,7 @@ const SkillAssessment = () => {
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => {
                                         showSuccess('Welcome to ForeignLang! 🎉');
-                                        navigate('/dashboard');
+                                        navigate('/');
                                     }}
                                     className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all"
                                 >

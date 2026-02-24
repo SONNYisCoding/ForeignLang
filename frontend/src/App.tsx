@@ -1,8 +1,8 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from 'sonner';
 import ProtectedRoute from './components/ProtectedRoute';
 import AnimatedRoutes from './components/ui/AnimatedRoutes';
@@ -91,6 +91,34 @@ const DelayedPageLoader = () => {
   return <PageLoader />;
 };
 
+// RootRoute: Conditional routing for the homepage based on authentication
+const RootRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  if (!user) {
+    return <PageTransition><LandingPage /></PageTransition>;
+  }
+
+  if (user.roles?.includes('ADMIN')) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (user.roles?.includes('TEACHER')) {
+    return <Navigate to="/teacher" replace />;
+  }
+
+  // For normal Learners, render the Dashboard directly at '/'
+  return (
+    <DashboardRoute>
+      <PageTransition><DashboardPage /></PageTransition>
+    </DashboardRoute>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -101,7 +129,8 @@ function App() {
             <Suspense fallback={<DelayedPageLoader />}>
               <AnimatedRoutes>
                 {/* Public Routes */}
-                <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+                {/* Dynamic Root Route */}
+                <Route path="/" element={<RootRoute />} />
                 <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
                 <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
                 <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
@@ -116,7 +145,7 @@ function App() {
                 <Route path="/topics/:id" element={<PageTransition><TopicDetailPage /></PageTransition>} />
 
                 {/* Dashboard Routes (Learner) */}
-                <Route path="/dashboard" element={<DashboardRoute><PageTransition><DashboardPage /></PageTransition></DashboardRoute>} />
+                <Route path="/dashboard" element={<Navigate to="/" replace />} />
                 <Route path="/dashboard/generator" element={<DashboardRoute><PageTransition><EmailGeneratorPage /></PageTransition></DashboardRoute>} />
                 <Route path="/dashboard/history" element={<DashboardRoute><PageTransition><EmailHistoryPage /></PageTransition></DashboardRoute>} />
                 <Route path="/dashboard/templates" element={<DashboardRoute><PageTransition><TemplatesPage /></PageTransition></DashboardRoute>} />

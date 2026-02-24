@@ -43,6 +43,9 @@ public class User {
     @Column(name = "google_id", unique = true)
     private String googleId; // Google OAuth sub ID
 
+    @Column(name = "facebook_id", unique = true)
+    private String facebookId; // Facebook OAuth ID
+
     @Column(columnDefinition = "TEXT")
     private String bio;
 
@@ -109,6 +112,8 @@ public class User {
     public enum AuthProvider {
         LOCAL, // Email/password registration
         GOOGLE, // Google OAuth only
-        BOTH // Linked accounts
+        FACEBOOK, // Facebook OAuth only
+        BOTH, // Linked accounts (Local + Google, Local + Facebook)
+        MULTIPLE // All formats
     }
 }

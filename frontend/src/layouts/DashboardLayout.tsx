@@ -51,6 +51,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         { name: t('dashboard.overview'), path: '/dashboard', icon: FileText },
         { name: t('dashboard.aiGenerator'), path: '/dashboard/generator', icon: Sparkles },
         { name: t('dashboard.templates'), path: '/dashboard/templates', icon: BookOpen },
+        { name: 'Topics & Lessons', path: '/dashboard/topics', icon: BookOpen },
+        { name: 'Vocabulary', path: '/dashboard/vocabulary', icon: FileText },
         { name: 'History', path: '/dashboard/history', icon: History },
     ];
 
@@ -74,28 +76,29 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             {/* Sidebar */}
             <aside className={`
                 fixed lg:sticky top-0 left-0 z-50 h-[100dvh] bg-[#F0F4F9] dark:bg-slate-900 border-r border-transparent dark:border-slate-800
-                transform transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-x-hidden
+                transform transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-x-hidden
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 ${isCollapsed ? 'w-64 lg:w-20' : 'w-64 lg:w-72'}
             `}>
                 <div className="flex flex-col h-full w-full">
-                    <div className="flex flex-col p-4 w-full">
-                        <div className="flex items-center gap-3 mb-6 pl-2">
-                            <div className="hidden lg:block -ml-2">
+                    <div className="flex flex-col py-4 px-3 w-full">
+
+                        {/* Header Row */}
+                        <div className="flex items-center h-14 mb-4 shrink-0">
+                            <div className="hidden lg:flex w-14 h-14 items-center justify-center shrink-0">
                                 <SidebarToggle
                                     isCollapsed={isCollapsed}
                                     toggle={() => setIsCollapsed(!isCollapsed)}
                                     title={isCollapsed ? "Expand" : "Collapse"}
+                                    className="scale-90"
                                 />
                             </div>
 
-                            <Link to="/dashboard" className="flex items-center gap-3 overflow-hidden">
-                                <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 ring-1 ring-gray-100 shadow-sm">
+                            <Link to="/dashboard" className={`flex items-center gap-2 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 lg:pointer-events-none' : 'opacity-100 lg:ml-1'}`}>
+                                <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 ring-1 ring-gray-100 shadow-sm">
                                     <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover" />
                                 </div>
-                                <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-32 opacity-100'}`}>
-                                    <span className="font-bold text-lg text-gray-800 dark:text-white tracking-tight whitespace-nowrap font-sans">ForeignLang</span>
-                                </div>
+                                <span className="font-bold text-lg text-gray-800 dark:text-white tracking-tight whitespace-nowrap font-sans">ForeignLang</span>
                             </Link>
 
                             <button onClick={() => setIsSidebarOpen(false)} className={`lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-200 dark:text-slate-400 dark:hover:bg-slate-800 rounded-full transition-opacity ${isCollapsed ? 'opacity-0 pointer-events-none w-0 h-0 p-0' : 'opacity-100'}`}>
@@ -104,27 +107,26 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         </div>
 
                         {/* Search Trigger */}
-                        <button
-                            onClick={() => setIsSearchOpen(true)}
-                            className={`group flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition-all mb-6 shadow-sm border border-gray-200/60 dark:border-slate-700/50 mx-2 ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : ''
-                                }`}
-                            title="Search (Ctrl+K)"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Search size={18} className="shrink-0 group-hover:text-indigo-500 transition-colors" />
-                                <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-24 opacity-100'}`}>
-                                    <span className="font-medium text-sm whitespace-nowrap">Search...</span>
+                        <div className="mb-6">
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className={`group flex items-center w-full bg-white dark:bg-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition-colors shadow-sm border border-gray-200/60 dark:border-slate-700/50 overflow-hidden`}
+                                title="Search (Ctrl+K)"
+                            >
+                                <div className="w-14 h-12 flex items-center justify-center shrink-0">
+                                    <Search size={18} className="group-hover:text-indigo-500 transition-colors" />
                                 </div>
-                            </div>
-                            <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-8 opacity-100'}`}>
-                                <kbd className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-gray-400 bg-gray-100 dark:bg-slate-900/50 rounded flex-shrink-0">
-                                    <span className="text-xs">⌘</span>K
-                                </kbd>
-                            </div>
-                        </button>
+                                <div className={`flex items-center justify-between flex-1 pr-3 transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                                    <span className="font-medium text-sm whitespace-nowrap">Search...</span>
+                                    <kbd className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-gray-400 bg-gray-100 dark:bg-slate-900/50 rounded flex-shrink-0">
+                                        <span className="text-xs">⌘</span>K
+                                    </kbd>
+                                </div>
+                            </button>
+                        </div>
 
                         {/* Navigation */}
-                        <nav className="flex-1 space-y-1.5 px-2">
+                        <nav className="flex-1 space-y-1.5 w-full">
                             {navItems.map((item) => {
                                 // Check active state
                                 const active = isActive(item.path);
@@ -134,11 +136,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setIsSidebarOpen(false)}
-                                        className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors font-medium relative group
+                                        className={`flex items-center w-full rounded-2xl transition-colors font-medium relative group overflow-hidden
                                         ${active
                                                 ? 'text-[#041E49] dark:text-indigo-300'
-                                                : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'}
-                                        ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : ''}
+                                                : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}
                                     `}
                                         title={isCollapsed ? item.name : undefined}
                                     >
@@ -149,19 +150,19 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                             />
                                         )}
-                                        <div className="relative z-10 flex items-center gap-4 w-full">
-                                            <item.icon size={22} className="min-w-[22px] shrink-0" />
-                                            <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-40 opacity-100'}`}>
-                                                <span className="whitespace-nowrap">{item.name}</span>
-                                            </div>
+                                        <div className="relative z-10 w-14 h-12 flex items-center justify-center shrink-0">
+                                            <item.icon size={22} className="shrink-0" />
+                                        </div>
+                                        <div className={`relative z-10 flex-1 whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                                            {item.name}
                                         </div>
                                     </Link>
-                                )
+                                );
                             })}
                         </nav>
                     </div>
 
-                    <div className="p-4 mt-auto">
+                    <div className="px-3 mt-auto">
                         {/* Upgrade Card - Minimal */}
                         {!isCollapsed ? (
                             <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-slate-800 dark:to-slate-800 border border-indigo-100 dark:border-slate-700">

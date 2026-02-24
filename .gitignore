@@ -39,3 +39,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs & Temp Files ###
+*.log
+*_log.txt
+register_test.json
+
+### AI Assistants ###
+.agent/
+.claude/
+.cursor/
+
+### Environment Configs ###
+.env
+.env.*
+application-local.properties

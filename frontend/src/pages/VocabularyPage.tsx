@@ -99,7 +99,7 @@ const VocabularyPage = () => {
             <div className="mb-10 relative">
                 <div className="absolute top-0 right-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-3xl -z-10 animate-pulse" />
                 <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/')}
                     className="inline-flex items-center text-sm font-semibold text-gray-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-6 transition-colors bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-slate-700/50 backdrop-blur-sm shadow-sm"
                 >
                     <ChevronLeft size={16} className="mr-1" /> Back to Dashboard

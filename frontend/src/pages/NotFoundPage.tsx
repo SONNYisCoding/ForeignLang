@@ -7,10 +7,10 @@ import { useAuth } from '../contexts/AuthContext';
 const NotFoundPage = () => {
     const { user } = useAuth();
 
-    // Determine the correct dashboard path based on role
-    let dashboardPath = '/dashboard';
+    // Determine the correct dashboard path based on role (ADMIN > TEACHER > Learner)
+    let dashboardPath = '/';
     if (user?.roles?.includes('ADMIN')) dashboardPath = '/admin';
-    if (user?.roles?.includes('TEACHER')) dashboardPath = '/teacher';
+    else if (user?.roles?.includes('TEACHER')) dashboardPath = '/teacher';
 
     return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">

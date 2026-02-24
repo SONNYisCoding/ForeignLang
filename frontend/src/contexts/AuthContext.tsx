@@ -13,6 +13,8 @@ interface User {
     emailsGenerated?: number;
     streak?: number;
     authProvider?: string;
+    googleId?: string;
+    facebookId?: string;
 }
 
 interface AuthContextType {
@@ -46,7 +48,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     usageRemaining: data.usageRemaining,
                     emailsGenerated: data.emailsGenerated,
                     streak: data.streak,
-                    authProvider: data.authProvider
+                    authProvider: data.authProvider,
+                    googleId: data.googleId,
+                    facebookId: data.facebookId
                 });
             } else {
                 setUser(null);

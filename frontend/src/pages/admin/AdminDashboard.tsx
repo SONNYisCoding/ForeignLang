@@ -55,9 +55,9 @@ const AdminDashboard = () => {
         { label: t('admin.stats.totalUsers'), value: stats.totalUsers, icon: Users, color: 'from-blue-500 to-blue-600', link: '/admin/users' },
         { label: t('admin.stats.learners'), value: stats.totalLearners, icon: Users, color: 'from-emerald-500 to-emerald-600', link: '/admin/users?role=LEARNER' },
         { label: t('admin.stats.teachers'), value: stats.totalTeachers, icon: Users, color: 'from-purple-500 to-purple-600', link: '/admin/users?role=TEACHER' },
-        { label: t('admin.stats.lessons'), value: stats.totalLessons, icon: BookOpen, color: 'from-amber-500 to-amber-600', link: '/admin/lessons' },
+        { label: t('admin.stats.lessons'), value: stats.totalLessons, icon: BookOpen, color: 'from-amber-500 to-amber-600', link: '/admin/approval' },
         { label: t('admin.stats.pendingApproval'), value: stats.pendingApprovals, icon: CheckSquare, color: 'from-red-500 to-red-600', link: '/admin/approval', urgent: stats.pendingApprovals > 0 },
-        { label: t('admin.stats.activeToday'), value: stats.recentActivity, icon: Activity, color: 'from-teal-500 to-teal-600', link: '/admin/analytics' },
+        { label: t('admin.stats.activeToday'), value: stats.recentActivity, icon: Activity, color: 'from-teal-500 to-teal-600', link: '/admin/users' },
     ];
 
     return (
@@ -123,9 +123,9 @@ const AdminDashboard = () => {
                                     <Icon size={26} />
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-4xl font-black text-gray-900 dark:text-white mb-1 tracking-tight">
+                                    <div className="text-4xl font-black text-gray-900 dark:text-white mb-1 tracking-tight">
                                         {loading ? <div className="h-10 w-24 bg-gray-200 dark:bg-slate-700 animate-pulse rounded-lg mt-1 mb-2"></div> : card.value.toLocaleString()}
-                                    </p>
+                                    </div>
                                     <p className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{card.label}</p>
                                 </div>
                             </Link>
@@ -196,7 +196,7 @@ const AdminDashboard = () => {
                             <Activity className="text-teal-500" size={24} />
                             {t('admin.activity.title')}
                         </h2>
-                        <Link to="/admin/analytics" className="text-sm font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1 group">
+                        <Link to="/admin/users" className="text-sm font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1 group">
                             {t('admin.activity.viewAll')}
                             <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </Link>

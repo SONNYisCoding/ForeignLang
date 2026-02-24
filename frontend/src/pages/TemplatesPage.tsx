@@ -59,7 +59,7 @@ const TemplatesPage = () => {
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
                 <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/')}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 >
                     <ChevronLeft size={24} className="text-gray-600 dark:text-slate-300" />

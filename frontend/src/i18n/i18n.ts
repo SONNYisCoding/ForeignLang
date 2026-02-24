@@ -12,8 +12,8 @@ i18n
             en: { translation: en },
             vi: { translation: vi }
         },
-        fallbackLng: 'vi', // Default to Vietnamese as requested "ưu tiên Việt"
-        debug: true,
+        fallbackLng: 'en', // English as universal fallback (Admin/Teacher are EN-only)
+        debug: false,
         interpolation: {
             escapeValue: false // not needed for react as it escapes by default
         },

@@ -20,6 +20,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.foreignlang.backend.security.RateLimitFilter;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,6 +117,7 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
+                                .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(
@@ -167,6 +170,10 @@ public class SecurityConfig {
 
                                                 // Admin routes
                                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                                                // Secure Swagger UI & Actuator strictly to ADMIN
+                                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
+                                                .hasRole("ADMIN")
 
                                                 // All other API and pages require authentication
                                                 .anyRequest().authenticated())

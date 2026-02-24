@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard, Users, BookOpen, Settings, LogOut,
-    Menu, X, FileText, ChevronDown,
-    BarChart3, UserCog, CheckSquare, Shield, Globe, User as UserIcon, MessageSquare
+    LayoutDashboard, Users, Settings, LogOut,
+    Menu, X,
+    UserCog, CheckSquare, Shield, User as UserIcon, MessageSquare
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from '../components/NotificationDropdown';
+import ThemeToggle from '../components/ui/ThemeToggle';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import { useAuth } from '../contexts/AuthContext';
 import SidebarToggle from '../components/ui/SidebarToggle';
@@ -22,21 +23,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const { user, logout } = useAuth(); // Use global auth
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-    const [isLangOpen, setIsLangOpen] = useState(false);
-    const langDropdownRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
         i18n.changeLanguage('en'); // Force English for Admin
-
-        const handleClickOutside = (event: MouseEvent) => {
-            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
-                setIsLangOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const handleLogout = async () => {
@@ -51,7 +42,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             title: 'Dashboard',
             items: [
                 { name: 'Overview', path: '/admin', icon: LayoutDashboard },
-                { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
             ]
         },
         {
@@ -65,8 +55,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         {
             title: 'Content',
             items: [
-                { name: 'Lessons', path: '/admin/lessons', icon: BookOpen },
-                { name: 'Templates', path: '/admin/templates', icon: FileText },
                 { name: 'Pending Approval', path: '/admin/approval', icon: CheckSquare },
             ]
         },
@@ -114,29 +102,30 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-[100dvh] overflow-x-hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border-r border-gray-200/50 dark:border-slate-800/50 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)]
+                fixed top-0 left-0 h-[100dvh] overflow-x-hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border-r border-gray-200/50 dark:border-slate-800/50 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)]
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 ${isCollapsed ? 'w-64 lg:w-20' : 'w-64 lg:w-72'}
             `}>
-                <div className="flex flex-col h-full relative">
+                <div className="flex flex-col h-full relative w-full">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full pointer-events-none" />
-                    <div className="flex flex-col p-4 relative z-10 w-full">
-                        <div className="flex items-center gap-3 mb-8 pl-2 mt-2">
-                            <div className="hidden lg:block -ml-2">
+                    <div className="flex flex-col py-4 px-3 relative z-10 w-full h-full">
+
+                        {/* Header Row */}
+                        <div className="flex items-center h-14 mb-8 shrink-0">
+                            <div className="hidden lg:flex w-14 h-14 items-center justify-center shrink-0">
                                 <SidebarToggle
                                     isCollapsed={isCollapsed}
                                     toggle={() => setIsCollapsed(!isCollapsed)}
                                     title={isCollapsed ? "Expand" : "Collapse"}
+                                    className="scale-90"
                                 />
                             </div>
 
-                            <Link to="/admin" className="flex items-center gap-3 overflow-hidden">
+                            <Link to="/admin" className={`flex items-center gap-2 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 lg:pointer-events-none' : 'opacity-100 lg:ml-1'}`}>
                                 <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-md shadow-indigo-500/10 border border-indigo-100 dark:border-indigo-900/50 relative">
                                     <img src="/mascot/logofl.png" alt="Logo" className="w-full h-full object-cover scale-110" />
                                 </div>
-                                <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-36 opacity-100'}`}>
-                                    <span className="font-extrabold text-xl bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight whitespace-nowrap">Admin Portal</span>
-                                </div>
+                                <span className="font-extrabold text-xl bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight whitespace-nowrap">Admin Portal</span>
                             </Link>
 
                             <button onClick={() => setIsSidebarOpen(false)} className={`lg:hidden ml-auto p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-opacity ${isCollapsed ? 'opacity-0 pointer-events-none w-0 h-0 p-0' : 'opacity-100'}`}>
@@ -145,12 +134,12 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                         </div>
 
                         {/* Navigation Groups */}
-                        <nav className="flex-1 overflow-y-auto space-y-8 scrollbar-hide">
+                        <nav className="flex-1 overflow-y-auto space-y-6 scrollbar-hide w-full">
                             {navGroups.map((group, groupIndex) => (
                                 <div key={group.title || groupIndex} className="relative">
                                     {group.title && (
                                         <div className={`overflow-hidden transition-[height,opacity,margin] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'h-0 opacity-0 mb-0' : 'h-6 opacity-100 mb-2'}`}>
-                                            <div className="px-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-5 whitespace-nowrap">
+                                            <div className="px-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">
                                                 {group.title}
                                             </div>
                                         </div>
@@ -163,20 +152,21 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                                                     key={item.path}
                                                     to={item.path}
                                                     onClick={() => setIsSidebarOpen(false)}
-                                                    className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors font-bold relative group overflow-hidden
+                                                    className={`flex items-center w-full rounded-2xl transition-colors font-bold relative group overflow-hidden
                                                     ${isActive(item.path)
                                                             ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-400 shadow-sm border border-indigo-500/10'
                                                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white border border-transparent'}
-                                                    ${isCollapsed ? 'justify-center px-0 w-12 h-12 mx-auto' : 'mx-2'}
                                                 `}
                                                     title={isCollapsed ? item.name : undefined}
                                                 >
                                                     {isActive(item.path) && (
-                                                        <motion.div layoutId="activeNavAdmin" className={`absolute top-1/4 bottom-1/4 w-1 bg-indigo-500 dark:bg-indigo-400 rounded-r-full transition-[left,opacity] duration-300 ${isCollapsed ? '-left-1 opacity-0' : 'left-0 opacity-100'}`} />
+                                                        <motion.div layoutId="activeNavAdmin" className={`absolute top-1/4 bottom-1/4 w-1 bg-indigo-500 dark:bg-indigo-400 rounded-r-full transition-[left,opacity] duration-300 ${isCollapsed ? 'left-0' : 'left-0'}`} />
                                                     )}
-                                                    <Icon size={22} className={`min-w-[22px] shrink-0 ${isActive(item.path) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors'}`} />
-                                                    <div className={`overflow-hidden transition-[width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-40 opacity-100'}`}>
-                                                        <span className="whitespace-nowrap">{item.name}</span>
+                                                    <div className="relative z-10 w-14 h-12 flex items-center justify-center shrink-0">
+                                                        <Icon size={22} className={`shrink-0 ${isActive(item.path) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors'}`} />
+                                                    </div>
+                                                    <div className={`relative z-10 flex-1 whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                                                        {item.name}
                                                     </div>
                                                 </Link>
                                             );
@@ -206,41 +196,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                             <NotificationDropdown />
                         </div>
 
-                        {/* Language Switcher */}
-                        <div className="relative" ref={langDropdownRef}>
-                            <button
-                                onClick={() => setIsLangOpen(!isLangOpen)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200/80 dark:border-slate-700/80 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm transition-all text-gray-700 dark:text-slate-300"
-                            >
-                                <Globe size={18} className="text-indigo-500" />
-                                <span className="text-sm font-bold">{i18n.language.toUpperCase()}</span>
-                                <ChevronDown size={14} className="text-gray-400" />
-                            </button>
-                            <AnimatePresence>
-                                {isLangOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="absolute right-0 mt-2 w-36 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 p-2"
-                                    >
-                                        {['en', 'vi'].map(lang => (
-                                            <button
-                                                key={lang}
-                                                onClick={() => { i18n.changeLanguage(lang); setIsLangOpen(false); }}
-                                                className={`w-full px-4 py-2.5 text-left text-sm font-bold rounded-xl transition-colors ${i18n.language === lang
-                                                    ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                                                    : 'text-gray-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                                    }`}
-                                            >
-                                                {lang === 'en' ? 'English' : 'Tiếng Việt'}
-                                            </button>
-                                        ))}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-
+                        {/* Theme Toggle */}
+                        <ThemeToggle />
                         {/* Profile Dropdown */}
                         <div className="relative group" onMouseEnter={() => setIsProfileDropdownOpen(true)} onMouseLeave={() => setIsProfileDropdownOpen(false)}>
                             <button className="flex items-center gap-3 focus:outline-none p-1 rounded-full hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors pr-3">

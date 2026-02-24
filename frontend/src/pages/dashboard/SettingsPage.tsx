@@ -302,33 +302,69 @@ const SettingsPage = () => {
                                         </div>
                                         Connected Accounts
                                     </h3>
-                                    <div className="p-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-14 h-14 bg-white border-2 border-gray-100 dark:border-slate-700 rounded-2xl flex items-center justify-center p-2.5 shadow-sm bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="w-full h-full object-contain drop-shadow-sm" />
+                                    <div className="space-y-4">
+                                        {/* Google Card */}
+                                        <div className="p-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 bg-white border-2 border-gray-100 dark:border-slate-700 rounded-2xl flex items-center justify-center p-2.5 shadow-sm bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="w-full h-full object-contain drop-shadow-sm" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Google</p>
+                                                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                                                        {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' || (profileData as any).authProvider === 'MULTIPLE'
+                                                            ? 'Securely connected to Google account'
+                                                            : 'Connect to log in with Google'}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Google</p>
-                                                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
-                                                    {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE'
-                                                        ? 'Securely connected to Google account'
-                                                        : 'Connect to log in with Google'}
-                                                </p>
+                                            <div className="w-full sm:w-auto self-end sm:self-center">
+                                                {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' || (profileData as any).authProvider === 'MULTIPLE' ? (
+                                                    <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
+                                                        <Check size={16} className="mr-1.5" /> Linked
+                                                    </span>
+                                                ) : (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/google`}
+                                                        className="w-full sm:w-auto inline-flex justify-center px-6 py-2.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95 text-center"
+                                                    >
+                                                        Connect Google
+                                                    </a>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="w-full sm:w-auto self-end sm:self-center">
-                                            {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' ? (
-                                                <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
-                                                    <Check size={16} className="mr-1.5" /> Linked
-                                                </span>
-                                            ) : (
-                                                <a
-                                                    href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/google`}
-                                                    className="w-full sm:w-auto inline-flex justify-center px-6 py-2.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95 text-center"
-                                                >
-                                                    Connect Google
-                                                </a>
-                                            )}
+
+                                        {/* Facebook Card */}
+                                        <div className="p-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 bg-white border-2 border-gray-100 dark:border-slate-700 rounded-2xl flex items-center justify-center p-2.5 shadow-sm bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900">
+                                                    <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm" aria-hidden="true">
+                                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Facebook</p>
+                                                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                                                        {((profileData as any).authProvider === 'FACEBOOK' || (profileData as any).authProvider === 'BOTH' && !(profileData as any).authProvider.includes('GOOGLE')) || (profileData as any).authProvider === 'MULTIPLE' || (profileData as any).facebookId
+                                                            ? 'Securely connected to Facebook account'
+                                                            : 'Connect to log in with Facebook'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full sm:w-auto self-end sm:self-center">
+                                                {((profileData as any).authProvider === 'FACEBOOK' || (profileData as any).authProvider === 'BOTH' && !(profileData as any).authProvider.includes('GOOGLE')) || (profileData as any).authProvider === 'MULTIPLE' || (profileData as any).facebookId ? (
+                                                    <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
+                                                        <Check size={16} className="mr-1.5" /> Linked
+                                                    </span>
+                                                ) : (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_BACKEND_URL || ''}/oauth2/authorization/facebook`}
+                                                        className="w-full sm:w-auto inline-flex justify-center px-6 py-2.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95 text-center"
+                                                    >
+                                                        Connect Facebook
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
