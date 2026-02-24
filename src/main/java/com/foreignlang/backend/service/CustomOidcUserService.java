@@ -15,10 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.annotation.Primary;
 
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Optional;
-
 @Service
 @Primary // FORCE Spring to use this bean
 @RequiredArgsConstructor
