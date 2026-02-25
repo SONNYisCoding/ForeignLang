@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../api/axiosConfig';
 
 interface Lesson {
     id: string;
@@ -25,17 +26,17 @@ const TopicDetailPage = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        import('axios').then(async (axiosModule) => {
-            const axios = axiosModule.default;
+        const fetchTopic = async () => {
             try {
-                const response = await axios.get(`/api/v1/topics/${id}`, { withCredentials: true });
+                const response = await api.get(`/api/v1/topics/${id}`);
                 setTopic(response.data);
                 setLoading(false);
             } catch (err) {
                 setError('Failed to load topic details');
                 setLoading(false);
             }
-        });
+        };
+        fetchTopic();
     }, [id]);
 
     const getLevelColor = (level: string) => {

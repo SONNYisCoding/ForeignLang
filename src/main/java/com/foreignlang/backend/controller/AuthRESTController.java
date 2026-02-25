@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
+import com.foreignlang.backend.security.JwtTokenProvider;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -34,6 +35,7 @@ public class AuthRESTController {
     private final UsageQuotaRepository usageQuotaRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // DTO for registration
     public record RegisterRequest(
@@ -53,6 +55,12 @@ public class AuthRESTController {
             String username,
             String fullName,
             LocalDate birthDate) {
+    }
+
+    public record ForgotPasswordRequest(String email) {
+    }
+
+    public record ResetPasswordRequest(String token, String newPassword) {
     }
 
     @PostMapping("/register")
@@ -103,17 +111,22 @@ public class AuthRESTController {
             throw e; // Will trigger rollback
         }
 
-        // Auto-login after registration
-        HttpSession session = httpRequest.getSession(true);
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("userEmail", user.getEmail());
-        session.setAttribute("userRoles",
-                user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()));
+        // Removed stateful session auto-login logic
+
+        // Generate Token immediately for auto-login
+        String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Registration successful! You have 5 free AI uses.",
-                "userId", user.getId()));
+                "token", token,
+                "user", Map.of(
+                        "id", user.getId(),
+                        "email", user.getEmail(),
+                        "fullName", user.getFullName(),
+                        "roles", user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()),
+                        "tier", user.getSubscriptionTier().name(),
+                        "profileComplete", user.isProfileComplete())));
     }
 
     @PostMapping("/login")
@@ -132,16 +145,8 @@ public class AuthRESTController {
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             User user = userPrincipal.getUser();
 
-            // Create HttpSession (optional if using stateless JWT, but we are using
-            // session)
-            HttpSession session = httpRequest.getSession(true);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("userEmail", user.getEmail());
-            session.setAttribute("userRoles",
-                    user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()));
-
-            // IMPORTANT: Hand over session management to Spring Security if needed
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            // Generate JWT Token
+            String token = jwtTokenProvider.generateToken(authentication);
 
             log.info("Login successful for user: {}", user.getEmail());
             log.info("Returning roles: {}", user.getRoles());
@@ -149,6 +154,7 @@ public class AuthRESTController {
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Login successful",
+                    "token", token,
                     "user", Map.of(
                             "id", user.getId(),
                             "email", user.getEmail(),
@@ -283,5 +289,24 @@ public class AuthRESTController {
                         "roles", user.getRoles(),
                         "tier", user.getSubscriptionTier().name(),
                         "profileComplete", user.isProfileComplete())));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        log.info("Mocking forgot-password for: {}", request.email());
+        return ResponseEntity.ok(Map.of("success", true, "message",
+                "If an account with that email exists, a password reset link has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        log.info("Mocking reset-password with token: {}", request.token());
+        return ResponseEntity.ok(Map.of("success", true, "message", "Password has been successfully reset."));
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+        log.info("Mocking verify-email with token: {}", token);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Email verified successfully."));
     }
 }

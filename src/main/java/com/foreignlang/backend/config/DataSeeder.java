@@ -39,8 +39,9 @@ public class DataSeeder {
                 String adminEmail = "admin@foreignlang.com";
                 String adminUsername = "admin";
                 try {
-                        if (userRepository.findByEmail(adminEmail).isPresent()) {
-                                User admin = userRepository.findByEmail(adminEmail).get();
+                        var existingAdminOpt = userRepository.findByEmail(adminEmail);
+                        if (existingAdminOpt.isPresent()) {
+                                User admin = existingAdminOpt.get();
                                 if (!admin.getRoles().contains(User.Role.ADMIN)) {
                                         admin.getRoles().add(User.Role.ADMIN);
                                         userRepository.save(admin);
@@ -74,7 +75,8 @@ public class DataSeeder {
                 String teacherEmail = "teacher@foreignlang.com";
                 String teacherUsername = "teacher";
                 try {
-                        if (userRepository.findByEmail(teacherEmail).isPresent()) {
+                        var existingTeacherOpt = userRepository.findByEmail(teacherEmail);
+                        if (existingTeacherOpt.isPresent()) {
                                 return;
                         }
                         if (userRepository.findByUsername(teacherUsername).isPresent()) {

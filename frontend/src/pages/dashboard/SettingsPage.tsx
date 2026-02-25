@@ -20,6 +20,7 @@ const SettingsPage = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
+    const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
 
     const [profileData, setProfileData] = useState<UserProfile>({
         fullName: '',
@@ -64,21 +65,43 @@ const SettingsPage = () => {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/v1/user/profile', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fullName: profileData.fullName,
-                    bio: profileData.bio,
-                    specialization: profileData.specialization,
-                    learningGoal: profileData.learningGoal
-                })
-            });
-
-            if (response.ok) {
-                toast.success('Profile updated successfully');
+            if (activeTab === 'security') {
+                if (!passwordData.newPassword || passwordData.newPassword.length < 6) {
+                    toast.error('Password must be at least 6 characters');
+                    return;
+                }
+                if (passwordData.newPassword !== passwordData.confirmPassword) {
+                    toast.error('Passwords do not match');
+                    return;
+                }
+                const response = await fetch('/api/v1/user/setup-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword: passwordData.newPassword })
+                });
+                if (response.ok) {
+                    toast.success('Password updated successfully');
+                    setPasswordData({ newPassword: '', confirmPassword: '' });
+                } else {
+                    toast.error('Failed to update password');
+                }
             } else {
-                toast.error('Failed to update profile');
+                const response = await fetch('/api/v1/user/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName: profileData.fullName,
+                        bio: profileData.bio,
+                        specialization: profileData.specialization,
+                        learningGoal: profileData.learningGoal
+                    })
+                });
+
+                if (response.ok) {
+                    toast.success('Profile updated successfully');
+                } else {
+                    toast.error('Failed to update profile');
+                }
             }
         } catch (error) {
             toast.error('An error occurred');
@@ -383,16 +406,27 @@ const SettingsPage = () => {
                                     </h3>
                                     <div className="space-y-6 max-w-xl">
                                         <div>
-                                            <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Current Password</label>
-                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
+                                            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Set a local password to log in without your social provider.</p>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">New Password</label>
-                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
+                                            <input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                value={passwordData.newPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                                className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600"
+                                            />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Confirm New Password</label>
-                                            <input type="password" placeholder="••••••••" className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600" />
+                                            <input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                value={passwordData.confirmPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                                className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-slate-600"
+                                            />
                                         </div>
                                     </div>
                                 </div>

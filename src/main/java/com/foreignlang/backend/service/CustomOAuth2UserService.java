@@ -10,9 +10,11 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Primary;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Custom OAuth2 User Service that handles both Google and Facebook OAuth2
@@ -27,6 +29,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @jakarta.annotation.PostConstruct
     public void init() {
@@ -143,13 +146,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 ? User.AuthProvider.FACEBOOK
                 : User.AuthProvider.GOOGLE;
 
+        String baseUsername = email.split("@")[0].replaceAll("[^a-zA-Z0-9]", "");
+        String uniqueUsername = baseUsername + "_" + UUID.randomUUID().toString().substring(0, 4);
+        String randomPassword = UUID.randomUUID().toString();
+
         User.UserBuilder userBuilder = User.builder()
                 .email(email)
+                .username(uniqueUsername)
+                .passwordHash(passwordEncoder.encode(randomPassword))
                 .fullName(name)
                 .avatarUrl(picture)
                 .authProvider(authProvider)
-                .profileComplete(false) // Needs to complete profile
-                .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.GUEST))) // GUEST until profile complete
+                .profileComplete(true) // Frictionless bypass
+                .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.LEARNER))) // Set to Learner by default
                 .subscriptionTier(User.SubscriptionTier.FREE);
 
         if ("google".equalsIgnoreCase(registrationId)) {

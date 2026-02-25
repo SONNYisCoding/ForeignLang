@@ -4,6 +4,8 @@ import { Check, Star, ArrowLeft, Shield, Zap, Crown, Sparkles, BookOpen } from '
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { UpgradeButton } from '../../components/common/UpgradeButton';
 
 type Step = 'select' | 'confirm' | 'processing' | 'success';
 type PlanType = 'subscription' | 'credits';
@@ -141,6 +143,33 @@ const UpgradePage = () => {
         setStep('confirm');
     };
 
+    const handlePaymentSuccess = async () => {
+        if (!selectedPlan) return;
+        setStep('processing');
+        try {
+            const response = await fetch('/api/v1/user/upgrade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    planId: selectedPlan.id,
+                    type: selectedPlan.type,
+                    amount: selectedPlan.price
+                })
+            });
+
+            if (response.ok) {
+                setStep('success');
+                // Could refresh via useAuth if needed, but App.tsx load handles it mostly
+            } else {
+                toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
+                setStep('select');
+            }
+        } catch (error) {
+            toast.error('Lỗi kết nối server');
+            setStep('select');
+        }
+    };
+
 
 
     const formatPrice = (price: number) => {
@@ -263,7 +292,7 @@ const UpgradePage = () => {
                                             </div>
                                         )}
 
-                                        <ul className="space-y-2 mb-4">
+                                        <ul className="space-y-2 mb-6">
                                             {plan.features.map((feature) => (
                                                 <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
                                                     <Check size={16} className="text-green-500 mt-0.5" />
@@ -271,12 +300,12 @@ const UpgradePage = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <button className={`w-full py-3 rounded-xl font-bold transition-all ${plan.recommended
-                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                            : 'bg-gray-100 hover:bg-indigo-100 text-indigo-700'
-                                            }`}>
-                                            Chọn gói này
-                                        </button>
+                                        <div className="flex justify-center mt-auto w-full">
+                                            <UpgradeButton
+                                                text={plan.type === 'subscription' ? "Unlock Pro" : "Get Credits"}
+                                                onClick={() => handleSelectPlan(plan)}
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -341,9 +370,9 @@ const UpgradePage = () => {
                                 {t('dashboard.transfer.autoActivation')}
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-3 mt-4">
                                 <button
-                                    onClick={() => setStep('success')} // Simulate success for now, in real life check status via API
+                                    onClick={handlePaymentSuccess}
                                     className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 animate-pulse"
                                 >
                                     <Check size={20} />

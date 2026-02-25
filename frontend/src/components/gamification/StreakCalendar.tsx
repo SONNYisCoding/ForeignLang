@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Check, Calendar as CalendarIcon, Zap } from 'lucide-react';
+import { Tooltip } from '../common/Tooltip';
 
 interface StreakData {
     currentStreak: number;
@@ -30,34 +31,46 @@ const StreakCalendar = () => {
         fetchStreak();
     }, []);
 
-    // Generate recent 7 days
+    // Generate next 7 days
     const days = [];
     const today = new Date();
 
     // Check if there's activity today based on the backend response
-    // A simplified view: if streak > 0, we count backwards from lastActivityDate
-    // For MVP frontend logic, if streak is 3, we color the last 3 days starting from today or yesterday
     let isActiveToday = false;
+    let lastActivityDate: Date | null = null;
+    let streakStartDate: Date | null = null;
+
     if (streakData.lastActivityDate) {
-        const lastDate = new Date(streakData.lastActivityDate);
-        isActiveToday = lastDate.toDateString() === today.toDateString();
+        lastActivityDate = new Date(streakData.lastActivityDate);
+        lastActivityDate.setHours(0, 0, 0, 0);
+
+        const latestMidnight = new Date();
+        latestMidnight.setHours(0, 0, 0, 0);
+        isActiveToday = lastActivityDate.getTime() === latestMidnight.getTime();
+
+        if (streakData.currentStreak > 0) {
+            streakStartDate = new Date(lastActivityDate);
+            streakStartDate.setDate(streakStartDate.getDate() - streakData.currentStreak + 1);
+        }
     }
 
-    // Start with today as index 6
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(today.getDate() - (6 - i));
+    const normalizedToday = new Date();
+    normalizedToday.setHours(0, 0, 0, 0);
+
+    // The calendar should start from the user's streak start date, 
+    // or today if they don't have an active streak.
+    const calendarStartDate = streakStartDate ? new Date(streakStartDate) : new Date(normalizedToday);
+
+    // Generate 7 consecutive days starting from the calendarStartDate
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(calendarStartDate);
+        d.setDate(calendarStartDate.getDate() + i);
 
         let isDone = false;
-        // Basic calculation for UI based on streak
-        if (streakData.currentStreak > 0) {
-            if (isActiveToday) {
-                // If active today, color 'currentStreak' number of days counting backwards from today
-                isDone = (6 - i) < streakData.currentStreak;
-            } else {
-                // If not active today, color 'currentStreak' number of days counting backwards from yesterday
-                // Today (i=6) is false. Yesterday (i=5) starts the streak.
-                isDone = (5 - i) >= 0 && (5 - i) < streakData.currentStreak;
+        if (streakData.currentStreak > 0 && streakStartDate && lastActivityDate) {
+            // True if the date falls strictly between start and end of streak bounds (inclusive)
+            if (d.getTime() >= streakStartDate.getTime() && d.getTime() <= lastActivityDate.getTime()) {
+                isDone = true;
             }
         }
 
@@ -65,7 +78,7 @@ const StreakCalendar = () => {
             date: d,
             dayName: d.toLocaleDateString('en-US', { weekday: 'narrow' }),
             done: isDone,
-            isToday: i === 6
+            isToday: d.getTime() === normalizedToday.getTime()
         });
     }
 
@@ -109,16 +122,18 @@ const StreakCalendar = () => {
                             {day.dayName}
                         </span>
 
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                            ${day.done
-                                ? 'bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)] font-bold scale-110 ring-2 ring-white dark:ring-slate-800 ring-offset-2 ring-offset-orange-100 dark:ring-offset-orange-900/50 z-10'
-                                : day.isToday
-                                    ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 ring-2 ring-orange-200 dark:ring-orange-500/50 border border-dashed border-orange-300 dark:border-orange-500 shadow-inner'
-                                    : 'bg-slate-50/50 dark:bg-slate-800/30 text-slate-300 dark:text-slate-600 border border-slate-200/50 dark:border-slate-700/50'
-                            }`}
-                        >
-                            {day.done ? <Check size={18} strokeWidth={3} /> : (day.isToday ? <div className="w-2.5 h-2.5 rounded-full bg-orange-400 dark:bg-orange-500 animate-pulse" /> : null)}
-                        </div>
+                        <Tooltip content={day.isToday ? "Hôm nay" : day.date.toLocaleDateString()}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
+                                ${day.done
+                                    ? 'bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)] font-bold scale-110 ring-2 ring-white dark:ring-slate-800 ring-offset-2 ring-offset-orange-100 dark:ring-offset-orange-900/50 z-10'
+                                    : day.isToday
+                                        ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 ring-2 ring-orange-200 dark:ring-orange-500/50 border border-dashed border-orange-300 dark:border-orange-500 shadow-inner'
+                                        : 'bg-slate-50/50 dark:bg-slate-800/30 text-slate-300 dark:text-slate-600 border border-slate-200/50 dark:border-slate-700/50'
+                                }`}
+                            >
+                                {day.done ? <Check size={18} strokeWidth={3} /> : (day.isToday ? <div className="w-2.5 h-2.5 rounded-full bg-orange-400 dark:bg-orange-500 animate-pulse" /> : null)}
+                            </div>
+                        </Tooltip>
                     </div>
                 ))}
             </div>
@@ -132,7 +147,7 @@ const StreakCalendar = () => {
                 <div className="flex items-center gap-1.5 bg-white/60 dark:bg-slate-800/60 px-2 py-1 rounded-lg">
                     <span className="text-sm font-black text-orange-600 dark:text-orange-400">{(Math.floor(streakData.currentStreak / 7) + 1) * 7} Days</span>
                     <span className="text-xs text-orange-500 dark:text-orange-500 flex items-center gap-0.5 font-bold">
-                        (+5 <Zap size={10} className="fill-current" />)
+                        (+3 <Zap size={10} className="fill-current" />)
                     </span>
                 </div>
             </div>

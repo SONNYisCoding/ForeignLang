@@ -52,6 +52,11 @@ const LoginPage = () => {
             const data = await res.json();
 
             if (res.ok) {
+                // Save JWT Token
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
+
                 // Refresh global auth state immediately
                 await refreshUser();
 

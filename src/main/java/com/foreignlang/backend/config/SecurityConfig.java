@@ -22,6 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.foreignlang.backend.security.RateLimitFilter;
 
 import java.util.List;
+import com.foreignlang.backend.security.JwtAuthenticationFilter;
+import com.foreignlang.backend.security.JwtTokenProvider;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -32,14 +35,11 @@ public class SecurityConfig {
         private final CustomOAuth2UserService customOAuth2UserService;
         private final com.foreignlang.backend.service.CustomOidcUserService customOidcUserService;
         private final UserRepository userRepository;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider;
 
         @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
         private String frontendUrl;
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder(12);
-        }
 
         @Bean
         public AuthenticationSuccessHandler oAuth2SuccessHandler() {
@@ -79,24 +79,27 @@ public class SecurityConfig {
                                                 user.getId(), user.getEmail(), user.isProfileComplete());
 
                                 if (!user.isProfileComplete()) {
-                                        response.sendRedirect(frontendUrl + "/profile-setup");
+                                        log.info("Redirecting to profile-setup with token");
+                                        String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+                                        response.sendRedirect(frontendUrl + "/profile-setup?token=" + token);
                                         return;
                                 }
 
-                                // Role-based redirection
+                                // Role-based redirection with token
+                                String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
                                 java.util.Set<com.foreignlang.backend.entity.User.Role> roles = user.getRoles();
                                 log.info("REDIRECT CHECK - User ID: {}", user.getId());
                                 log.info("REDIRECT CHECK - Roles: {}", roles);
 
                                 if (roles.contains(com.foreignlang.backend.entity.User.Role.ADMIN)) {
                                         log.info("Redirecting to ADMIN dashboard");
-                                        response.sendRedirect(frontendUrl + "/admin");
+                                        response.sendRedirect(frontendUrl + "/admin?token=" + token);
                                 } else if (roles.contains(com.foreignlang.backend.entity.User.Role.TEACHER)) {
                                         log.info("Redirecting to TEACHER dashboard");
-                                        response.sendRedirect(frontendUrl + "/teacher");
+                                        response.sendRedirect(frontendUrl + "/teacher?token=" + token);
                                 } else {
                                         log.info("Redirecting to LEARNER dashboard");
-                                        response.sendRedirect(frontendUrl + "/dashboard");
+                                        response.sendRedirect(frontendUrl + "/dashboard?token=" + token);
                                 }
                         } else {
                                 log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
@@ -114,19 +117,10 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(csrf -> csrf
-                                                .csrfTokenRepository(
-                                                                org.springframework.security.web.csrf.CookieCsrfTokenRepository
-                                                                                .withHttpOnlyFalse())
-                                                .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
-                                                                "/api/v1/auth/logout", "/api/v1/chat/**",
-                                                                "/api/v1/assessment/**")) // Optional:
-                                                                                          // Ignore
-                                                                                          // auth
-                                // endpoints if issues arise,
-                                // but better to support XSRF
+                                .csrf(csrf -> csrf.disable()) // Stateless JWT is immune to CSRF
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.deny()) // Prevent Clickjacking
                                                 .xssProtection(xss -> xss.disable()) // Modern browsers ignore this, CSP
@@ -174,6 +168,8 @@ public class SecurityConfig {
 
                                                 // All other API and pages require authentication
                                                 .anyRequest().authenticated())
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                                 .oauth2Login(oauth2 -> oauth2
                                                 .loginPage("/login")
                                                 .userInfoEndpoint(userInfo -> userInfo

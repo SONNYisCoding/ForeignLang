@@ -101,7 +101,7 @@ public class AssessmentController {
         user.setProfileComplete(true);
 
         // Update streak
-        streakService.updateStreak(user);
+        streakService.updateStreak(user, httpRequest.getHeader("X-Timezone"));
 
         userRepository.save(user);
 
@@ -187,7 +187,7 @@ public class AssessmentController {
         }
         user.setProficiencyLevel(level);
         user.setProfileComplete(true);
-        streakService.updateStreak(user);
+        streakService.updateStreak(user, httpRequest.getHeader("X-Timezone"));
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of(

@@ -33,7 +33,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const fetchUser = async () => {
         try {
-            const res = await fetch('/api/v1/user/me', { credentials: 'include' });
+            const token = localStorage.getItem('token');
+            const headers: HeadersInit = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const res = await fetch('/api/v1/user/me', { headers });
             if (res.ok) {
                 const data = await res.json();
                 setUser({
@@ -64,12 +70,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
+        // Intercept OAuth2 token from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const urlToken = params.get('token');
+
+        if (urlToken) {
+            localStorage.setItem('token', urlToken);
+            // Clean the URL without causing a page reload
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         fetchUser();
     }, []);
 
     const logout = async () => {
         try {
-            await fetch('/api/v1/auth/logout', { method: 'POST' });
+            const token = localStorage.getItem('token');
+            await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            localStorage.removeItem('token');
             setUser(null);
             sessionStorage.removeItem('dashboardIntroShown');
             window.location.href = '/login';

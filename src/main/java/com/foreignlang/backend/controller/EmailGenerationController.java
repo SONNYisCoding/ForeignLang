@@ -87,7 +87,7 @@ public class EmailGenerationController {
             usageQuotaService.consumeRequest(user.getId());
 
             // Update streak
-            streakService.updateStreak(user);
+            streakService.updateStreak(user, httpRequest.getHeader("X-Timezone"));
 
             // Save to history
             EmailHistory history = new EmailHistory(

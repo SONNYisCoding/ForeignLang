@@ -777,7 +777,7 @@ const LandingPage = () => {
                     <div className="pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
                         <p>{t('landing.footer.copyright')} © {new Date().getFullYear()} ForeignLang. All rights reserved.</p>
                         <div className="flex items-center gap-6">
-                            <span className="flex items-center gap-1">Made with <span className="text-red-500">❤️</span> by our Team</span>
+                            <span className="flex items-center gap-1">Made by <span className="text-indigo-600 font-bold">FiveFusion</span> Team</span>
                         </div>
                     </div>
                 </div>

@@ -19,7 +19,7 @@ To run this application, you must set the following environment variables (local
 ### Backend
 | Variable | Description | Example / Default |
 | :--- | :--- | :--- |
-| `DB_URL` | Database Connection URL | `jdbc:postgresql://host:5432/db` |
+| `DB_URL` | Database Connection URL | `jdbc:postgresql://host:5434/db` |
 | `DB_USERNAME` | Database Username | `postgres` |
 | `DB_PASSWORD` | Database Password | `password` |
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID | `7216...apps.googleusercontent.com` |

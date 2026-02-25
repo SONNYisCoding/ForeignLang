@@ -8,6 +8,7 @@ import ThemeToggle from '../components/ui/ThemeToggle';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import SearchModal from '../components/SearchModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useSidebar } from '../contexts/SidebarContext';
 import ChatbotWidget from '../components/ChatbotWidget';
 import SidebarToggle from '../components/ui/SidebarToggle';
 
@@ -19,7 +20,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
     const { user, logout } = useAuth(); // Use Auth Context
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const { isCollapsed, toggleSidebar } = useSidebar();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
@@ -88,7 +89,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                             <div className="hidden lg:flex w-14 h-14 items-center justify-center shrink-0">
                                 <SidebarToggle
                                     isCollapsed={isCollapsed}
-                                    toggle={() => setIsCollapsed(!isCollapsed)}
+                                    toggle={toggleSidebar}
                                     title={isCollapsed ? "Expand" : "Collapse"}
                                     className="scale-90"
                                 />

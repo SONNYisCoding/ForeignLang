@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, GraduationCap, Sparkles, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from '../api/axiosConfig';
 
 interface Topic {
     id: string;
@@ -22,12 +22,12 @@ const TopicsPage = () => {
     useEffect(() => {
         const fetchTopics = async () => {
             try {
-                const response = await axios.get('/api/v1/topics/published', { withCredentials: true });
+                const response = await api.get('/api/v1/topics/published');
                 setTopics(response.data);
             } catch (err) {
                 // Fallback to all topics if /published doesn't return results
                 try {
-                    const fallback = await axios.get('/api/v1/topics', { withCredentials: true });
+                    const fallback = await api.get('/api/v1/topics');
                     setTopics(fallback.data);
                 } catch {
                     console.error('Failed to fetch topics');
