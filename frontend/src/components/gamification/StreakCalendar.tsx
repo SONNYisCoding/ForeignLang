@@ -33,10 +33,8 @@ const StreakCalendar = () => {
 
     // Generate next 7 days
     const days = [];
-    const today = new Date();
 
     // Check if there's activity today based on the backend response
-    let isActiveToday = false;
     let lastActivityDate: Date | null = null;
     let streakStartDate: Date | null = null;
 
@@ -46,7 +44,6 @@ const StreakCalendar = () => {
 
         const latestMidnight = new Date();
         latestMidnight.setHours(0, 0, 0, 0);
-        isActiveToday = lastActivityDate.getTime() === latestMidnight.getTime();
 
         if (streakData.currentStreak > 0) {
             streakStartDate = new Date(lastActivityDate);

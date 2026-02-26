@@ -15,7 +15,7 @@ import java.util.Map;
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
-    private String error;
+    private String code;
     private String message;
     private String path;
     private Map<String, String> fieldErrors;

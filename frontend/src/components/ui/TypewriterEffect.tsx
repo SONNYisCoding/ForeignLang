@@ -55,17 +55,17 @@ export const TypewriterEffect = ({
     }, [isStarted, text, typingSpeed]);
 
     return (
-        <span className={`${className} inline-flex items-center`}>
-            {displayedText}
-            {showCursor && (!hideCursorOnComplete || !isComplete) && (
+        <>
+            <span className={className}>{displayedText}</span>
+            {showCursor && isStarted && (!hideCursorOnComplete || !isComplete) && (
                 <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-                    className={`ml-1 w-[2px] h-[1em] ${cursorColor}`}
+                    transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse" }}
+                    className={`inline-block ml-[2px] w-[3px] sm:w-[5px] h-[0.9em] align-middle -translate-y-[0.05em] ${cursorColor}`}
                 />
             )}
-        </span>
+        </>
     );
 };
 

@@ -16,7 +16,6 @@ import com.foreignlang.backend.security.UserPrincipal;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -133,43 +132,36 @@ public class AuthRESTController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         log.info("Login attempt for email: {}", request.email());
 
-        // Use AuthenticationManager to authenticate
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        // Use AuthenticationManager to authenticate. Any failure will be intercepted by
+        // GlobalExceptionHandler
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-            // Set authentication in SecurityContext
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Set authentication in SecurityContext
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Get User details
-            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-            User user = userPrincipal.getUser();
+        // Get User details
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
 
-            // Generate JWT Token
-            String token = jwtTokenProvider.generateToken(authentication);
+        // Generate JWT Token
+        String token = jwtTokenProvider.generateToken(authentication);
 
-            log.info("Login successful for user: {}", user.getEmail());
-            log.info("Returning roles: {}", user.getRoles());
+        log.info("Login successful for user: {}", user.getEmail());
+        log.info("Returning roles: {}", user.getRoles());
 
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Login successful",
-                    "token", token,
-                    "user", Map.of(
-                            "id", user.getId(),
-                            "email", user.getEmail(),
-                            "fullName", user.getFullName() != null ? user.getFullName() : "",
-                            "roles",
-                            user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()),
-                            "tier", user.getSubscriptionTier().name(),
-                            "profileComplete", user.isProfileComplete())));
-
-        } catch (AuthenticationException e) {
-            log.warn("Login failed: bad credentials");
-            return ResponseEntity.status(401).body(Map.of(
-                    "error", "Invalid email or password",
-                    "code", "INVALID_CREDENTIALS"));
-        }
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Login successful",
+                "token", token,
+                "user", Map.of(
+                        "id", user.getId(),
+                        "email", user.getEmail(),
+                        "fullName", user.getFullName() != null ? user.getFullName() : "",
+                        "roles",
+                        user.getRoles().stream().map(Enum::name).collect(java.util.stream.Collectors.toList()),
+                        "tier", user.getSubscriptionTier().name(),
+                        "profileComplete", user.isProfileComplete())));
     }
 
     @PostMapping("/profile-setup")

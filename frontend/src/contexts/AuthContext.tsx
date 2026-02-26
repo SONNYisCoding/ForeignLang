@@ -70,16 +70,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
-        // Intercept OAuth2 token from URL parameters
-        const params = new URLSearchParams(window.location.search);
-        const urlToken = params.get('token');
-
-        if (urlToken) {
-            localStorage.setItem('token', urlToken);
-            // Clean the URL without causing a page reload
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
         fetchUser();
     }, []);
 

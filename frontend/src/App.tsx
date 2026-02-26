@@ -13,6 +13,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ProfileSetupPage = lazy(() => import('./pages/ProfileSetupPage'));
+const OAuth2RedirectHandler = lazy(() => import('./components/auth/OAuth2RedirectHandler'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const EmailGeneratorPage = lazy(() => import('./pages/dashboard/EmailGeneratorPage'));
 const EmailHistoryPage = lazy(() => import('./pages/dashboard/EmailHistoryPage'));
@@ -136,6 +137,7 @@ function App() {
                 <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
                 <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
                 <Route path="/teachers/:id" element={<PageTransition><TeacherProfilePage /></PageTransition>} />
+                <Route path="/oauth2/redirect" element={<PageTransition><OAuth2RedirectHandler /></PageTransition>} />
 
                 {/* Semi-Protected Routes (Auth required but no specific role, or handled internally) */}
                 <Route path="/profile-setup" element={<ProtectedRoute><PageTransition><ProfileSetupPage /></PageTransition></ProtectedRoute>} />

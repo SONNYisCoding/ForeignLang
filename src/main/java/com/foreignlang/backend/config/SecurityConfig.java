@@ -78,29 +78,10 @@ public class SecurityConfig {
                                 log.info("OAuth2 Success: Direct User Object Access. ID={}, Email={}, ProfileComplete={}",
                                                 user.getId(), user.getEmail(), user.isProfileComplete());
 
-                                if (!user.isProfileComplete()) {
-                                        log.info("Redirecting to profile-setup with token");
-                                        String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-                                        response.sendRedirect(frontendUrl + "/profile-setup?token=" + token);
-                                        return;
-                                }
-
-                                // Role-based redirection with token
+                                // Unified redirection to frontend callback handler
                                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-                                java.util.Set<com.foreignlang.backend.entity.User.Role> roles = user.getRoles();
-                                log.info("REDIRECT CHECK - User ID: {}", user.getId());
-                                log.info("REDIRECT CHECK - Roles: {}", roles);
-
-                                if (roles.contains(com.foreignlang.backend.entity.User.Role.ADMIN)) {
-                                        log.info("Redirecting to ADMIN dashboard");
-                                        response.sendRedirect(frontendUrl + "/admin?token=" + token);
-                                } else if (roles.contains(com.foreignlang.backend.entity.User.Role.TEACHER)) {
-                                        log.info("Redirecting to TEACHER dashboard");
-                                        response.sendRedirect(frontendUrl + "/teacher?token=" + token);
-                                } else {
-                                        log.info("Redirecting to LEARNER dashboard");
-                                        response.sendRedirect(frontendUrl + "/dashboard?token=" + token);
-                                }
+                                log.info("OAuth2 Success: Redirecting to frontend auth handler");
+                                response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + token);
                         } else {
                                 log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
                                 response.sendRedirect(frontendUrl + "/login?error=auth_principal_failure");
@@ -119,6 +100,8 @@ public class SecurityConfig {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf.disable()) // Stateless JWT is immune to CSRF
+                                .formLogin(form -> form.disable()) // Disable form login to prevent 302 redirects
+                                .httpBasic(basic -> basic.disable()) // Disable HTTP Basic auth
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .headers(headers -> headers
@@ -181,18 +164,15 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl(frontendUrl + "/")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "XSRF-TOKEN"))
-                                // For API endpoints, return 401 instead of redirect
+                                // For API endpoints, strictly return 401 instead of redirecting anywhere
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
-                                                        String path = request.getRequestURI();
-                                                        if (path.startsWith("/api/")) {
-                                                                response.setStatus(401);
-                                                                response.setContentType("application/json");
-                                                                response.getWriter()
-                                                                                .write("{\"error\":\"Unauthorized\"}");
-                                                        } else {
-                                                                response.sendRedirect(frontendUrl + "/");
-                                                        }
+                                                        response.setStatus(401);
+                                                        response.setContentType("application/json;charset=UTF-8");
+                                                        response.getWriter().write(
+                                                                        "{\"code\":\"UNAUTHORIZED\", \"message\":\""
+                                                                                        + authException.getMessage()
+                                                                                        + "\"}");
                                                 }));
 
                 return http.build();
