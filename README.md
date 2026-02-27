@@ -354,5 +354,5 @@ MIT License — See LICENSE file for details.
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by the ForeignLang Team · FPT University · 2026</sub>
+  <sub>Built with ❤️ by the FiveFusion Team · FPT University · 2026</sub>
 </p>
