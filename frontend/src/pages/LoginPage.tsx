@@ -60,7 +60,7 @@ const LoginPage = () => {
                 // Refresh global auth state immediately
                 await refreshUser();
 
-                console.log('Login response user:', data.user);
+                // Login response received
                 // Check if profile is complete (handled by backend response)
                 if (data.user && !data.user.profileComplete) {
                     navigate('/profile-setup');
