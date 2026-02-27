@@ -2,13 +2,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
-    Sparkles, FileText, Zap, BookOpen,
-    Play, Crown,
-    ChevronRight, TrendingUp
+    Sparkles, FileText, BookOpen,
+    Crown,
+    ChevronRight, TrendingUp, PenTool, Map
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import OnboardingModal from '../components/OnboardingModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useCredits } from '../contexts/CreditContext';
 import StreakCalendar from '../components/gamification/StreakCalendar';
 import Leaderboard from '../components/gamification/Leaderboard';
 
@@ -16,25 +17,17 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const { user, loading: authLoading } = useAuth();
+    const { credits: globalCredits } = useCredits();
     const [groupId] = useState<string | null>(null);
     const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('dashboardIntroShown'));
 
     useEffect(() => {
-        // Fetch user's first group to show leaderboard
-        // For MVP, we will assume standard endpoint exists if they are in a group
-        const fetchUserGroup = async () => {
-            // In a real app we'd have a specific endpoint. 
-            // We can use the /api/v1/user/me response if it contains groups,
-            // or fetch from a dedicated group endpoint.
-            // Mocking this behavior unless we have a clear endpoint for user groups.
-            // If User has a group, this is where we'd set it.
-        };
+        const fetchUserGroup = async () => { };
         fetchUserGroup();
     }, []);
 
     useEffect(() => {
         if (showIntro) {
-            // Hide intro after 2.5 seconds
             const timer = setTimeout(() => {
                 setShowIntro(false);
                 sessionStorage.setItem('dashboardIntroShown', 'true');
@@ -44,7 +37,7 @@ const DashboardPage = () => {
     }, [showIntro]);
 
     const stats = {
-        credits: user?.usageRemaining || 0,
+        credits: globalCredits ?? user?.usageRemaining ?? 0,
         emailsGenerated: user?.emailsGenerated || 0,
         streak: user?.streak || 0
     };
@@ -117,78 +110,103 @@ const DashboardPage = () => {
         >
             <OnboardingModal />
 
-            {/* Main Content Grid */}
+            {/* ═══ PRIMARY FEATURES — Equal Visual Weight Hero Grid ═══ */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Card 1: AI Email Generator */}
+                <motion.div
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                    onClick={() => navigate('/dashboard/generator')}
+                    className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-500 to-blue-600 rounded-3xl p-7 text-white cursor-pointer group shadow-[0_20px_50px_-12px_rgba(79,70,229,0.4)] dark:shadow-none transition-all border border-indigo-400/30"
+                >
+                    <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-700">
+                        <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full blur-3xl translate-x-10 -translate-y-10" />
+                    </div>
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm w-fit mb-4">
+                            <Sparkles size={28} className="text-yellow-300" />
+                        </div>
+                        <h2 className="text-xl font-extrabold mb-1">{t('dashboard.quickActions.newEmail.title')}</h2>
+                        <p className="text-indigo-100 text-sm mb-5 flex-1">{t('dashboard.quickActions.newEmail.desc')}</p>
+                        <div className="flex items-center justify-between">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-1.5 flex items-center gap-2 text-sm">
+                                <span className="text-indigo-100 text-xs font-semibold">Start composing →</span>
+                            </div>
+                            <motion.div animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                                <ChevronRight size={24} className="text-white/60 group-hover:text-white transition-colors" />
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Card 2: AI Email Feedback */}
+                <motion.div
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                    onClick={() => navigate('/dashboard/feedback')}
+                    className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-violet-500 to-fuchsia-600 rounded-3xl p-7 text-white cursor-pointer group shadow-[0_20px_50px_-12px_rgba(147,51,234,0.4)] dark:shadow-none transition-all border border-purple-400/30"
+                >
+                    <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-700">
+                        <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }} className="absolute bottom-0 left-0 w-40 h-40 bg-white rounded-full blur-3xl -translate-x-10 translate-y-10" />
+                    </div>
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm w-fit mb-4">
+                            <PenTool size={28} className="text-pink-200" />
+                        </div>
+                        <h2 className="text-xl font-extrabold mb-1">AI Email Feedback</h2>
+                        <p className="text-purple-100 text-sm mb-5 flex-1">Check grammar, tone & vocabulary with instant AI scoring.</p>
+                        <div className="flex items-center justify-between">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-1.5 flex items-center gap-2 text-sm">
+                                <span className="text-purple-100 text-xs font-semibold">Analyze your email →</span>
+                            </div>
+                            <motion.div animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }}>
+                                <ChevronRight size={24} className="text-white/60 group-hover:text-white transition-colors" />
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Card 3: Personalized Learning Roadmap */}
+                <motion.div
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                    onClick={() => navigate('/dashboard/roadmap')}
+                    className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-500 to-cyan-600 rounded-3xl p-7 text-white cursor-pointer group shadow-[0_20px_50px_-12px_rgba(16,185,129,0.4)] dark:shadow-none transition-all border border-emerald-400/30"
+                >
+                    <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-700">
+                        <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 45, 0] }} transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }} className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full blur-3xl -translate-x-10 -translate-y-10" />
+                    </div>
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm w-fit mb-4">
+                            <Map size={28} className="text-emerald-200" />
+                        </div>
+                        <h2 className="text-xl font-extrabold mb-1">My Learning Roadmap</h2>
+                        <p className="text-emerald-100 text-sm mb-5 flex-1">Personalized learning path tailored to your career goals.</p>
+                        <div className="flex items-center justify-between">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-1.5 flex items-center gap-2 text-sm">
+                                <span className="text-emerald-100 text-xs font-bold">Not set up yet</span>
+                            </div>
+                            <motion.div animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.6 }}>
+                                <ChevronRight size={24} className="text-white/60 group-hover:text-white transition-colors" />
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* ═══ SECONDARY CONTENT GRID ═══ */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* LEFT COLUMN - Primary Actions (2/3 width on desktop) */}
+                {/* LEFT COLUMN — Secondary Quick Actions */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Hero CTA - AI Email Generator */}
-                    <motion.div
-                        whileHover={{ y: -4, scale: 1.01 }}
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1, duration: 0.4 }}
-                        onClick={() => navigate('/dashboard/generator')}
-                        className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700 rounded-3xl p-8 text-white cursor-pointer group shadow-[0_20px_50px_-12px_rgba(79,70,229,0.5)] dark:shadow-none transition-all border border-indigo-400/30 dark:border-indigo-500/50"
-                    >
-                        {/* Animated Background Pattern */}
-                        <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-700">
-                            <motion.div
-                                animate={{
-                                    scale: [1, 1.2, 1],
-                                    opacity: [0.5, 0.8, 0.5]
-                                }}
-                                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-                                className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl transform translate-x-20 -translate-y-20"
-                            />
-                            <motion.div
-                                animate={{
-                                    scale: [1, 1.5, 1],
-                                    rotate: [0, 90, 0]
-                                }}
-                                transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
-                                className="absolute bottom-0 left-0 w-48 h-48 bg-purple-300 rounded-full blur-2xl transform -translate-x-10 translate-y-10"
-                            />
-                        </div>
-
-                        <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                                        <Sparkles size={28} className="text-yellow-300" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold">{t('dashboard.quickActions.newEmail.title')}</h2>
-                                        <p className="text-indigo-100 text-sm">{t('dashboard.quickActions.newEmail.desc')}</p>
-                                    </div>
-                                </div>
-                                <motion.div
-                                    animate={{ x: [0, 5, 0] }}
-                                    transition={{ repeat: Infinity, duration: 1.5 }}
-                                >
-                                    <ChevronRight size={32} className="text-white/70 group-hover:text-white transition-colors" />
-                                </motion.div>
-                            </div>
-
-                            {/* Credits Badge */}
-                            <div className="flex items-center gap-4">
-                                <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center gap-2">
-                                    <Zap size={18} className="text-yellow-300" />
-                                    <span className="font-bold text-lg">{stats.credits}</span>
-                                    <span className="text-indigo-100 text-sm">{t('dashboard.stats.creditsToday')}</span>
-                                </div>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="bg-white text-indigo-600 font-bold px-6 py-2 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
-                                >
-                                    <Play size={18} fill="currentColor" />
-                                    {t('dashboard.stats.useNow')}
-                                </motion.button>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Quick Actions Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Templates */}
                         <motion.div
@@ -196,7 +214,7 @@ const DashboardPage = () => {
                             whileTap={{ scale: 0.98 }}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+                            transition={{ delay: 0.35, type: 'spring', stiffness: 300 }}
                             onClick={() => navigate('/dashboard/templates')}
                             className="group bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-slate-700/50 shadow-lg shadow-indigo-100/20 dark:shadow-none cursor-pointer relative overflow-hidden"
                         >
@@ -214,7 +232,7 @@ const DashboardPage = () => {
                             whileTap={{ scale: 0.98 }}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+                            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
                             onClick={() => navigate('/dashboard/vocabulary')}
                             className="group bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-slate-700/50 shadow-lg shadow-emerald-100/20 dark:shadow-none cursor-pointer relative overflow-hidden"
                         >

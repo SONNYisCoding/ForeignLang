@@ -122,6 +122,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/public/**").permitAll()
                                                 .requestMatchers("/api/v1/topics/**").permitAll()
                                                 .requestMatchers("/api/v1/templates/**").permitAll()
+                                                .requestMatchers("/api/v1/vocabulary/**").permitAll()
                                                 .requestMatchers("/api/v1/email/**").permitAll() // Allow manual session
                                                                                                  // check in controller
                                                 .requestMatchers("/api/v1/notifications/**").permitAll() // Allow manual

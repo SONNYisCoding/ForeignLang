@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, History, Search } from 'lucide-react';
+import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, History, Search, PenTool, Map, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from '../components/NotificationDropdown';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import CreditDropdown from '../components/ui/CreditModal';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import SearchModal from '../components/SearchModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useCredits } from '../contexts/CreditContext';
 import { useSidebar } from '../contexts/SidebarContext';
 import ChatbotWidget from '../components/ChatbotWidget';
 import SidebarToggle from '../components/ui/SidebarToggle';
@@ -18,13 +20,16 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
-    const { user, logout } = useAuth(); // Use Auth Context
+    const { user, logout } = useAuth();
+    const { credits, isCreditLoading } = useCredits();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { isCollapsed, toggleSidebar } = useSidebar();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isCreditDropdownOpen, setIsCreditDropdownOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const langDropdownRef = useRef<HTMLDivElement>(null);
+    const creditBtnRef = useRef<HTMLButtonElement>(null);
     const location = useLocation();
 
     // Close language dropdown when clicking outside
@@ -51,6 +56,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const navItems = [
         { name: t('dashboard.overview'), path: '/dashboard', icon: FileText },
         { name: t('dashboard.aiGenerator'), path: '/dashboard/generator', icon: Sparkles },
+        { name: 'AI Feedback', path: '/dashboard/feedback', icon: PenTool },
+        { name: 'My Roadmap', path: '/dashboard/roadmap', icon: Map },
         { name: t('dashboard.templates'), path: '/dashboard/templates', icon: BookOpen },
         { name: 'Topics & Lessons', path: '/dashboard/topics', icon: BookOpen },
         { name: 'Vocabulary', path: '/dashboard/vocabulary', icon: FileText },
@@ -206,9 +213,30 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         {/* Notifications */}
                         <NotificationDropdown />
+
+                        {/* ═══ Global AI Credit Badge ═══ */}
+                        <div className="relative">
+                            <button
+                                ref={creditBtnRef}
+                                onClick={() => setIsCreditDropdownOpen(!isCreditDropdownOpen)}
+                                className="group flex items-center gap-1.5 px-3 py-2 rounded-full border border-purple-200 dark:border-purple-800/50 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 hover:shadow-lg hover:shadow-purple-500/10 transition-all hover:-translate-y-0.5"
+                                title="AI Credits"
+                            >
+                                <Zap size={14} className="text-purple-600 dark:text-purple-400 fill-purple-600 dark:fill-purple-400" />
+                                {isCreditLoading ? (
+                                    <span className="w-5 h-4 bg-purple-200 dark:bg-purple-700 rounded animate-pulse" />
+                                ) : (
+                                    <span className="text-sm font-black text-purple-700 dark:text-purple-300">{credits ?? 0}</span>
+                                )}
+                                <span className="relative flex h-5 w-5 items-center justify-center ml-0.5 bg-purple-200 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded-full text-xs font-black group-hover:bg-purple-300 dark:group-hover:bg-purple-700/50 transition-colors">
+                                    +
+                                </span>
+                            </button>
+                            <CreditDropdown isOpen={isCreditDropdownOpen} onClose={() => setIsCreditDropdownOpen(false)} anchorRef={creditBtnRef} />
+                        </div>
 
                         {/* Theme Toggle */}
                         <ThemeToggle />

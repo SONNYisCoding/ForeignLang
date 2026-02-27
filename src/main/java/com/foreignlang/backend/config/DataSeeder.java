@@ -31,6 +31,7 @@ public class DataSeeder {
                 return args -> {
                         seedAdminUser();
                         seedTeacherUser();
+                        seedLearnerUser();
                         seedTopicsAndLessons();
                 };
         }
@@ -98,6 +99,36 @@ public class DataSeeder {
                         log.info("Teacher user created: email={}, password=teacher123", teacherEmail);
                 } catch (Exception e) {
                         log.error("Failed to seed teacher user: {}", e.getMessage());
+                }
+        }
+
+        private void seedLearnerUser() {
+                String learnerEmail = "learner@foreignlang.com";
+                String learnerUsername = "learner";
+                try {
+                        var existingLearnerOpt = userRepository.findByEmail(learnerEmail);
+                        if (existingLearnerOpt.isPresent()) {
+                                return;
+                        }
+                        if (userRepository.findByUsername(learnerUsername).isPresent()) {
+                                log.warn("Username '{}' already exists. Skipping learner creation.", learnerUsername);
+                                return;
+                        }
+                        User learner = User.builder()
+                                        .email(learnerEmail)
+                                        .passwordHash(passwordEncoder.encode("learner123"))
+                                        .fullName("Learner")
+                                        .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.LEARNER)))
+                                        .authProvider(User.AuthProvider.LOCAL)
+                                        .profileComplete(true)
+                                        .subscriptionTier(User.SubscriptionTier.PREMIUM)
+                                        .username(learnerUsername)
+                                        .birthDate(LocalDate.of(2000, 1, 1))
+                                        .build();
+                        userRepository.save(learner);
+                        log.info("Learner user created: email={}, password=learner123", learnerEmail);
+                } catch (Exception e) {
+                        log.error("Failed to seed learner user: {}", e.getMessage());
                 }
         }
 

@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const res = await fetch('/api/v1/user/me', { headers });
+            const res = await fetch('/api/v1/user/me', { headers, credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setUser({

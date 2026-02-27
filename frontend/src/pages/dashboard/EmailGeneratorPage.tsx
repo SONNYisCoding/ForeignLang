@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Send, Copy, Check, Briefcase, MessageSquare, Zap, History, Wand2, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../contexts/ToastContext';
+import { useCredits } from '../../contexts/CreditContext';
 import { useNavigate } from 'react-router-dom';
 import UiverseLoader from '../../components/ui/UiverseLoader';
 import SparkleButton from '../../components/ui/SparkleButton';
@@ -28,38 +29,20 @@ interface EmailGenerateResponse {
 const EmailGeneratorPage = () => {
     const { t, i18n } = useTranslation();
     const { showSuccess, showError } = useToast();
+    const { credits: remainingCredits, quotaDetails, deductCredit, refreshCredits, handleWatchAd, showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal } = useCredits();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [result, setResult] = useState<EmailGenerateResponse | null>(null);
     const [copied, setCopied] = useState(false);
-    const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
-    const [quotaDetails, setQuotaDetails] = useState({ free: 0, sub: 0, purchased: 0 });
 
     // Form state
     const [formData, setFormData] = useState<EmailGenerateRequest>({
         prompt: '',
         tone: 'Professional',
-        language: i18n.language === 'vi' ? 'vi' : 'en', // Sync with current language
+        language: i18n.language === 'vi' ? 'vi' : 'en',
         emailType: 'general',
         recipientType: 'colleague'
     });
-
-    // Fetch quota on mount
-    React.useEffect(() => {
-        fetch('/api/v1/user/me')
-            .then(res => res.json())
-            .then(data => {
-                if (data.usageRemaining !== undefined) {
-                    setRemainingCredits(data.usageRemaining);
-                    setQuotaDetails({
-                        free: data.freeCredits || 0,
-                        sub: data.subscriptionCredits || 0,
-                        purchased: data.purchasedCredits || 0
-                    });
-                }
-            })
-            .catch(console.error);
-    }, []);
 
     const handleGenerate = async () => {
         if (!formData.prompt.trim()) return;
@@ -88,20 +71,9 @@ const EmailGeneratorPage = () => {
             if (response.ok) {
                 setResult(data);
                 if (data.remainingUses !== undefined) {
-                    setRemainingCredits(data.remainingUses);
-                    // Refresh breakdown
-                    fetch('/api/v1/user/me')
-                        .then(res => res.json())
-                        .then(userData => {
-                            if (userData.usageRemaining !== undefined) {
-                                setRemainingCredits(userData.usageRemaining);
-                                setQuotaDetails({
-                                    free: userData.freeCredits || 0,
-                                    sub: userData.subscriptionCredits || 0,
-                                    purchased: userData.purchasedCredits || 0
-                                });
-                            }
-                        });
+                    deductCredit();
+                    // Refresh from server to sync
+                    refreshCredits();
                 }
             } else if (response.status === 401) {
                 // Redirect will be handled by Layout or protected route effectively,
@@ -127,61 +99,6 @@ const EmailGeneratorPage = () => {
         setCopied(true);
         showSuccess('Email copied to clipboard!');
         setTimeout(() => setCopied(false), 2000);
-    };
-
-    const [showAdModal, setShowAdModal] = useState(false);
-    const [adTimer, setAdTimer] = useState(5);
-    const [adFinished, setAdFinished] = useState(false);
-
-
-    const handleWatchAd = () => {
-        setShowAdModal(true);
-        setAdTimer(5);
-        setAdFinished(false);
-        const interval = setInterval(() => {
-            setAdTimer((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    setAdFinished(true);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-    };
-
-    const handleClaimReward = async () => {
-        try {
-            const response = await fetch('/api/v1/email/ad-reward', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setRemainingCredits(data.remainingUses);
-                // Refresh breakdown
-                fetch('/api/v1/user/me')
-                    .then(res => res.json())
-                    .then(userData => {
-                        if (userData.usageRemaining !== undefined) {
-                            setRemainingCredits(userData.usageRemaining);
-                            setQuotaDetails({
-                                free: userData.freeCredits || 0,
-                                sub: userData.subscriptionCredits || 0,
-                                purchased: userData.purchasedCredits || 0
-                            });
-                        }
-                    });
-
-                setShowAdModal(false);
-                alert(t('generator.adRewardSuccess') || 'You earned 1 credit!');
-            } else {
-                alert(data.error);
-                setShowAdModal(false);
-            }
-        } catch (error) {
-            console.error('Ad reward error:', error);
-        }
     };
 
     return (
@@ -233,7 +150,7 @@ const EmailGeneratorPage = () => {
                                 )}
 
                                 <button
-                                    onClick={() => setShowAdModal(false)}
+                                    onClick={() => closeAdModal()}
                                     className="mt-6 text-sm font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                 >
                                     Close without reward
@@ -259,8 +176,8 @@ const EmailGeneratorPage = () => {
 
                     <div className="mt-6 flex flex-wrap items-center gap-3">
                         <div className={`inline-flex items-center rounded-xl p-1.5 pr-4 border shadow-sm transition-colors ${remainingCredits !== null && remainingCredits > 0
-                                ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
-                                : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30 text-red-700'
+                            ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
+                            : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30 text-red-700'
                             }`}>
                             <div className="flex flex-col px-3">
                                 <span className={`text-xs font-bold uppercase tracking-wider ${remainingCredits !== null && remainingCredits > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
