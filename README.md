@@ -5,7 +5,7 @@
 <h1 align="center">🌐 ForeignLang</h1>
 
 <p align="center">
-  <strong>Business English Learning Platform for IT Professionals</strong>
+  <strong>Business English Learning Platform for Professionals</strong>
 </p>
 
 <p align="center">
