@@ -309,26 +309,28 @@ const DashboardPage = () => {
                     </motion.div>
 
                     {/* Upgrade CTA - Compact */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-800 rounded-2xl p-5 border border-indigo-100 dark:border-slate-700"
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                                <Crown size={20} />
-                            </div>
-                            <span className="font-bold text-indigo-900 dark:text-white">{t('dashboard.upgrade.title')}</span>
-                        </div>
-                        <p className="text-sm text-indigo-700 dark:text-slate-400 mb-3">{t('dashboard.upgrade.subtitle')}</p>
-                        <Link
-                            to="/upgrade"
-                            className="w-full block text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 dark:shadow-none"
+                    {!user?.isPremium && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-800 rounded-2xl p-5 border border-indigo-100 dark:border-slate-700"
                         >
-                            {t('dashboard.upgrade.cta')}
-                        </Link>
-                    </motion.div>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                                    <Crown size={20} />
+                                </div>
+                                <span className="font-bold text-indigo-900 dark:text-white">{t('dashboard.upgrade.title')}</span>
+                            </div>
+                            <p className="text-sm text-indigo-700 dark:text-slate-400 mb-3">{t('dashboard.upgrade.subtitle')}</p>
+                            <Link
+                                to="/upgrade"
+                                className="w-full block text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-sm shadow-md shadow-indigo-200 dark:shadow-none"
+                            >
+                                {t('dashboard.upgrade.cta')}
+                            </Link>
+                        </motion.div>
+                    )}
                 </div>
             </div>
         </motion.div>

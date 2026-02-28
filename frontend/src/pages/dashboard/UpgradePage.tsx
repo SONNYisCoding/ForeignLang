@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Star, ArrowLeft, Shield, Zap, Crown, Sparkles, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCredits } from '../../contexts/CreditContext';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { UpgradeButton } from '../../components/common/UpgradeButton';
@@ -45,7 +46,8 @@ const UpgradePage = () => {
             .catch(() => navigate('/login?redirect=/upgrade'));
     }, [navigate]);
 
-    const { user } = useAuth(); // Get user ID for SePay content
+    const { user, refreshUser } = useAuth(); // Get user ID for SePay content
+    const { refreshCredits } = useCredits();
 
     // Pre-select plan from URL params
     useEffect(() => {
@@ -150,8 +152,9 @@ const UpgradePage = () => {
             const response = await fetch('/api/v1/user/upgrade', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
-                    planId: selectedPlan.id,
+                    planId: selectedPlan.type === 'subscription' ? 'PREMIUM' : selectedPlan.id,
                     type: selectedPlan.type,
                     amount: selectedPlan.price
                 })
@@ -159,7 +162,9 @@ const UpgradePage = () => {
 
             if (response.ok) {
                 setStep('success');
-                // Could refresh via useAuth if needed, but App.tsx load handles it mostly
+                // Sync user profile (isPremium flag) and credit count globally
+                await refreshUser();
+                refreshCredits();
             } else {
                 toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
                 setStep('select');

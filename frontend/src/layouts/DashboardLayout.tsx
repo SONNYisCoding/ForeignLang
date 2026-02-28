@@ -22,6 +22,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
     const { user, logout } = useAuth();
     const { credits, isCreditLoading } = useCredits();
+
+    const isPremium = user?.isPremium;
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { isCollapsed, toggleSidebar } = useSidebar();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -171,22 +174,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     </div>
 
                     <div className="px-3 mt-auto">
-                        {/* Upgrade Card - Minimal */}
-                        {!isCollapsed ? (
-                            <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-slate-800 dark:to-slate-800 border border-indigo-100 dark:border-slate-700">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Sparkles size={16} className="text-indigo-600 dark:text-indigo-400 fill-indigo-600 dark:fill-indigo-400" />
-                                    <span className="font-semibold text-sm text-indigo-900 dark:text-indigo-200">Pro Plan</span>
+                        {/* Upgrade Card - Minimal (Hidden if PRO) */}
+                        {!isPremium && (
+                            !isCollapsed ? (
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-slate-800 dark:to-slate-800 border border-indigo-100 dark:border-slate-700">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Sparkles size={16} className="text-indigo-600 dark:text-indigo-400 fill-indigo-600 dark:fill-indigo-400" />
+                                        <span className="font-semibold text-sm text-indigo-900 dark:text-indigo-200">Pro Plan</span>
+                                    </div>
+                                    <p className="text-xs text-indigo-700/80 dark:text-slate-400 mb-3 line-clamp-2">Get unlimited AI credits & exclusive features.</p>
+                                    <Link to="/upgrade" className="block w-full text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
+                                        Upgrade
+                                    </Link>
                                 </div>
-                                <p className="text-xs text-indigo-700/80 dark:text-slate-400 mb-3 line-clamp-2">Get unlimited AI credits & exclusive features.</p>
-                                <Link to="/upgrade" className="block w-full text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
-                                    Upgrade
+                            ) : (
+                                <Link to="/upgrade" className="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Upgrade">
+                                    <Sparkles size={20} />
                                 </Link>
-                            </div>
-                        ) : (
-                            <Link to="/upgrade" className="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Upgrade">
-                                <Sparkles size={20} />
-                            </Link>
+                            )
                         )}
                     </div>
                 </div>
@@ -228,6 +233,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                 <Zap size={14} className="text-purple-600 dark:text-purple-400 fill-purple-600 dark:fill-purple-400" />
                                 {isCreditLoading ? (
                                     <span className="w-5 h-4 bg-purple-200 dark:bg-purple-700 rounded animate-pulse" />
+                                ) : isPremium ? (
+                                    <span className="text-sm font-black text-purple-700 dark:text-purple-300">∞</span>
                                 ) : (
                                     <span className="text-sm font-black text-purple-700 dark:text-purple-300">{credits ?? 0}</span>
                                 )}
@@ -284,7 +291,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         <div className="relative group" onMouseEnter={() => setIsProfileDropdownOpen(true)} onMouseLeave={() => setIsProfileDropdownOpen(false)}>
                             <button className="flex items-center gap-3 focus:outline-none">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-none mb-1">{user?.name || 'User'}</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-none mb-1 flex items-center justify-end gap-2">
+                                        {isPremium && (
+                                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-black tracking-wider rounded uppercase shadow-sm">
+                                                PRO
+                                            </span>
+                                        )}
+                                        {user?.name || 'User'}
+                                    </p>
                                     <p className="text-xs text-gray-500 dark:text-slate-400">{t('dashboard.welcome', { name: '' }).replace(',', '').trim()}</p>
                                 </div>
                                 <div className="relative">

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, FileText, RotateCcw, Zap, Crown, X, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import UiverseLoader from '../../components/ui/UiverseLoader';
 import AnnotatedTextPanel from '../../components/feedback/AnnotatedTextPanel';
 import ScoreDashboard from '../../components/feedback/ScoreDashboard';
 import SuggestionsSidebar from '../../components/feedback/SuggestionsSidebar';
 import { getMockFeedback, SAMPLE_EMAIL } from '../../data/mockFeedbackData';
 import { useCredits } from '../../contexts/CreditContext';
+import { useAuth } from '../../contexts/AuthContext';
 import type { FeedbackResult } from '../../data/mockFeedbackData';
 
 // History item stored in localStorage
@@ -41,6 +43,8 @@ const EmailFeedbackPage: React.FC = () => {
         deductCredit, refreshCredits,
         handleWatchAd, showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal
     } = useCredits();
+    const { user } = useAuth();
+    const isPremium = user?.isPremium;
 
     const [emailInput, setEmailInput] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -58,7 +62,7 @@ const EmailFeedbackPage: React.FC = () => {
     const handleAnalyze = async () => {
         if (!emailInput.trim()) return;
 
-        if (credits !== null && credits <= 0) {
+        if (!isPremium && credits !== null && credits <= 0) {
             setShowUpgradeModal(true);
             return;
         }
@@ -77,15 +81,21 @@ const EmailFeedbackPage: React.FC = () => {
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
                 if (res.status === 429) {
-                    setShowUpgradeModal(true);
+                    if (isPremium) {
+                        toast.error('To ensure high speeds for everyone, you have reached the daily Fair Use limit. Please try again tomorrow!');
+                    } else {
+                        setShowUpgradeModal(true);
+                    }
+                } else {
+                    toast.error('Network or server error during credit deduction.');
                 }
                 console.error('Credit deduction failed:', errData);
                 setIsAnalyzing(false);
                 return;
             }
 
-            // Optimistic UI update
-            deductCredit();
+            // Optimistic UI update (skip for PRO — they have ∞)
+            if (!isPremium) deductCredit();
 
             // Simulate AI analysis delay
             await new Promise(resolve => setTimeout(resolve, 2500));
@@ -227,27 +237,29 @@ const EmailFeedbackPage: React.FC = () => {
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">AI Email Feedback</h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">Paste your email and get instant grammar, tone, and vocabulary analysis.</p>
                     </div>
-                    <div className={`inline-flex items-center rounded-xl p-1.5 pr-4 border shadow-sm transition-colors ${credits !== null && credits > 0
-                        ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
-                        : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30'
-                        }`}>
-                        <div className="flex flex-col px-3">
-                            <span className={`text-xs font-bold uppercase tracking-wider ${credits !== null && credits > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>Credits</span>
-                            <span className={`text-xl font-black ${credits !== null && credits > 0 ? 'text-gray-900 dark:text-white' : 'text-red-700 dark:text-red-300'}`}>{credits ?? 0}</span>
+                    {!isPremium && (
+                        <div className={`inline-flex items-center rounded-xl p-1.5 pr-4 border shadow-sm transition-colors ${credits !== null && credits > 0
+                            ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
+                            : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30'
+                            }`}>
+                            <div className="flex flex-col px-3">
+                                <span className={`text-xs font-bold uppercase tracking-wider ${credits !== null && credits > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>Credits</span>
+                                <span className={`text-xl font-black ${credits !== null && credits > 0 ? 'text-gray-900 dark:text-white' : 'text-red-700 dark:text-red-300'}`}>{credits ?? 0}</span>
+                            </div>
+                            <div className="h-10 w-px bg-gray-200 dark:bg-slate-700 mx-2" />
+                            <div className="flex flex-col text-xs font-medium text-gray-500 dark:text-slate-400 leading-tight">
+                                <span>{quotaDetails.free} Free</span>
+                                <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
+                            </div>
+                            <button onClick={handleWatchAd} className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative" title="Watch Ad for +1 Credit">
+                                <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
+                                <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
+                                </span>
+                            </button>
                         </div>
-                        <div className="h-10 w-px bg-gray-200 dark:bg-slate-700 mx-2" />
-                        <div className="flex flex-col text-xs font-medium text-gray-500 dark:text-slate-400 leading-tight">
-                            <span>{quotaDetails.free} Free</span>
-                            <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
-                        </div>
-                        <button onClick={handleWatchAd} className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative" title="Watch Ad for +1 Credit">
-                            <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
-                            <span className="absolute -top-2 -right-2 flex h-4 w-4">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
-                            </span>
-                        </button>
-                    </div>
+                    )}
                 </div>
 
                 <AnimatePresence mode="wait">

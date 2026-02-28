@@ -61,6 +61,7 @@ public class UsageQuota {
     private static final int MAX_ADS_PER_DAY = 3;
     private static final int WEEKLY_FREE_LIMIT = 2;
     private static final int MONTHLY_SUB_LIMIT = 20;
+    private static final int PREMIUM_DAILY_LIMIT = 20;
 
     @Column(name = "last_free_reset")
     private LocalDate lastFreeReset;
@@ -71,9 +72,20 @@ public class UsageQuota {
     @Column(name = "last_ad_reset")
     private LocalDate lastAdReset;
 
+    // Premium daily usage counter (for rate limiting)
+    @Column(name = "premium_daily_used")
+    @Builder.Default
+    private Integer premiumDailyUsed = 0;
+
+    @Column(name = "last_premium_reset")
+    private LocalDate lastPremiumReset;
+
     // Check if user can use AI
     public boolean canUseAI(boolean isPremium) {
         checkAndResetQuotas(isPremium);
+        if (isPremium) {
+            return (premiumDailyUsed != null ? premiumDailyUsed : 0) < PREMIUM_DAILY_LIMIT;
+        }
         return (freeCredits != null ? freeCredits : 0) > 0 ||
                 (subscriptionCredits != null ? subscriptionCredits : 0) > 0 ||
                 (purchasedCredits != null ? purchasedCredits : 0) > 0;
@@ -82,6 +94,9 @@ public class UsageQuota {
     // Get remaining uses for display
     public int getRemainingUses(boolean isPremium) {
         checkAndResetQuotas(isPremium);
+        if (isPremium) {
+            return PREMIUM_DAILY_LIMIT - (premiumDailyUsed != null ? premiumDailyUsed : 0);
+        }
         return (freeCredits != null ? freeCredits : 0) +
                 (subscriptionCredits != null ? subscriptionCredits : 0) +
                 (purchasedCredits != null ? purchasedCredits : 0);
@@ -91,13 +106,24 @@ public class UsageQuota {
     public boolean useOneCredit(boolean isPremium) {
         checkAndResetQuotas(isPremium);
 
+        // Premium users: bypass credit deduction, only increment daily counter
+        if (isPremium) {
+            if (premiumDailyUsed == null)
+                premiumDailyUsed = 0;
+            if (premiumDailyUsed >= PREMIUM_DAILY_LIMIT) {
+                return false; // Rate limited
+            }
+            premiumDailyUsed++;
+            return true;
+        }
+
         // Priority 1: Free Weekly Credits
         if (freeCredits != null && freeCredits > 0) {
             freeCredits--;
             return true;
         }
         // Priority 2: Subscription Credits (if Premium)
-        if (isPremium && subscriptionCredits != null && subscriptionCredits > 0) {
+        if (subscriptionCredits != null && subscriptionCredits > 0) {
             subscriptionCredits--;
             return true;
         }
@@ -157,6 +183,14 @@ public class UsageQuota {
         if (lastAdReset == null || now.isAfter(lastAdReset)) {
             lastAdReset = now;
             adUsesToday = 0;
+        }
+
+        // 4. Daily Premium Usage Reset
+        if (isPremium) {
+            if (lastPremiumReset == null || now.isAfter(lastPremiumReset)) {
+                lastPremiumReset = now;
+                premiumDailyUsed = 0;
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import { ChevronLeft, Lock, Unlock, Copy, Check, Shield, FileText, Zap, Share2 }
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCredits } from '../contexts/CreditContext';
+import { useAuth } from '../contexts/AuthContext';
 
 /* ═══ Types ═══ */
 interface TemplateField { name: string; placeholder: string; }
@@ -63,6 +64,8 @@ const TemplateDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { credits, deductCredit, refreshCredits } = useCredits();
+    const { user } = useAuth();
+    const isPremium = user?.isPremium;
 
     const [template, setTemplate] = useState<Template | null>(null);
     const [loading, setLoading] = useState(true);
@@ -103,12 +106,12 @@ const TemplateDetailPage = () => {
 
     // ── Parse template structure (all templates get form treatment) ──
     const parsed: ParsedTemplate | null = template ? parseTemplate(template.structure) : null;
-    const isUnlocked = id ? unlockedIds.has(id) : false;
+    const isUnlocked = isPremium || (id ? unlockedIds.has(id) : false);
 
     // ── Unlock handler ──
     const handleUnlock = useCallback(async () => {
         if (!id) return;
-        if (credits !== null && credits <= 0) {
+        if (!isPremium && credits !== null && credits <= 0) {
             toast.error('No credits left! Use the ⚡ button in the navbar to get more.');
             return;
         }
@@ -120,7 +123,11 @@ const TemplateDetailPage = () => {
                 credentials: 'include',
             });
             if (!res.ok) {
-                toast.error('Failed to deduct credit. Please try again.');
+                if (res.status === 429 && isPremium) {
+                    toast.error('To ensure high speeds for everyone, you have reached the daily Fair Use limit. Please try again tomorrow!');
+                } else {
+                    toast.error('Failed to deduct credit. Please try again.');
+                }
                 return;
             }
         } catch {
@@ -128,7 +135,7 @@ const TemplateDetailPage = () => {
             return;
         }
 
-        deductCredit();
+        if (!isPremium) deductCredit();
         const updated = new Set(unlockedIds);
         updated.add(id);
         setUnlockedIds(updated);

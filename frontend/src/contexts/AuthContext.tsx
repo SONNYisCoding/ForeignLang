@@ -15,6 +15,8 @@ interface User {
     authProvider?: string;
     googleId?: string;
     facebookId?: string;
+    isPremium?: boolean;
+    tier?: string;
 }
 
 interface AuthContextType {
@@ -56,7 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     streak: data.streak,
                     authProvider: data.authProvider,
                     googleId: data.googleId,
-                    facebookId: data.facebookId
+                    facebookId: data.facebookId,
+                    isPremium: data.isPremium ?? false,
+                    tier: data.tier || 'FREE',
                 });
             } else {
                 setUser(null);

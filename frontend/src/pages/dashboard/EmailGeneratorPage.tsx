@@ -3,6 +3,7 @@ import { Send, Copy, Check, Briefcase, MessageSquare, Zap, History, Wand2, Spark
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../contexts/ToastContext';
 import { useCredits } from '../../contexts/CreditContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import UiverseLoader from '../../components/ui/UiverseLoader';
 import SparkleButton from '../../components/ui/SparkleButton';
@@ -30,6 +31,8 @@ const EmailGeneratorPage = () => {
     const { t, i18n } = useTranslation();
     const { showSuccess, showError } = useToast();
     const { credits: remainingCredits, quotaDetails, deductCredit, refreshCredits, handleWatchAd, showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal } = useCredits();
+    const { user } = useAuth();
+    const isPremium = user?.isPremium;
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [result, setResult] = useState<EmailGenerateResponse | null>(null);
@@ -74,6 +77,12 @@ const EmailGeneratorPage = () => {
                     deductCredit();
                     // Refresh from server to sync
                     refreshCredits();
+                }
+            } else if (response.status === 429) {
+                if (isPremium) {
+                    showError("To ensure high speeds for everyone, you have reached the daily Fair Use limit. Please try again tomorrow!");
+                } else {
+                    showError(data.error || "You've used all your AI credits for today.");
                 }
             } else if (response.status === 401) {
                 // Redirect will be handled by Layout or protected route effectively,
@@ -175,35 +184,37 @@ const EmailGeneratorPage = () => {
                     </p>
 
                     <div className="mt-6 flex flex-wrap items-center gap-3">
-                        <div className={`inline-flex items-center rounded-xl p-1.5 pr-4 border shadow-sm transition-colors ${remainingCredits !== null && remainingCredits > 0
-                            ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
-                            : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30 text-red-700'
-                            }`}>
-                            <div className="flex flex-col px-3">
-                                <span className={`text-xs font-bold uppercase tracking-wider ${remainingCredits !== null && remainingCredits > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
-                                    Credits Remaining
-                                </span>
-                                <span className={`text-xl font-black ${remainingCredits !== null && remainingCredits > 0 ? 'text-gray-900 dark:text-white' : 'text-red-700 dark:text-red-300'}`}>
-                                    {remainingCredits ?? 0}
-                                </span>
+                        {!isPremium && (
+                            <div className={`inline-flex items-center rounded-xl p-1.5 pr-4 border shadow-sm transition-colors ${remainingCredits !== null && remainingCredits > 0
+                                ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50 shadow-indigo-500/5'
+                                : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30 text-red-700'
+                                }`}>
+                                <div className="flex flex-col px-3">
+                                    <span className={`text-xs font-bold uppercase tracking-wider ${remainingCredits !== null && remainingCredits > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
+                                        Credits Remaining
+                                    </span>
+                                    <span className={`text-xl font-black ${remainingCredits !== null && remainingCredits > 0 ? 'text-gray-900 dark:text-white' : 'text-red-700 dark:text-red-300'}`}>
+                                        {remainingCredits ?? 0}
+                                    </span>
+                                </div>
+                                <div className="h-10 w-px bg-gray-200 dark:bg-slate-700 mx-2" />
+                                <div className="flex flex-col text-xs font-medium text-gray-500 dark:text-slate-400 leading-tight">
+                                    <span>{quotaDetails.free} Free</span>
+                                    <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
+                                </div>
+                                <button
+                                    onClick={handleWatchAd}
+                                    className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative"
+                                    title="Watch Ad for +1 Credit"
+                                >
+                                    <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
+                                    <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
+                                    </span>
+                                </button>
                             </div>
-                            <div className="h-10 w-px bg-gray-200 dark:bg-slate-700 mx-2" />
-                            <div className="flex flex-col text-xs font-medium text-gray-500 dark:text-slate-400 leading-tight">
-                                <span>{quotaDetails.free} Free</span>
-                                <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
-                            </div>
-                            <button
-                                onClick={handleWatchAd}
-                                className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative"
-                                title="Watch Ad for +1 Credit"
-                            >
-                                <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
-                                <span className="absolute -top-2 -right-2 flex h-4 w-4">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
-                                </span>
-                            </button>
-                        </div>
+                        )}
                     </div>
                 </div>
 
