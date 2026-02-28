@@ -105,10 +105,13 @@ const LearningRoadmapPage: React.FC = () => {
                             <div className="p-6 text-center text-slate-400 text-sm">No roadmaps yet. Create one above!</div>
                         ) : (
                             roadmaps.map(item => (
-                                <button
+                                <div
                                     key={item.id}
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => { setSelectedId(item.id); setShowForm(false); }}
-                                    className={`w-full text-left p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-emerald-50/50 dark:hover:bg-slate-750 transition-colors group ${selectedId === item.id && !showForm ? 'bg-emerald-50 dark:bg-emerald-900/20 border-l-2 border-l-emerald-500' : ''
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSelectedId(item.id); setShowForm(false); } }}
+                                    className={`w-full text-left p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-emerald-50/50 dark:hover:bg-slate-750 transition-colors group cursor-pointer ${selectedId === item.id && !showForm ? 'bg-emerald-50 dark:bg-emerald-900/20 border-l-2 border-l-emerald-500' : ''
                                         }`}
                                 >
                                     <div className="flex items-start justify-between gap-2">
@@ -127,7 +130,7 @@ const LearningRoadmapPage: React.FC = () => {
                                             <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
                                         </div>
                                     </div>
-                                </button>
+                                </div>
                             ))
                         )}
                     </div>

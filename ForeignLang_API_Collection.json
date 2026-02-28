@@ -705,6 +705,25 @@
                     }
                 },
                 {
+                    "name": "Consume 1 Credit (AI Feedback)",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/consume-credit",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "consume-credit"
+                            ]
+                        },
+                        "description": "Deducts 1 AI credit without generating an email. Used by AI Feedback feature. Returns { success, remainingUses }."
+                    }
+                },
+                {
                     "name": "Get Email Generation History",
                     "request": {
                         "method": "GET",

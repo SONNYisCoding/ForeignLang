@@ -117,6 +117,38 @@ public class EmailGenerationController {
     }
 
     /**
+     * Consume 1 AI credit without generating email.
+     * Used by AI Feedback feature which runs mock analysis locally.
+     */
+    @PostMapping("/consume-credit")
+    public ResponseEntity<?> consumeCredit(
+            HttpServletRequest httpRequest,
+            @AuthenticationPrincipal OAuth2User principal) {
+
+        String userEmail = getUserEmail(httpRequest, principal);
+        if (userEmail == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("error", "User not found"));
+        }
+
+        User user = userOpt.get();
+
+        if (!usageQuotaService.consumeRequest(user.getId())) {
+            return ResponseEntity.status(429).body(Map.of(
+                    "error", "No credits remaining",
+                    "code", "QUOTA_EXCEEDED"));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "remainingUses", usageQuotaService.getRemainingUses(user.getId())));
+    }
+
+    /**
      * Get AI service status
      */
     @GetMapping("/status")

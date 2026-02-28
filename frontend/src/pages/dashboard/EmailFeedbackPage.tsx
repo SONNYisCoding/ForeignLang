@@ -38,7 +38,7 @@ const EmailFeedbackPage: React.FC = () => {
     // ═══ Global Credit System — Single Source of Truth ═══
     const {
         credits, quotaDetails,
-        deductCredit,
+        deductCredit, refreshCredits,
         handleWatchAd, showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal
     } = useCredits();
 
@@ -55,7 +55,7 @@ const EmailFeedbackPage: React.FC = () => {
         setHistory(loadHistory());
     }, []);
 
-    const handleAnalyze = () => {
+    const handleAnalyze = async () => {
         if (!emailInput.trim()) return;
 
         if (credits !== null && credits <= 0) {
@@ -67,33 +67,53 @@ const EmailFeedbackPage: React.FC = () => {
         setResult(null);
         setActiveHistoryId(null);
 
-        setTimeout(async () => {
-            try {
-                const feedback = getMockFeedback(emailInput);
-                setResult(feedback);
+        try {
+            // ═══ Server-side credit deduction (matching EmailGeneratorPage) ═══
+            const res = await fetch('/api/v1/email/consume-credit', {
+                method: 'POST',
+                credentials: 'include',
+            });
 
-                // Deduct credit optimistically (no server call for mock)
-                // DO NOT call refreshCredits() here — server hasn't deducted,
-                // so refresh would revert the optimistic update causing flicker
-                deductCredit();
-
-                // Push to history
-                const newItem: HistoryItem = {
-                    id: Date.now().toString(),
-                    emailSnippet: emailInput.slice(0, 80) + (emailInput.length > 80 ? '...' : ''),
-                    overallScore: feedback.scores.overall,
-                    timestamp: Date.now(),
-                    emailInput,
-                    result: feedback,
-                };
-                const updated = [newItem, ...history].slice(0, 20);
-                setHistory(updated);
-                saveHistory(updated);
-                setActiveHistoryId(newItem.id);
-            } finally {
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                if (res.status === 429) {
+                    setShowUpgradeModal(true);
+                }
+                console.error('Credit deduction failed:', errData);
                 setIsAnalyzing(false);
+                return;
             }
-        }, 2500);
+
+            // Optimistic UI update
+            deductCredit();
+
+            // Simulate AI analysis delay
+            await new Promise(resolve => setTimeout(resolve, 2500));
+
+            const feedback = getMockFeedback(emailInput);
+            setResult(feedback);
+
+            // Push to history
+            const newItem: HistoryItem = {
+                id: Date.now().toString(),
+                emailSnippet: emailInput.slice(0, 80) + (emailInput.length > 80 ? '...' : ''),
+                overallScore: feedback.scores.overall,
+                timestamp: Date.now(),
+                emailInput,
+                result: feedback,
+            };
+            const updated = [newItem, ...history].slice(0, 20);
+            setHistory(updated);
+            saveHistory(updated);
+            setActiveHistoryId(newItem.id);
+
+            // Sync credits from server (server HAS deducted now)
+            refreshCredits();
+        } catch (error) {
+            console.error('Analysis error:', error);
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const handleReset = () => {
