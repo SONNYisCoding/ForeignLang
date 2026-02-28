@@ -37,7 +37,13 @@ public class UserRESTController {
     public record SetupPasswordRequest(String newPassword) {
     }
 
-    public record UpgradeRequest(String planId, String type, java.math.BigDecimal amount) {
+    @lombok.Data
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class UpgradeRequest {
+        private String planId;
+        private String type;
+        private java.math.BigDecimal amount;
     }
 
     @GetMapping("/me")
@@ -95,6 +101,7 @@ public class UserRESTController {
             boolean isPremium = subscriptionService.isPremium(user.getId());
             response.put("tier", isPremium ? "PREMIUM" : "FREE");
             response.put("isPremium", isPremium);
+            response.put("subscriptionExpiryDate", user.getSubscriptionExpiryDate());
             response.put("roles", user.getRoles());
             response.put("profileComplete", user.isProfileComplete());
             response.put("username", user.getUsername());
@@ -256,12 +263,12 @@ public class UserRESTController {
         }
 
         return userRepository.findByEmail(email).map(user -> {
-            if (request.type() == null
-                    || (!request.type().equals("subscription") && !request.type().equals("credits"))) {
+            if (request.getType() == null
+                    || (!request.getType().equals("subscription") && !request.getType().equals("credits"))) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Invalid or missing 'type'. Expected 'subscription' or 'credits'."));
             }
-            if (request.planId() == null || request.planId().isBlank()) {
+            if (request.getPlanId() == null || request.getPlanId().isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of("error",
                         "Missing 'planId'. Expected a valid plan identifier like 'PREMIUM' or 'credits-15'."));
             }
@@ -269,42 +276,55 @@ public class UserRESTController {
             // Create Transaction Record
             com.foreignlang.backend.entity.Transaction tx = com.foreignlang.backend.entity.Transaction.builder()
                     .user(user)
-                    .amount(request.amount() != null ? request.amount() : java.math.BigDecimal.ZERO)
+                    .amount(request.getAmount() != null ? request.getAmount() : java.math.BigDecimal.ZERO)
                     .currency("VND")
-                    .type("subscription".equals(request.type())
+                    .type("subscription".equals(request.getType())
                             ? com.foreignlang.backend.entity.Transaction.Type.PRO_UPGRADE
                             : com.foreignlang.backend.entity.Transaction.Type.AI_CREDIT)
                     .status(com.foreignlang.backend.entity.Transaction.Status.SUCCESS)
-                    .planId(request.planId())
+                    .planId(request.getPlanId())
                     .build();
             transactionRepository.save(tx);
 
-            if ("subscription".equals(request.type())) {
-                if (!request.planId().equalsIgnoreCase("PRO") && !request.planId().equalsIgnoreCase("PREMIUM")) {
+            if ("subscription".equals(request.getType())) {
+                boolean isMonthly = "flpro-monthly".equalsIgnoreCase(request.getPlanId());
+                boolean isQuarterly = "flpro-quarterly".equalsIgnoreCase(request.getPlanId());
+
+                if (!isMonthly && !isQuarterly) {
                     return ResponseEntity.badRequest()
-                            .body(Map.of("error", "Invalid subscription planId. Expected 'PREMIUM'."));
+                            .body(Map.of("error",
+                                    "Invalid subscription planId. Expected 'flpro-monthly' or 'flpro-quarterly'."));
                 }
+
+                java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                java.time.LocalDateTime currentExpiry = user.getSubscriptionExpiryDate();
+                java.time.LocalDateTime newExpiry = (currentExpiry != null && currentExpiry.isAfter(now))
+                        ? currentExpiry
+                        : now;
+
+                newExpiry = isQuarterly ? newExpiry.plusDays(90) : newExpiry.plusDays(30);
+
                 user.setSubscriptionTier(com.foreignlang.backend.entity.User.SubscriptionTier.PREMIUM);
+                user.setSubscriptionExpiryDate(newExpiry);
                 userRepository.save(user);
 
                 com.foreignlang.backend.entity.Subscription sub = com.foreignlang.backend.entity.Subscription.builder()
                         .user(user)
-                        .planType(request.planId() != null && request.planId().contains("quarterly")
+                        .planType(isQuarterly
                                 ? com.foreignlang.backend.entity.Subscription.PlanType.QUARTERLY
                                 : com.foreignlang.backend.entity.Subscription.PlanType.MONTHLY)
                         .amountVnd(tx.getAmount())
-                        .startDate(java.time.LocalDateTime.now())
-                        .endDate(java.time.LocalDateTime.now()
-                                .plusMonths(request.planId() != null && request.planId().contains("quarterly") ? 3 : 1))
+                        .startDate(now)
+                        .endDate(newExpiry)
                         .status(com.foreignlang.backend.entity.Subscription.Status.ACTIVE)
                         .build();
                 subscriptionRepository.save(sub);
 
-            } else if ("credits".equals(request.type())) {
+            } else if ("credits".equals(request.getType())) {
                 UsageQuota quota = usageQuotaRepository.findByUserId(user.getId())
                         .orElseGet(() -> UsageQuota.createForNewUser(user));
 
-                int bonus = request.planId() != null && request.planId().contains("15") ? 15 : 5;
+                int bonus = request.getPlanId() != null && request.getPlanId().contains("15") ? 15 : 5;
                 quota.setPurchasedCredits(
                         (quota.getPurchasedCredits() != null ? quota.getPurchasedCredits() : 0) + bonus);
                 usageQuotaRepository.save(quota);

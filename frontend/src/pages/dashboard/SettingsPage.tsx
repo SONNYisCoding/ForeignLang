@@ -481,7 +481,11 @@ const SettingsPage = () => {
                                                         </div>
                                                         <div className="text-left md:text-right">
                                                             <p className="text-indigo-200 text-sm mb-1">Next billing date</p>
-                                                            <p className="text-xl font-bold">{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                                                            <p className="text-xl font-bold">
+                                                                {user?.subscriptionExpiryDate
+                                                                    ? new Date(user.subscriptionExpiryDate).toLocaleDateString('vi-VN')
+                                                                    : 'N/A'}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>

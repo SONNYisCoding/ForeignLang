@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, Play, Sparkles, X } from 'lucide-react';
+import { CreditCard, Play, Sparkles, X, Infinity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCredits } from '../../contexts/CreditContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -65,7 +65,9 @@ const CreditDropdown = ({ isOpen, onClose, anchorRef }: {
                         </div>
                         <div className="text-2xl font-black text-white mt-1">
                             {isPremium ? (
-                                <span className="text-lg">PRO Plan Active - Unlimited AI Access</span>
+                                <span className="text-lg flex items-center gap-2">
+                                    <Infinity size={24} /> PRO Plan Active - Unlimited Access
+                                </span>
                             ) : (
                                 <>
                                     {credits ?? 0}
@@ -86,7 +88,7 @@ const CreditDropdown = ({ isOpen, onClose, anchorRef }: {
                                 </div>
                                 <div className="text-left flex-1">
                                     <p className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">Current Plan: PRO</p>
-                                    <p className="text-[10px] text-emerald-600/60">Valid until: {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                                    <p className="text-[10px] text-emerald-600/60">Valid until: {user?.subscriptionExpiryDate ? new Date(user.subscriptionExpiryDate).toLocaleDateString('vi-VN') : 'N/A'}</p>
                                 </div>
                                 <span className="px-2 py-1 bg-emerald-200/60 text-emerald-800 text-[10px] font-black rounded-md uppercase">Active</span>
                             </div>

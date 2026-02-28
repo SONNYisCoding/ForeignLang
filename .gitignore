@@ -56,3 +56,4 @@ register_test.json
 application-local.properties
 
 compile-output.txt
+test_output.txt

@@ -17,6 +17,7 @@ interface User {
     facebookId?: string;
     isPremium?: boolean;
     tier?: string;
+    subscriptionExpiryDate?: string;
 }
 
 interface AuthContextType {
@@ -61,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     facebookId: data.facebookId,
                     isPremium: data.isPremium ?? false,
                     tier: data.tier || 'FREE',
+                    subscriptionExpiryDate: data.subscriptionExpiryDate,
                 });
             } else {
                 setUser(null);

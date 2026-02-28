@@ -106,7 +106,7 @@ const TemplateDetailPage = () => {
 
     // ── Parse template structure (all templates get form treatment) ──
     const parsed: ParsedTemplate | null = template ? parseTemplate(template.structure) : null;
-    const isUnlocked = isPremium || (id ? unlockedIds.has(id) : false);
+    const isUnlocked = id ? unlockedIds.has(id) : false;
 
     // ── Unlock handler ──
     const handleUnlock = useCallback(async () => {
@@ -117,33 +117,31 @@ const TemplateDetailPage = () => {
         }
 
         // ═══ Server-side credit deduction (matching EmailGeneratorPage) ═══
-        try {
-            const res = await fetch('/api/v1/quota/consume', {
-                method: 'POST',
-                credentials: 'include',
-            });
-            if (!res.ok) {
-                if (res.status === 429 && isPremium) {
-                    toast.error('To ensure high speeds for everyone, you have reached the daily Fair Use limit. Please try again tomorrow!');
-                } else {
+        if (!isPremium) {
+            try {
+                const res = await fetch('/api/v1/quota/consume', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+                if (!res.ok) {
                     toast.error('Failed to deduct credit. Please try again.');
+                    return;
                 }
+            } catch {
+                toast.error('Network error. Please try again.');
                 return;
             }
-        } catch {
-            toast.error('Network error. Please try again.');
-            return;
+            deductCredit();
         }
 
-        if (!isPremium) deductCredit();
         const updated = new Set(unlockedIds);
         updated.add(id);
         setUnlockedIds(updated);
         saveUnlocked(updated);
         setFieldValues({});
-        toast.success('Template unlocked! Fill in the fields to generate your email.');
+        toast.success(isPremium ? 'Template access granted!' : 'Template unlocked! Fill in the fields to generate your email.');
         refreshCredits();
-    }, [id, credits, deductCredit, refreshCredits, unlockedIds]);
+    }, [id, credits, isPremium, deductCredit, refreshCredits, unlockedIds]);
 
     // ── Live preview renderer ──
     const renderLivePreview = useCallback((templateBody: string, values: Record<string, string>): string => {
@@ -241,8 +239,8 @@ const TemplateDetailPage = () => {
                             >
                                 <Lock size={20} className="group-hover:hidden" />
                                 <Unlock size={20} className="hidden group-hover:block" />
-                                Unlock to Fill & Copy
-                                <span className="text-pink-200 text-sm font-medium">(-1 Credit)</span>
+                                {isPremium ? "Use Template" : "Unlock to Fill & Copy"}
+                                {!isPremium && <span className="text-pink-200 text-sm font-medium">(-1 Credit)</span>}
                             </button>
                         </div>
                     </div>

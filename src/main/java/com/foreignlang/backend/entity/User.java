@@ -86,6 +86,9 @@ public class User {
     @Builder.Default
     private SubscriptionTier subscriptionTier = SubscriptionTier.FREE;
 
+    @Column(name = "subscription_expiry_date")
+    private LocalDateTime subscriptionExpiryDate;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "proficiency_level")
     private ProficiencyLevel proficiencyLevel;

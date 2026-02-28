@@ -60,7 +60,8 @@ class UserRESTControllerTest {
     @Test
     void testProcessUpgrade_PremiumSubscription_Success() {
         // Arrange
-        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("PREMIUM", "subscription",
+        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("flpro-monthly",
+                "subscription",
                 BigDecimal.valueOf(300000));
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
 
@@ -119,7 +120,8 @@ class UserRESTControllerTest {
     @Test
     void testProcessUpgrade_InvalidType_BadRequest() {
         // Arrange
-        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("PREMIUM", "invalid_type",
+        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("flpro-monthly",
+                "invalid_type",
                 BigDecimal.ZERO);
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
 
@@ -134,7 +136,7 @@ class UserRESTControllerTest {
     @Test
     void testProcessUpgrade_InvalidPlanId_BadRequest() {
         // Arrange
-        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("NOT_PREMIUM", "subscription",
+        UserRESTController.UpgradeRequest request = new UserRESTController.UpgradeRequest("PREMIUM", "subscription",
                 BigDecimal.ZERO);
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
 

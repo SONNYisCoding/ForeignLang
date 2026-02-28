@@ -154,7 +154,7 @@ const UpgradePage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    planId: selectedPlan.type === 'subscription' ? 'PREMIUM' : selectedPlan.id,
+                    planId: selectedPlan.id,
                     type: selectedPlan.type,
                     amount: selectedPlan.price
                 })
