@@ -60,6 +60,7 @@ const EmailFeedbackPage: React.FC = () => {
     }, []);
 
     const handleAnalyze = async () => {
+        if (isAnalyzing) return;
         if (!emailInput.trim()) return;
 
         if (!isPremium && credits !== null && credits <= 0) {
@@ -73,8 +74,13 @@ const EmailFeedbackPage: React.FC = () => {
 
         try {
             // ═══ Server-side credit deduction (matching EmailGeneratorPage) ═══
-            const res = await fetch('/api/v1/email/consume-credit', {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/v1/quota/consume', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 credentials: 'include',
             });
 
@@ -198,33 +204,12 @@ const EmailFeedbackPage: React.FC = () => {
                                     <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Out of AI Credits!</h2>
                                     <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">Upgrade to Premium or watch an ad for a free credit.</p>
                                     <button onClick={() => navigate('/upgrade')} className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"><Crown size={18} /> Upgrade to Premium</button>
-                                    <button onClick={() => { setShowUpgradeModal(false); handleWatchAd(); }} className="w-full mt-3 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all flex items-center justify-center gap-2"><Zap size={16} /> Watch Ad for +1 Credit</button>
-                                    <button onClick={() => setShowUpgradeModal(false)} className="mt-3 text-sm text-slate-400 hover:text-slate-600 transition-colors">Maybe later</button>
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Watch Ad Modal (from CreditContext) */}
-                <AnimatePresence>
-                    {showAdModal && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative border border-gray-100 dark:border-slate-800">
-                                <div className="bg-slate-900 dark:bg-black h-64 flex items-center justify-center relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-yellow-500/10 blur-xl" />
-                                    <Zap size={80} className="text-yellow-400 animate-pulse relative z-10 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-                                    <p className="text-white mt-4 absolute bottom-6 font-bold tracking-widest uppercase text-sm">{adFinished ? "Reward Unlocked" : `Ad Playing: ${adTimer}s`}</p>
-                                </div>
-                                <div className="p-8 text-center bg-white dark:bg-slate-900">
-                                    <h3 className="text-2xl font-black mb-3 text-gray-900 dark:text-white">Claim Your Free Credit</h3>
-                                    <p className="text-gray-500 dark:text-slate-400 mb-8 max-w-sm mx-auto leading-relaxed">Watch this short message to earn a free analysis credit.</p>
-                                    {adFinished ? (
-                                        <button onClick={handleClaimReward} className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]">Claim +1 Credit</button>
+                                    {quotaDetails.adsWatched >= 2 ? (
+                                        <button disabled className="w-full mt-3 py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2"><Zap size={16} /> Daily Ad Limit Reached</button>
                                     ) : (
-                                        <button disabled className="w-full py-4 bg-gray-100 dark:bg-slate-800 text-gray-400 font-bold rounded-2xl cursor-not-allowed border border-gray-200 dark:border-slate-700">Please Wait {adTimer}s...</button>
+                                        <button onClick={() => { setShowUpgradeModal(false); handleWatchAd(); }} className="w-full mt-3 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all flex items-center justify-center gap-2"><Zap size={16} /> Watch Ad for +1 Credit</button>
                                     )}
-                                    <button onClick={closeAdModal} className="mt-6 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">Close without reward</button>
+                                    <button onClick={() => setShowUpgradeModal(false)} className="mt-3 text-sm text-slate-400 hover:text-slate-600 transition-colors">Maybe later</button>
                                 </div>
                             </motion.div>
                         </motion.div>
@@ -251,13 +236,19 @@ const EmailFeedbackPage: React.FC = () => {
                                 <span>{quotaDetails.free} Free</span>
                                 <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
                             </div>
-                            <button onClick={handleWatchAd} className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative" title="Watch Ad for +1 Credit">
-                                <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
-                                <span className="absolute -top-2 -right-2 flex h-4 w-4">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
-                                </span>
-                            </button>
+                            {quotaDetails.adsWatched >= 2 ? (
+                                <button disabled className="ml-4 p-2.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-400 dark:text-slate-500 cursor-not-allowed group relative" title="Daily ad limit reached">
+                                    <Zap size={18} />
+                                </button>
+                            ) : (
+                                <button onClick={handleWatchAd} className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative" title="Watch Ad for +1 Credit">
+                                    <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
+                                    <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
+                                    </span>
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>

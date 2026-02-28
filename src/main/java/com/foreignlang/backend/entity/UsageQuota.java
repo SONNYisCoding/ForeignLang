@@ -58,7 +58,7 @@ public class UsageQuota {
     // ------------------------------------------------------------
 
     // Limits
-    private static final int MAX_ADS_PER_DAY = 3;
+    private static final int MAX_ADS_PER_DAY = 2;
     private static final int WEEKLY_FREE_LIMIT = 2;
     private static final int MONTHLY_SUB_LIMIT = 20;
     private static final int PREMIUM_DAILY_LIMIT = 20;

@@ -118,7 +118,7 @@ public class UsageQuotaService {
                 quota.getFreeCredits(),
                 quota.getSubscriptionCredits(),
                 quota.getAdUsesToday(),
-                3 - quota.getAdUsesToday(), // Remaining ads
+                2 - quota.getAdUsesToday(), // Remaining ads
                 isPremium,
                 quota.getRemainingUses(isPremium));
     }

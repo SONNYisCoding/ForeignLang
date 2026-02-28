@@ -117,38 +117,6 @@ public class EmailGenerationController {
     }
 
     /**
-     * Consume 1 AI credit without generating email.
-     * Used by AI Feedback feature which runs mock analysis locally.
-     */
-    @PostMapping("/consume-credit")
-    public ResponseEntity<?> consumeCredit(
-            HttpServletRequest httpRequest,
-            @AuthenticationPrincipal OAuth2User principal) {
-
-        String userEmail = getUserEmail(httpRequest, principal);
-        if (userEmail == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        }
-
-        Optional<User> userOpt = userRepository.findByEmail(userEmail);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("error", "User not found"));
-        }
-
-        User user = userOpt.get();
-
-        if (!usageQuotaService.consumeRequest(user.getId())) {
-            return ResponseEntity.status(429).body(Map.of(
-                    "error", "No credits remaining",
-                    "code", "QUOTA_EXCEEDED"));
-        }
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "remainingUses", usageQuotaService.getRemainingUses(user.getId())));
-    }
-
-    /**
      * Get AI service status
      */
     @GetMapping("/status")
@@ -159,39 +127,8 @@ public class EmailGenerationController {
     }
 
     /**
-     * Watch ad to get more credits
-     */
-    @PostMapping("/ad-reward")
-    public ResponseEntity<?> watchAdReward(
-            HttpServletRequest httpRequest,
-            @AuthenticationPrincipal OAuth2User principal) {
-
-        String userEmail = getUserEmail(httpRequest, principal);
-        if (userEmail == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        }
-
-        Optional<User> userOpt = userRepository.findByEmail(userEmail);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("error", "User not found"));
-        }
-
-        User user = userOpt.get();
-
-        if (usageQuotaService.rewardAdWatch(user.getId())) {
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Ad watched! You earned 1 credit.",
-                    "remainingUses", usageQuotaService.getRemainingUses(user.getId()),
-                    "canWatchMore", usageQuotaService.canWatchAd(user.getId())));
-        } else {
-            return ResponseEntity.status(429).body(Map.of(
-                    "error", "Daily ad limit reached",
-                    "code", "AD_LIMIT_REACHED"));
-        }
-    }
-
-    /**
+     * 
+     * /**
      * Get user email from session or OAuth principal
      */
     private String getUserEmail(HttpServletRequest request, OAuth2User principal) {

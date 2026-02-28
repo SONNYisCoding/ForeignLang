@@ -118,7 +118,7 @@ const TemplateDetailPage = () => {
 
         // ═══ Server-side credit deduction (matching EmailGeneratorPage) ═══
         try {
-            const res = await fetch('/api/v1/email/consume-credit', {
+            const res = await fetch('/api/v1/quota/consume', {
                 method: 'POST',
                 credentials: 'include',
             });

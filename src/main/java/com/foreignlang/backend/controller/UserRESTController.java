@@ -126,7 +126,8 @@ public class UserRESTController {
             response.put("freeCredits", free);
             response.put("subscriptionCredits", sub);
 
-            response.put("adsRemaining", 3 - adUses);
+            response.put("adsRemaining", 2 - adUses);
+            response.put("adsWatchedToday", adUses);
             response.put("usageRemaining", remaining);
 
             // For display purposes, maybe show Total Limit if not premium

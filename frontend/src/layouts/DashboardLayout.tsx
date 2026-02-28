@@ -13,6 +13,7 @@ import { useCredits } from '../contexts/CreditContext';
 import { useSidebar } from '../contexts/SidebarContext';
 import ChatbotWidget from '../components/ChatbotWidget';
 import SidebarToggle from '../components/ui/SidebarToggle';
+import GlobalAdModal from '../components/ui/GlobalAdModal';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -319,7 +320,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                         initial={{ opacity: 0, y: 15, scale: 0.95, filter: 'blur(10px)' }}
                                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(5px)' }}
-                                        transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+                                        transition={{
+                                            default: { type: 'spring', stiffness: 300, damping: 25, duration: 0.2 },
+                                            filter: { type: 'tween', duration: 0.2 }
+                                        }}
                                         className="absolute right-0 top-full mt-3 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 dark:shadow-black/40 border border-white/20 dark:border-slate-700/50 py-3 z-50 origin-top-right overflow-hidden"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
@@ -378,6 +382,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     {children}
                 </div>
             </main>
+
+            <GlobalAdModal />
 
             {/* AI Chatbot Widget */}
             <ChatbotWidget />

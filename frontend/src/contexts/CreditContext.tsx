@@ -5,6 +5,7 @@ interface QuotaDetails {
     free: number;
     sub: number;
     purchased: number;
+    adsWatched: number;
 }
 
 interface CreditContextType {
@@ -28,7 +29,7 @@ export const CreditProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const { user } = useAuth();
     const [credits, setCredits] = useState<number | null>(null);
     const [isCreditLoading, setIsCreditLoading] = useState(true);
-    const [quotaDetails, setQuotaDetails] = useState<QuotaDetails>({ free: 0, sub: 0, purchased: 0 });
+    const [quotaDetails, setQuotaDetails] = useState<QuotaDetails>({ free: 0, sub: 0, purchased: 0, adsWatched: 0 });
 
     // Watch Ad modal state
     const [showAdModal, setShowAdModal] = useState(false);
@@ -53,7 +54,8 @@ export const CreditProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     setQuotaDetails({
                         free: data.freeCredits || 0,
                         sub: data.subscriptionCredits || 0,
-                        purchased: data.purchasedCredits || 0
+                        purchased: data.purchasedCredits || 0,
+                        adsWatched: data.adsWatchedToday || 0
                     });
                 }
             }
@@ -101,7 +103,7 @@ export const CreditProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const handleClaimReward = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/v1/email/ad-reward', {
+            const response = await fetch('/api/v1/quota/ad-reward', {
                 method: 'POST',
                 credentials: 'include', // Send session cookies
                 headers: {

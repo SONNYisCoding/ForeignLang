@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, FileText, X, Sparkles } from 'lucide-react';
+import { Upload, FileText, X, Sparkles, Loader2 } from 'lucide-react';
 
 interface RoadmapInputFormProps {
     onSubmit: (input: string) => void;
@@ -66,8 +66,8 @@ const RoadmapInputForm: React.FC<RoadmapInputFormProps> = ({ onSubmit, isLoading
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 mb-6 ${isDragging
-                        ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                    ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-900/50'
                     }`}
             >
                 <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,.txt" onChange={handleFileChange} />
@@ -112,7 +112,15 @@ const RoadmapInputForm: React.FC<RoadmapInputFormProps> = ({ onSubmit, isLoading
                     disabled={!textInput.trim() || isLoading}
                     className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 >
-                    <Sparkles size={18} /> Generate Roadmap
+                    {isLoading ? (
+                        <>
+                            <Loader2 size={18} className="animate-spin" /> Generating...
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles size={18} /> Generate Roadmap
+                        </>
+                    )}
                 </button>
             </div>
         </motion.div>

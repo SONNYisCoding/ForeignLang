@@ -4,6 +4,9 @@ import { Target, BarChart3, Clock, Plus, Map, ChevronRight, Trash2 } from 'lucid
 import UiverseLoader from '../../components/ui/UiverseLoader';
 import RoadmapInputForm from '../../components/roadmap/RoadmapInputForm';
 import RoadmapTimeline from '../../components/roadmap/RoadmapTimeline';
+import { toast } from 'sonner';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCredits } from '../../contexts/CreditContext';
 import { getMockRoadmap } from '../../data/mockRoadmapData';
 import type { RoadmapData } from '../../data/mockRoadmapData';
 
@@ -42,8 +45,45 @@ const LearningRoadmapPage: React.FC = () => {
 
     const selectedRoadmap = roadmaps.find(r => r.id === selectedId)?.data || null;
 
-    const handleGenerate = (input: string) => {
+    const { user } = useAuth();
+    const { credits, deductCredit, refreshCredits } = useCredits();
+    const isPremium = user?.isPremium || false;
+
+    const handleGenerate = async (input: string) => {
+        if (isGenerating) return;
+        if (!isPremium && credits !== null && credits <= 0) {
+            toast.error('No credits left! Use the ⚡ button in the navbar to get more.');
+            return;
+        }
+
         setIsGenerating(true);
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/v1/quota/consume', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                credentials: 'include',
+            });
+            if (!res.ok) {
+                if (res.status === 429 && isPremium) {
+                    toast.error('To ensure high speeds for everyone, you have reached the daily Fair Use limit. Please try again tomorrow!');
+                } else {
+                    toast.error('Failed to deduct credit. Please try again.');
+                }
+                setIsGenerating(false);
+                return;
+            }
+        } catch {
+            toast.error('Network error. Please try again.');
+            setIsGenerating(false);
+            return;
+        }
+
+        if (!isPremium) deductCredit();
 
         setTimeout(() => {
             const data = getMockRoadmap(input);
@@ -59,6 +99,7 @@ const LearningRoadmapPage: React.FC = () => {
             setSelectedId(newRoadmap.id);
             setShowForm(false);
             setIsGenerating(false);
+            refreshCredits();
         }, 3000);
     };
 

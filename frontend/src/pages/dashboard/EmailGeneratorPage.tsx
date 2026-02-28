@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, Copy, Check, Briefcase, MessageSquare, Zap, History, Wand2, Sparkles } from 'lucide-react';
+import { Send, Copy, Check, Briefcase, MessageSquare, History, Wand2, Sparkles, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../contexts/ToastContext';
 import { useCredits } from '../../contexts/CreditContext';
@@ -30,7 +30,7 @@ interface EmailGenerateResponse {
 const EmailGeneratorPage = () => {
     const { t, i18n } = useTranslation();
     const { showSuccess, showError } = useToast();
-    const { credits: remainingCredits, quotaDetails, deductCredit, refreshCredits, handleWatchAd, showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal } = useCredits();
+    const { credits: remainingCredits, quotaDetails, deductCredit, refreshCredits, handleWatchAd } = useCredits();
     const { user } = useAuth();
     const isPremium = user?.isPremium;
     const [loading, setLoading] = useState(false);
@@ -48,6 +48,7 @@ const EmailGeneratorPage = () => {
     });
 
     const handleGenerate = async () => {
+        if (loading) return;
         if (!formData.prompt.trim()) return;
         if (remainingCredits === 0) {
             showError(t('common.error') + ": No credits left!");
@@ -59,9 +60,13 @@ const EmailGeneratorPage = () => {
         setResult(null);
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch('/api/v1/email/generate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 credentials: 'include', // Ensure session cookies are sent
                 body: JSON.stringify({
                     ...formData,
@@ -119,57 +124,6 @@ const EmailGeneratorPage = () => {
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
 
-            {/* Ad Modal */}
-            <AnimatePresence>
-                {showAdModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative border border-gray-100 dark:border-slate-800"
-                        >
-                            <div className="bg-slate-900 dark:bg-black h-64 flex items-center justify-center relative overflow-hidden">
-                                <div className="absolute inset-0 bg-yellow-500/10 blur-xl" />
-                                <Zap size={80} className="text-yellow-400 animate-pulse relative z-10 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-                                <p className="text-white mt-4 absolute bottom-6 font-bold tracking-widest uppercase text-sm">
-                                    {adFinished ? "Reward Unlocked" : `Ad Playing: ${adTimer}s`}
-                                </p>
-                            </div>
-                            <div className="p-8 text-center relative z-10 bg-white dark:bg-slate-900">
-                                <h3 className="text-2xl font-black mb-3 text-gray-900 dark:text-white">Claim Your Free Credit</h3>
-                                <p className="text-gray-500 dark:text-slate-400 mb-8 max-w-sm mx-auto leading-relaxed">By watching this short message, you directly support the platform and earn a free generation credit.</p>
-
-                                {adFinished ? (
-                                    <button
-                                        onClick={handleClaimReward}
-                                        className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        Claim +1 Credit
-                                    </button>
-                                ) : (
-                                    <button disabled className="w-full py-4 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 font-bold rounded-2xl cursor-not-allowed border border-gray-200 dark:border-slate-700">
-                                        Please Wait {adTimer}s...
-                                    </button>
-                                )}
-
-                                <button
-                                    onClick={() => closeAdModal()}
-                                    className="mt-6 text-sm font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                                >
-                                    Close without reward
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 relative z-10">
                 <div>
@@ -202,17 +156,19 @@ const EmailGeneratorPage = () => {
                                     <span>{quotaDetails.free} Free</span>
                                     <span>{quotaDetails.sub + quotaDetails.purchased} Premium</span>
                                 </div>
-                                <button
-                                    onClick={handleWatchAd}
-                                    className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative"
-                                    title="Watch Ad for +1 Credit"
-                                >
-                                    <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
-                                    <span className="absolute -top-2 -right-2 flex h-4 w-4">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
-                                    </span>
-                                </button>
+                                {quotaDetails.adsWatched >= 2 ? (
+                                    <button disabled className="ml-4 p-2.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-400 dark:text-slate-500 cursor-not-allowed group relative" title="Daily ad limit reached">
+                                        <Zap size={18} />
+                                    </button>
+                                ) : (
+                                    <button onClick={handleWatchAd} className="ml-4 p-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors group relative" title="Watch Ad for +1 Credit">
+                                        <Zap size={18} className="group-hover:fill-current group-hover:animate-pulse" />
+                                        <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 text-[9px] text-white items-center justify-center font-bold">+1</span>
+                                        </span>
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
