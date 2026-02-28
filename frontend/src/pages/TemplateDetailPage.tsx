@@ -62,7 +62,7 @@ const parseTemplate = (structure: string): ParsedTemplate => {
 const TemplateDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { credits, deductCredit } = useCredits();
+    const { credits, deductCredit, refreshCredits } = useCredits();
 
     const [template, setTemplate] = useState<Template | null>(null);
     const [loading, setLoading] = useState(true);
@@ -106,12 +106,28 @@ const TemplateDetailPage = () => {
     const isUnlocked = id ? unlockedIds.has(id) : false;
 
     // ── Unlock handler ──
-    const handleUnlock = useCallback(() => {
+    const handleUnlock = useCallback(async () => {
         if (!id) return;
         if (credits !== null && credits <= 0) {
             toast.error('No credits left! Use the ⚡ button in the navbar to get more.');
             return;
         }
+
+        // ═══ Server-side credit deduction (matching EmailGeneratorPage) ═══
+        try {
+            const res = await fetch('/api/v1/email/consume-credit', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            if (!res.ok) {
+                toast.error('Failed to deduct credit. Please try again.');
+                return;
+            }
+        } catch {
+            toast.error('Network error. Please try again.');
+            return;
+        }
+
         deductCredit();
         const updated = new Set(unlockedIds);
         updated.add(id);
@@ -119,7 +135,8 @@ const TemplateDetailPage = () => {
         saveUnlocked(updated);
         setFieldValues({});
         toast.success('Template unlocked! Fill in the fields to generate your email.');
-    }, [id, credits, deductCredit, unlockedIds]);
+        refreshCredits();
+    }, [id, credits, deductCredit, refreshCredits, unlockedIds]);
 
     // ── Live preview renderer ──
     const renderLivePreview = useCallback((templateBody: string, values: Record<string, string>): string => {
@@ -178,8 +195,8 @@ const TemplateDetailPage = () => {
                             <span className="text-xs font-medium px-2 py-0.5 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 rounded-full">{template.topic.title}</span>
                         )}
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${isUnlocked
-                                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
                             }`}>
                             {isUnlocked ? <><Unlock size={10} /> Unlocked</> : <><Lock size={10} /> Locked</>}
                         </span>
