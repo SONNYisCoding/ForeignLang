@@ -105,7 +105,8 @@ public class SecurityConfig {
                                                                                 .withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
                                                                 "/api/v1/auth/logout", "/api/v1/chat/**",
-                                                                "/api/v1/assessment/**", "/api/v1/email/**")) // Optional:
+                                                                "/api/v1/assessment/**", "/api/v1/email/**",
+                                                                "/api/v1/quota/**")) // Optional:
                                 // Ignore
                                 // auth
                                 // endpoints if issues arise,
@@ -131,6 +132,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/vocabulary/**").permitAll()
                                                 .requestMatchers("/api/v1/email/**").permitAll() // Allow manual session
                                                                                                  // check in controller
+                                                .requestMatchers("/api/v1/quota/**").permitAll() // Allow manual session
+                                                                                                 // check
                                                 .requestMatchers("/api/v1/notifications/**").permitAll() // Allow manual
                                                                                                          // session
                                                                                                          // check

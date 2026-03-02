@@ -33,6 +33,19 @@ window.fetch = async (...args) => {
     // Ignore timezone error
   }
 
+  // Add XSRF-TOKEN to POST/PUT/DELETE/PATCH requests if available in cookies
+  const method = config?.method?.toUpperCase() || 'GET';
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+    const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+    if (match) {
+      config = config || {};
+      config.headers = {
+        ...config.headers,
+        'X-XSRF-TOKEN': decodeURIComponent(match[2])
+      };
+    }
+  }
+
   return originalFetch(resource, config);
 };
 
