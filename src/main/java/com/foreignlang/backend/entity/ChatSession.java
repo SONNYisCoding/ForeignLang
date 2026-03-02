@@ -20,8 +20,8 @@ import java.util.UUID;
 public class ChatSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     // Optional: Linked to a logged-in user
     @Column(name = "user_id")
@@ -29,6 +29,7 @@ public class ChatSession {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 
     // Optional: For guest users (stored in localStorage)

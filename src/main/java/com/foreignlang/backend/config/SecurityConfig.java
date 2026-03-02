@@ -122,9 +122,9 @@ public class SecurityConfig {
                                                                                 .withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
                                                                 "/api/v1/auth/logout", "/api/v1/chat/**",
-                                                                "/api/v1/assessment/**")) // Optional:
-                                                                                          // Ignore
-                                                                                          // auth
+                                                                "/api/v1/assessment/**", "/api/v1/email/**")) // Optional:
+                                // Ignore
+                                // auth
                                 // endpoints if issues arise,
                                 // but better to support XSRF
                                 .headers(headers -> headers

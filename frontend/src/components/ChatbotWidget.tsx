@@ -233,7 +233,7 @@ const ChatbotWidget = () => {
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Nhập tin nhắn..."
                                 disabled={isTyping}
-                                className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all disabled:opacity-50"
+                                className="flex-1 px-4 py-2.5 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all disabled:opacity-50"
                             />
                             <button
                                 type="submit"

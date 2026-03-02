@@ -225,7 +225,7 @@ const RegisterPage = () => {
                                         type="text"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white text-gray-900 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="John Doe"
                                         required
                                     />
@@ -240,7 +240,7 @@ const RegisterPage = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white text-gray-900 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="user@example.com"
                                         required
                                     />
@@ -255,7 +255,7 @@ const RegisterPage = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-12 py-3.5 bg-white text-gray-900 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -277,7 +277,7 @@ const RegisterPage = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
+                                        className="w-full pl-12 pr-12 py-3.5 bg-white text-gray-900 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-sky-500 outline-none transition-all hover:bg-white/80 shadow-sm"
                                         placeholder="••••••••"
                                         required
                                     />

@@ -148,6 +148,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .fullName(name)
                 .avatarUrl(picture)
                 .authProvider(authProvider)
+                .passwordHash(java.util.UUID.randomUUID().toString()) // Random password for OAuth users to satisfy DB
+                                                                      // NOT NULL
                 .profileComplete(false) // Needs to complete profile
                 .roles(new java.util.HashSet<>(java.util.Set.of(User.Role.GUEST))) // GUEST until profile complete
                 .subscriptionTier(User.SubscriptionTier.FREE);

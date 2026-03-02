@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> {
+public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> {
 
     // Find active session for user
     Optional<ChatSession> findFirstByUserIdAndIsActiveTrueOrderByLastActivityDesc(UUID userId);
