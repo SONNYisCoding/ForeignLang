@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class ChatController {
 
     @PostMapping("/message")
     public ResponseEntity<ChatMessage> sendMessage(@RequestBody Map<String, Object> payload) {
-        Long sessionId = Long.valueOf(payload.get("sessionId").toString());
+        UUID sessionId = UUID.fromString(payload.get("sessionId").toString());
         String sender = (String) payload.get("sender");
         String content = (String) payload.get("content");
 
@@ -60,7 +62,7 @@ public class ChatController {
     }
 
     @GetMapping("/history/{sessionId}")
-    public ResponseEntity<List<ChatMessage>> getHistory(@PathVariable Long sessionId) {
+    public ResponseEntity<List<ChatMessage>> getHistory(@PathVariable UUID sessionId) {
         return ResponseEntity.ok(chatService.getSessionHistory(sessionId));
     }
 }

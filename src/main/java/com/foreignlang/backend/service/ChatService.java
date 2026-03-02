@@ -41,7 +41,7 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatMessage saveMessage(Long sessionId, String sender, String content) {
+    public ChatMessage saveMessage(UUID sessionId, String sender, String content) {
         ChatSession session = chatSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
@@ -57,7 +57,7 @@ public class ChatService {
         return chatMessageRepository.save(message);
     }
 
-    public List<ChatMessage> getSessionHistory(Long sessionId) {
+    public List<ChatMessage> getSessionHistory(UUID sessionId) {
         return chatMessageRepository.findBySessionIdOrderByTimestampAsc(sessionId);
     }
 

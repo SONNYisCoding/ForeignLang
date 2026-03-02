@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/admin/chat")
@@ -23,7 +24,7 @@ public class AdminChatController {
     }
 
     @GetMapping("/session/{sessionId}/messages")
-    public ResponseEntity<List<ChatMessage>> getSessionMessages(@PathVariable Long sessionId) {
+    public ResponseEntity<List<ChatMessage>> getSessionMessages(@PathVariable UUID sessionId) {
         return ResponseEntity.ok(chatService.getSessionHistory(sessionId));
     }
 }

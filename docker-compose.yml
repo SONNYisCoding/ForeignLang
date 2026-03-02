@@ -39,6 +39,10 @@ services:
       - "5434:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+      # 1. Lưu trữ dữ liệu bền vững (không mất khi tắt container)
+      # - postgres_data:/var/lib/postgresql/data
+      # 2. TỰ ĐỘNG CHẠY FILE SQL KHI KHỞI TẠO (Đây là chìa khóa!)
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 

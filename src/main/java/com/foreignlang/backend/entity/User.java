@@ -25,8 +25,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password_hash")
-    private String passwordHash; // BCrypt hashed, null for OAuth-only users
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash; // BCrypt hashed, random UUID for OAuth-only users
 
     @Column(unique = true)
     private String username; // Unique handle

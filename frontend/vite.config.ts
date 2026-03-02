@@ -11,13 +11,15 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      '/oauth2/authorization': {
-        target: 'http://localhost:8080', // Trỏ về Backend Spring Boot
+      '/oauth2': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
+        secure: false,
       },
       '/login/oauth2': {
-        target: 'http://localhost:8080', // Dành cho luồng callback của OAuth2
+        target: 'http://localhost:8080',
         changeOrigin: true,
+        secure: false,
       }
     },
   },

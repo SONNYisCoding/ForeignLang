@@ -99,11 +99,17 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(csrf -> csrf.disable()) // Stateless JWT is immune to CSRF
-                                .formLogin(form -> form.disable()) // Disable form login to prevent 302 redirects
-                                .httpBasic(basic -> basic.disable()) // Disable HTTP Basic auth
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(
+                                                                org.springframework.security.web.csrf.CookieCsrfTokenRepository
+                                                                                .withHttpOnlyFalse())
+                                                .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
+                                                                "/api/v1/auth/logout", "/api/v1/chat/**",
+                                                                "/api/v1/assessment/**", "/api/v1/email/**")) // Optional:
+                                // Ignore
+                                // auth
+                                // endpoints if issues arise,
+                                // but better to support XSRF
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.deny()) // Prevent Clickjacking
                                                 .xssProtection(xss -> xss.disable()) // Modern browsers ignore this, CSP
