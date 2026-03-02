@@ -45,4 +45,30 @@ public class TopicRESTController {
     public ResponseEntity<List<Lesson>> getTopicLessons(@PathVariable UUID id) {
         return ResponseEntity.ok(lessonRepository.findByTopicIdOrderByOrderIndexAsc(id));
     }
+
+    @PostMapping
+    public ResponseEntity<Topic> createTopic(@RequestBody Topic topic) {
+        return ResponseEntity.ok(topicRepository.save(topic));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Topic> updateTopic(@PathVariable UUID id, @RequestBody Topic topicDetails) {
+        return topicRepository.findById(id).map(topic -> {
+            topic.setTitle(topicDetails.getTitle());
+            topic.setDescription(topicDetails.getDescription());
+            topic.setDifficultyLevel(topicDetails.getDifficultyLevel());
+            if (topicDetails.getStatus() != null) {
+                topic.setStatus(topicDetails.getStatus());
+            }
+            return ResponseEntity.ok(topicRepository.save(topic));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTopic(@PathVariable UUID id) {
+        return topicRepository.findById(id).map(topic -> {
+            topicRepository.delete(topic);
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

@@ -1,5 +1,6 @@
 package com.foreignlang.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class Template {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
+    @JsonIgnoreProperties({ "lessons", "vocabulary", "author", "hibernateLazyInitializer", "handler" })
     private Topic topic;
 
     @Column(nullable = false)

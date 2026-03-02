@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -14,9 +15,20 @@ public class StreakService {
 
     private final UserRepository userRepository;
 
+    private ZoneId getZoneIdOrDefault(String timezone) {
+        if (timezone == null || timezone.isBlank())
+            return ZoneId.systemDefault();
+        try {
+            return ZoneId.of(timezone);
+        } catch (Exception e) {
+            return ZoneId.systemDefault();
+        }
+    }
+
     @Transactional
-    public void updateStreak(User user) {
-        LocalDate today = LocalDate.now();
+    public void updateStreak(User user, String timezone) {
+        ZoneId zoneId = getZoneIdOrDefault(timezone);
+        LocalDate today = LocalDate.now(zoneId);
         LocalDate lastActivity = user.getLastActivityDate();
 
         if (lastActivity != null && lastActivity.equals(today)) {
@@ -32,13 +44,10 @@ public class StreakService {
         user.setLastActivityDate(today);
         userRepository.save(user);
 
-        // Notify Gamification (Dependency via ApplicationEventPublisher or direct call
-        // if refactored)
-        // Note: For simplicity and avoiding circular dependency, GamificationService
-        // handles the milestone logic itself
+        // Notify Gamification handles milestone logic
     }
 
-    public int getEffectiveStreak(User user) {
+    public int getEffectiveStreak(User user, String timezone) {
         if (user.getStreakDays() == 0)
             return 0;
 
@@ -46,7 +55,8 @@ public class StreakService {
         if (lastActivity == null)
             return 0;
 
-        LocalDate today = LocalDate.now();
+        ZoneId zoneId = getZoneIdOrDefault(timezone);
+        LocalDate today = LocalDate.now(zoneId);
 
         // If last activity was today or yesterday, streak is valid
         if (lastActivity.equals(today) || lastActivity.equals(today.minusDays(1))) {

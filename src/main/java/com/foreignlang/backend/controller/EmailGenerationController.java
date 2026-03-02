@@ -87,7 +87,7 @@ public class EmailGenerationController {
             usageQuotaService.consumeRequest(user.getId());
 
             // Update streak
-            streakService.updateStreak(user);
+            streakService.updateStreak(user, httpRequest.getHeader("X-Timezone"));
 
             // Save to history
             EmailHistory history = new EmailHistory(
@@ -127,39 +127,8 @@ public class EmailGenerationController {
     }
 
     /**
-     * Watch ad to get more credits
-     */
-    @PostMapping("/ad-reward")
-    public ResponseEntity<?> watchAdReward(
-            HttpServletRequest httpRequest,
-            @AuthenticationPrincipal OAuth2User principal) {
-
-        String userEmail = getUserEmail(httpRequest, principal);
-        if (userEmail == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        }
-
-        Optional<User> userOpt = userRepository.findByEmail(userEmail);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("error", "User not found"));
-        }
-
-        User user = userOpt.get();
-
-        if (usageQuotaService.rewardAdWatch(user.getId())) {
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Ad watched! You earned 1 credit.",
-                    "remainingUses", usageQuotaService.getRemainingUses(user.getId()),
-                    "canWatchMore", usageQuotaService.canWatchAd(user.getId())));
-        } else {
-            return ResponseEntity.status(429).body(Map.of(
-                    "error", "Daily ad limit reached",
-                    "code", "AD_LIMIT_REACHED"));
-        }
-    }
-
-    /**
+     * 
+     * /**
      * Get user email from session or OAuth principal
      */
     private String getUserEmail(HttpServletRequest request, OAuth2User principal) {

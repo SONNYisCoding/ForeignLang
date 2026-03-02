@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     BookOpen, LayoutDashboard, Users, LogOut, Menu, X,
@@ -10,6 +10,7 @@ import NotificationDropdown from '../components/NotificationDropdown';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import { useAuth } from '../contexts/AuthContext';
+import { useSidebar } from '../contexts/SidebarContext';
 import SidebarToggle from '../components/ui/SidebarToggle';
 
 interface TeacherLayoutProps {
@@ -19,14 +20,17 @@ interface TeacherLayoutProps {
 const TeacherLayout = ({ children }: TeacherLayoutProps) => {
     const { i18n } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const { isCollapsed, toggleSidebar } = useSidebar();
     const { user, logout } = useAuth(); // Use global auth
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
+    const prevLangRef = useRef(i18n.language);
     useEffect(() => {
+        prevLangRef.current = i18n.language;
         i18n.changeLanguage('en'); // Force English for Teacher
+        return () => { i18n.changeLanguage(prevLangRef.current); };
     }, []);
 
     const handleLogout = async () => {
@@ -88,7 +92,7 @@ const TeacherLayout = ({ children }: TeacherLayoutProps) => {
                         <div className="hidden lg:flex w-14 h-14 items-center justify-center shrink-0">
                             <SidebarToggle
                                 isCollapsed={isCollapsed}
-                                toggle={() => setIsCollapsed(!isCollapsed)}
+                                toggle={toggleSidebar}
                                 title={isCollapsed ? "Expand" : "Collapse"}
                                 className="scale-90"
                             />

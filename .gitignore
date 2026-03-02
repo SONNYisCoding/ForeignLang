@@ -54,3 +54,6 @@ register_test.json
 .env
 .env.*
 application-local.properties
+
+compile-output.txt
+test_output.txt

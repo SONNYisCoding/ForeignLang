@@ -22,6 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.foreignlang.backend.security.RateLimitFilter;
 
 import java.util.List;
+import com.foreignlang.backend.security.JwtAuthenticationFilter;
+import com.foreignlang.backend.security.JwtTokenProvider;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -32,14 +35,11 @@ public class SecurityConfig {
         private final CustomOAuth2UserService customOAuth2UserService;
         private final com.foreignlang.backend.service.CustomOidcUserService customOidcUserService;
         private final UserRepository userRepository;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider;
 
         @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
         private String frontendUrl;
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder(12);
-        }
 
         @Bean
         public AuthenticationSuccessHandler oAuth2SuccessHandler() {
@@ -78,26 +78,10 @@ public class SecurityConfig {
                                 log.info("OAuth2 Success: Direct User Object Access. ID={}, Email={}, ProfileComplete={}",
                                                 user.getId(), user.getEmail(), user.isProfileComplete());
 
-                                if (!user.isProfileComplete()) {
-                                        response.sendRedirect(frontendUrl + "/profile-setup");
-                                        return;
-                                }
-
-                                // Role-based redirection
-                                java.util.Set<com.foreignlang.backend.entity.User.Role> roles = user.getRoles();
-                                log.info("REDIRECT CHECK - User ID: {}", user.getId());
-                                log.info("REDIRECT CHECK - Roles: {}", roles);
-
-                                if (roles.contains(com.foreignlang.backend.entity.User.Role.ADMIN)) {
-                                        log.info("Redirecting to ADMIN dashboard");
-                                        response.sendRedirect(frontendUrl + "/admin");
-                                } else if (roles.contains(com.foreignlang.backend.entity.User.Role.TEACHER)) {
-                                        log.info("Redirecting to TEACHER dashboard");
-                                        response.sendRedirect(frontendUrl + "/teacher");
-                                } else {
-                                        log.info("Redirecting to LEARNER dashboard");
-                                        response.sendRedirect(frontendUrl + "/dashboard");
-                                }
+                                // Unified redirection to frontend callback handler
+                                String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+                                log.info("OAuth2 Success: Redirecting to frontend auth handler");
+                                response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + token);
                         } else {
                                 log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
                                 response.sendRedirect(frontendUrl + "/login?error=auth_principal_failure");
@@ -114,7 +98,6 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(
@@ -145,6 +128,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/public/**").permitAll()
                                                 .requestMatchers("/api/v1/topics/**").permitAll()
                                                 .requestMatchers("/api/v1/templates/**").permitAll()
+                                                .requestMatchers("/api/v1/vocabulary/**").permitAll()
                                                 .requestMatchers("/api/v1/email/**").permitAll() // Allow manual session
                                                                                                  // check in controller
                                                 .requestMatchers("/api/v1/notifications/**").permitAll() // Allow manual
@@ -174,6 +158,8 @@ public class SecurityConfig {
 
                                                 // All other API and pages require authentication
                                                 .anyRequest().authenticated())
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                                 .oauth2Login(oauth2 -> oauth2
                                                 .loginPage("/login")
                                                 .userInfoEndpoint(userInfo -> userInfo
@@ -185,18 +171,15 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl(frontendUrl + "/")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "XSRF-TOKEN"))
-                                // For API endpoints, return 401 instead of redirect
+                                // For API endpoints, strictly return 401 instead of redirecting anywhere
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
-                                                        String path = request.getRequestURI();
-                                                        if (path.startsWith("/api/")) {
-                                                                response.setStatus(401);
-                                                                response.setContentType("application/json");
-                                                                response.getWriter()
-                                                                                .write("{\"error\":\"Unauthorized\"}");
-                                                        } else {
-                                                                response.sendRedirect(frontendUrl + "/");
-                                                        }
+                                                        response.setStatus(401);
+                                                        response.setContentType("application/json;charset=UTF-8");
+                                                        response.getWriter().write(
+                                                                        "{\"code\":\"UNAUTHORIZED\", \"message\":\""
+                                                                                        + authException.getMessage()
+                                                                                        + "\"}");
                                                 }));
 
                 return http.build();

@@ -1,0 +1,1360 @@
+{
+    "info": {
+        "name": "ForeignLang API Collection",
+        "description": "Complete API documentation for the ForeignLang Platform.\n\n**Base URL**: `http://localhost:8080`\n\n**Authentication**: Most endpoints require session cookies (credentials: include) or Bearer JWT Token.\n\nTo authenticate:\n1. POST /api/v1/auth/login → Copy the token from the response\n2. Set the Bearer Token in the Collection Authorization tab\n3. Or use OAuth2 Google/Facebook login via browser",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{jwt_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080"
+        },
+        {
+            "key": "jwt_token",
+            "value": ""
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Auth",
+            "description": "Authentication endpoints (Register, Login, OAuth2, Profile Setup)",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"learner@example.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Le Tran\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"learner@example.com\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "description": "Returns JWT token + user object. Copy the token to Collection Variables → jwt_token."
+                    }
+                },
+                {
+                    "name": "Profile Setup (Google Users)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/setup-profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "setup-profile"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"letran\",\n  \"fullName\": \"Le Tran\",\n  \"birthDate\": \"2000-01-15\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Check Auth Status",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/check",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "check"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/forgot-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "forgot-password"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"learner@example.com\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "reset-password"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"newpass123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Email",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/verify-email?token=verification_token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "verify-email"
+                            ],
+                            "query": [
+                                {
+                                    "key": "token",
+                                    "value": "verification_token"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. User Profile",
+            "description": "User data, profile updates, password, credits, and transactions",
+            "item": [
+                {
+                    "name": "Get Current User (Me)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user/me",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user",
+                                "me"
+                            ]
+                        },
+                        "description": "Returns user profile + AI credit balance (usageRemaining, freeCredits, purchasedCredits, subscriptionCredits)"
+                    }
+                },
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user",
+                                "profile"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"fullName\": \"Le Tran Updated\",\n  \"username\": \"letran2026\",\n  \"bio\": \"Software Engineer\",\n  \"specialization\": \"Backend Development\",\n  \"learningGoal\": \"IELTS 7.0\",\n  \"proficiencyLevel\": \"INTERMEDIATE\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Setup Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user/setup-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user",
+                                "setup-password"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"newPassword\": \"newpassword123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Upgrade (Buy Credits / Subscribe)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user/upgrade",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user",
+                                "upgrade"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"planId\": \"credits-5\",\n  \"type\": \"credits\",\n  \"amount\": 25000\n}"
+                        },
+                        "description": "type: 'credits' or 'subscription'. planId: 'credits-5', 'credits-15', or 'PREMIUM'."
+                    }
+                },
+                {
+                    "name": "Get Transaction History",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user/transactions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user",
+                                "transactions"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Content (Topics, Lessons, Vocabulary)",
+            "description": "Learning content management",
+            "item": [
+                {
+                    "name": "Get All Topics",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/topics",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "topics"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Published Topics",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/topics/published",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "topics",
+                                "published"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Topic by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/topics/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "topics",
+                                ":id"
+                            ]
+                        },
+                        "description": "Replace :id with a valid topic UUID."
+                    }
+                },
+                {
+                    "name": "Get Lessons by Topic",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/topics/:id/lessons",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "topics",
+                                ":id",
+                                "lessons"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Lesson by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/lessons/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "lessons",
+                                ":id"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Vocabulary by Topic",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/topic/:topicId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                "topic",
+                                ":topicId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Search Vocabulary",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/search?keyword=deploy",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "keyword",
+                                    "value": "deploy"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Vocabulary by Part of Speech",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/pos/NOUN",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                "pos",
+                                "NOUN"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Vocabulary by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                ":id"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Toggle Mastered Vocabulary",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/:id/master",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                ":id",
+                                "master"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Mastered Vocabulary",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/vocabulary/mastered",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "vocabulary",
+                                "mastered"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Email Templates",
+            "description": "Browsable email template library",
+            "item": [
+                {
+                    "name": "Get All Templates",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/templates",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "templates"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Templates by Topic",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/templates/topic/:topicId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "templates",
+                                "topic",
+                                ":topicId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Template by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/templates/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "templates",
+                                ":id"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. AI Features (Email Generator & Feedback)",
+            "description": "AI-powered email generation and feedback (uses Gemini API or mock mode)",
+            "item": [
+                {
+                    "name": "Generate AI Email",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/generate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "generate"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"prompt\": \"Request a deadline extension for the sprint task FL-203\",\n  \"tone\": \"professional\",\n  \"language\": \"en\",\n  \"emailType\": \"request\",\n  \"recipientType\": \"manager\"\n}"
+                        },
+                        "description": "Consumes 1 AI credit. Returns generated email subject + body."
+                    }
+                },
+                {
+                    "name": "Get AI Service Status",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "status"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Watch Ad Reward (+1 Credit)",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/ad-reward",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "ad-reward"
+                            ]
+                        },
+                        "description": "Grants +1 free AI credit. Max 3 ads/day."
+                    }
+                },
+                {
+                    "name": "Consume 1 Credit (AI Feedback)",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/consume-credit",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "consume-credit"
+                            ]
+                        },
+                        "description": "Deducts 1 AI credit without generating an email. Used by AI Feedback feature. Returns { success, remainingUses }."
+                    }
+                },
+                {
+                    "name": "Get Email Generation History",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/email/history",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "email",
+                                "history"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Assessment & Gamification",
+            "description": "Skill assessment, streak tracking, and leaderboards",
+            "item": [
+                {
+                    "name": "Submit MCQ Assessment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/assessment/submit",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "assessment",
+                                "submit"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"answers\": [\"B\", \"A\", \"C\", \"D\", \"A\", \"B\", \"C\", \"A\", \"D\", \"B\"],\n  \"score\": 7\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Evaluate Writing (AI Assessment)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/assessment/evaluate-writing",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "assessment",
+                                "evaluate-writing"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"mcqScore\": 7,\n  \"writingText\": \"Dear Manager, I would like to request a day off on Friday due to personal reasons. I will ensure all my tasks are completed beforehand.\"\n}"
+                        },
+                        "description": "Combines MCQ score (40%) + AI writing evaluation (60%)."
+                    }
+                },
+                {
+                    "name": "Get Leaderboard by Group",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/gamification/leaderboard/:groupId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "gamification",
+                                "leaderboard",
+                                ":groupId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Streak Info",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/gamification/streak",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "gamification",
+                                "streak"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "7. Subscription & Payments",
+            "description": "Subscription management, SePay VietQR webhook",
+            "item": [
+                {
+                    "name": "Get Subscription Status",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/status/:userId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "status",
+                                ":userId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Can Request Ad Reward",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/can-request/:userId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "can-request",
+                                ":userId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Watch Ad (Subscription Controller)",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/watch-ad/:userId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "watch-ad",
+                                ":userId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Active Subscription",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/active/:userId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "active",
+                                ":userId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Subscription",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/create",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "create"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userId\": \"uuid-here\",\n  \"planType\": \"MONTHLY\",\n  \"amountVnd\": 99000\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Cancel Subscription",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/subscription/cancel/:subscriptionId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "subscription",
+                                "cancel",
+                                ":subscriptionId"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "SePay Webhook (VietQR)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/payment/sepay-webhook",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "payment",
+                                "sepay-webhook"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"transferAmount\": 25000,\n  \"content\": \"FL-credits-5-uuid-here\"\n}"
+                        },
+                        "description": "Called by SePay payment gateway on successful VietQR payment."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "8. Chat (AI Chatbot)",
+            "description": "AI-powered learning consultant chatbot",
+            "item": [
+                {
+                    "name": "Start Chat Session",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/session",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "session"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"guestId\": \"guest-123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Send Chat Message",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/message",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "message"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"sessionId\": 1,\n  \"sender\": \"USER\",\n  \"content\": \"What is the best way to learn English for software engineering?\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Chat History",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/chat/history/:sessionId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "chat",
+                                "history",
+                                ":sessionId"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "9. Notifications",
+            "description": "User notification system",
+            "item": [
+                {
+                    "name": "Get All Notifications",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/notifications",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "notifications"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Unread Count",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/notifications/unread-count",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "notifications",
+                                "unread-count"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark Notification as Read",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/notifications/:id/read",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "notifications",
+                                ":id",
+                                "read"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark All as Read",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/notifications/read-all",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "notifications",
+                                "read-all"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10. Search",
+            "description": "Global search across topics, vocabulary, and templates",
+            "item": [
+                {
+                    "name": "Global Search",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/search?q=deploy",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "deploy"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "11. Admin",
+            "description": "Admin dashboard, user management, content approvals, chat history",
+            "item": [
+                {
+                    "name": "Get Admin Stats",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/stats",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "stats"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "users"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update User Roles",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users/:id/roles",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "users",
+                                ":id",
+                                "roles"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"roles\": [\"LEARNER\", \"TEACHER\"]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Ban User",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users/:id/ban",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "users",
+                                ":id",
+                                "ban"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reset User Password",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users/:id/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "users",
+                                ":id",
+                                "reset-password"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Pending Approvals",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/approvals",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "approvals"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Admin Chat Sessions",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/chat/sessions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "chat",
+                                "sessions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Manage Groups",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/groups",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "groups"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

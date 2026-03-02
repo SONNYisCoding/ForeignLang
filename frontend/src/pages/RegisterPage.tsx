@@ -59,7 +59,12 @@ const RegisterPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                if (data.userId) {
+                // Save JWT Token to ensure Auto-Login works
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
+
+                if (data.user?.id || data.userId) {
                     // Registration successful - always require profile setup
                     navigate('/profile-setup');
                 } else {

@@ -46,7 +46,7 @@ public class GamificationController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("currentStreak", streakService.getEffectiveStreak(user));
+        response.put("currentStreak", streakService.getEffectiveStreak(user, httpRequest.getHeader("X-Timezone")));
         response.put("lastActivityDate", user.getLastActivityDate());
 
         // MVP: Only tracking consecutive days based on current streak count for the UI

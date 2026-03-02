@@ -28,9 +28,11 @@ const VocabularyPage = () => {
     useEffect(() => {
         const fetchVocabAndMastered = async () => {
             try {
+                const token = localStorage.getItem('token');
+                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
                 const [vocabRes, masteredRes] = await Promise.all([
-                    fetch('/api/v1/vocabulary/search?term=', { credentials: 'include' }),
-                    fetch('/api/v1/vocabulary/mastered', { credentials: 'include' })
+                    fetch('/api/v1/vocabulary/search?term=', { headers }),
+                    fetch('/api/v1/vocabulary/mastered', { headers })
                 ]);
 
                 if (vocabRes.ok) {
@@ -55,9 +57,10 @@ const VocabularyPage = () => {
 
     const toggleMastery = async (id: string) => {
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(`/api/v1/vocabulary/${id}/master`, {
                 method: 'POST',
-                credentials: 'include'
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
 
             if (res.ok) {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Clock, CheckCircle2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../api/axiosConfig';
 import Confetti from '../components/ui/Confetti';
 
 interface Lesson {
@@ -27,8 +27,8 @@ const LessonPage = () => {
             try {
                 setLoading(true);
                 const [lessonRes, lessonsRes] = await Promise.all([
-                    axios.get(`/api/v1/lessons/${lessonId}`, { withCredentials: true }),
-                    axios.get(`/api/v1/topics/${topicId}/lessons`, { withCredentials: true })
+                    api.get(`/api/v1/lessons/${lessonId}`),
+                    api.get(`/api/v1/topics/${topicId}/lessons`)
                 ]);
                 setLesson(lessonRes.data);
                 setAllLessons(lessonsRes.data.sort((a: Lesson, b: Lesson) => a.orderIndex - b.orderIndex));

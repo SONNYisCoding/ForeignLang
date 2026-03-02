@@ -15,6 +15,9 @@ interface User {
     authProvider?: string;
     googleId?: string;
     facebookId?: string;
+    isPremium?: boolean;
+    tier?: string;
+    subscriptionExpiryDate?: string;
 }
 
 interface AuthContextType {
@@ -33,7 +36,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const fetchUser = async () => {
         try {
-            const res = await fetch('/api/v1/user/me', { credentials: 'include' });
+            const token = localStorage.getItem('token');
+            const headers: HeadersInit = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const res = await fetch('/api/v1/user/me', { headers, credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setUser({
@@ -50,7 +59,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     streak: data.streak,
                     authProvider: data.authProvider,
                     googleId: data.googleId,
-                    facebookId: data.facebookId
+                    facebookId: data.facebookId,
+                    isPremium: data.isPremium ?? false,
+                    tier: data.tier || 'FREE',
+                    subscriptionExpiryDate: data.subscriptionExpiryDate,
                 });
             } else {
                 setUser(null);
@@ -69,7 +81,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = async () => {
         try {
-            await fetch('/api/v1/auth/logout', { method: 'POST' });
+            const token = localStorage.getItem('token');
+            await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            localStorage.removeItem('token');
             setUser(null);
             sessionStorage.removeItem('dashboardIntroShown');
             window.location.href = '/login';

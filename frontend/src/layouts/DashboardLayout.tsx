@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, History, Search } from 'lucide-react';
+import { FileText, Sparkles, BookOpen, LogOut, Menu, X, User as UserIcon, Globe, ChevronDown, Settings, HelpCircle, History, Search, PenTool, Map, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from '../components/NotificationDropdown';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import CreditDropdown from '../components/ui/CreditModal';
 import RoleSwitcher from '../components/role/RoleSwitcher';
 import SearchModal from '../components/SearchModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useCredits } from '../contexts/CreditContext';
+import { useSidebar } from '../contexts/SidebarContext';
 import ChatbotWidget from '../components/ChatbotWidget';
 import SidebarToggle from '../components/ui/SidebarToggle';
+import GlobalAdModal from '../components/ui/GlobalAdModal';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -17,13 +21,19 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const { t, i18n } = useTranslation();
-    const { user, logout } = useAuth(); // Use Auth Context
+    const { user, logout } = useAuth();
+    const { credits, isCreditLoading } = useCredits();
+
+    const isPremium = user?.isPremium;
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const { isCollapsed, toggleSidebar } = useSidebar();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isCreditDropdownOpen, setIsCreditDropdownOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
     const langDropdownRef = useRef<HTMLDivElement>(null);
+    const creditBtnRef = useRef<HTMLButtonElement>(null);
     const location = useLocation();
 
     // Close language dropdown when clicking outside
@@ -50,6 +60,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const navItems = [
         { name: t('dashboard.overview'), path: '/dashboard', icon: FileText },
         { name: t('dashboard.aiGenerator'), path: '/dashboard/generator', icon: Sparkles },
+        { name: 'AI Feedback', path: '/dashboard/feedback', icon: PenTool },
+        { name: 'My Roadmap', path: '/dashboard/roadmap', icon: Map },
         { name: t('dashboard.templates'), path: '/dashboard/templates', icon: BookOpen },
         { name: 'Topics & Lessons', path: '/dashboard/topics', icon: BookOpen },
         { name: 'Vocabulary', path: '/dashboard/vocabulary', icon: FileText },
@@ -88,7 +100,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                             <div className="hidden lg:flex w-14 h-14 items-center justify-center shrink-0">
                                 <SidebarToggle
                                     isCollapsed={isCollapsed}
-                                    toggle={() => setIsCollapsed(!isCollapsed)}
+                                    toggle={toggleSidebar}
                                     title={isCollapsed ? "Expand" : "Collapse"}
                                     className="scale-90"
                                 />
@@ -163,22 +175,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     </div>
 
                     <div className="px-3 mt-auto">
-                        {/* Upgrade Card - Minimal */}
-                        {!isCollapsed ? (
-                            <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-slate-800 dark:to-slate-800 border border-indigo-100 dark:border-slate-700">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Sparkles size={16} className="text-indigo-600 dark:text-indigo-400 fill-indigo-600 dark:fill-indigo-400" />
-                                    <span className="font-semibold text-sm text-indigo-900 dark:text-indigo-200">Pro Plan</span>
+                        {/* Upgrade Card - Minimal (Hidden if PRO) */}
+                        {!isPremium && (
+                            !isCollapsed ? (
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-slate-800 dark:to-slate-800 border border-indigo-100 dark:border-slate-700">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Sparkles size={16} className="text-indigo-600 dark:text-indigo-400 fill-indigo-600 dark:fill-indigo-400" />
+                                        <span className="font-semibold text-sm text-indigo-900 dark:text-indigo-200">Pro Plan</span>
+                                    </div>
+                                    <p className="text-xs text-indigo-700/80 dark:text-slate-400 mb-3 line-clamp-2">Get unlimited AI credits & exclusive features.</p>
+                                    <Link to="/upgrade" className="block w-full text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
+                                        Upgrade
+                                    </Link>
                                 </div>
-                                <p className="text-xs text-indigo-700/80 dark:text-slate-400 mb-3 line-clamp-2">Get unlimited AI credits & exclusive features.</p>
-                                <Link to="/upgrade" className="block w-full text-center py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
-                                    Upgrade
+                            ) : (
+                                <Link to="/upgrade" className="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Upgrade">
+                                    <Sparkles size={20} />
                                 </Link>
-                            </div>
-                        ) : (
-                            <Link to="/upgrade" className="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Upgrade">
-                                <Sparkles size={20} />
-                            </Link>
+                            )
                         )}
                     </div>
                 </div>
@@ -205,9 +219,32 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         {/* Notifications */}
                         <NotificationDropdown />
+
+                        {/* ═══ Global AI Credit Badge ═══ */}
+                        <div className="relative">
+                            <button
+                                ref={creditBtnRef}
+                                onClick={() => setIsCreditDropdownOpen(!isCreditDropdownOpen)}
+                                className="group flex items-center gap-1.5 px-3 py-2 rounded-full border border-purple-200 dark:border-purple-800/50 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 hover:shadow-lg hover:shadow-purple-500/10 transition-all hover:-translate-y-0.5"
+                                title="AI Credits"
+                            >
+                                <Zap size={14} className="text-purple-600 dark:text-purple-400 fill-purple-600 dark:fill-purple-400" />
+                                {isCreditLoading ? (
+                                    <span className="w-5 h-4 bg-purple-200 dark:bg-purple-700 rounded animate-pulse" />
+                                ) : isPremium ? (
+                                    <span className="text-sm font-black text-purple-700 dark:text-purple-300">∞</span>
+                                ) : (
+                                    <span className="text-sm font-black text-purple-700 dark:text-purple-300">{credits ?? 0}</span>
+                                )}
+                                <span className="relative flex h-5 w-5 items-center justify-center ml-0.5 bg-purple-200 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded-full text-xs font-black group-hover:bg-purple-300 dark:group-hover:bg-purple-700/50 transition-colors">
+                                    +
+                                </span>
+                            </button>
+                            <CreditDropdown isOpen={isCreditDropdownOpen} onClose={() => setIsCreditDropdownOpen(false)} anchorRef={creditBtnRef} />
+                        </div>
 
                         {/* Theme Toggle */}
                         <ThemeToggle />
@@ -255,7 +292,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         <div className="relative group" onMouseEnter={() => setIsProfileDropdownOpen(true)} onMouseLeave={() => setIsProfileDropdownOpen(false)}>
                             <button className="flex items-center gap-3 focus:outline-none">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-none mb-1">{user?.name || 'User'}</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-none mb-1 flex items-center justify-end gap-2">
+                                        {isPremium && (
+                                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-black tracking-wider rounded uppercase shadow-sm">
+                                                PRO
+                                            </span>
+                                        )}
+                                        {user?.name || 'User'}
+                                    </p>
                                     <p className="text-xs text-gray-500 dark:text-slate-400">{t('dashboard.welcome', { name: '' }).replace(',', '').trim()}</p>
                                 </div>
                                 <div className="relative">
@@ -276,7 +320,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                         initial={{ opacity: 0, y: 15, scale: 0.95, filter: 'blur(10px)' }}
                                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(5px)' }}
-                                        transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+                                        transition={{
+                                            default: { type: 'spring', stiffness: 300, damping: 25, duration: 0.2 },
+                                            filter: { type: 'tween', duration: 0.2 }
+                                        }}
                                         className="absolute right-0 top-full mt-3 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 dark:shadow-black/40 border border-white/20 dark:border-slate-700/50 py-3 z-50 origin-top-right overflow-hidden"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
@@ -335,6 +382,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     {children}
                 </div>
             </main>
+
+            <GlobalAdModal />
 
             {/* AI Chatbot Widget */}
             <ChatbotWidget />

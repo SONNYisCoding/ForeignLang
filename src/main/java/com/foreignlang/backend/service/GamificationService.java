@@ -30,8 +30,8 @@ public class GamificationService {
      * Returns true if a reward was granted
      */
     @Transactional
-    public boolean checkAndRewardStreakMilestone(User user) {
-        int currentStreak = streakService.getEffectiveStreak(user);
+    public boolean checkAndRewardStreakMilestone(User user, String timezone) {
+        int currentStreak = streakService.getEffectiveStreak(user, timezone);
 
         // We only reward exactly on the 7th, 14th, 21st, etc. day milestone
         // Note: For MVP, every 7 days gives +5 bonus AI credits

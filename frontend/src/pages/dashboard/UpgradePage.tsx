@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Star, ArrowLeft, Shield, Zap, Crown, Sparkles, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCredits } from '../../contexts/CreditContext';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { UpgradeButton } from '../../components/common/UpgradeButton';
 
 type Step = 'select' | 'confirm' | 'processing' | 'success';
 type PlanType = 'subscription' | 'credits';
@@ -43,7 +46,8 @@ const UpgradePage = () => {
             .catch(() => navigate('/login?redirect=/upgrade'));
     }, [navigate]);
 
-    const { user } = useAuth(); // Get user ID for SePay content
+    const { user, refreshUser } = useAuth(); // Get user ID for SePay content
+    const { refreshCredits } = useCredits();
 
     // Pre-select plan from URL params
     useEffect(() => {
@@ -139,6 +143,36 @@ const UpgradePage = () => {
     const handleSelectPlan = (plan: Plan) => {
         setSelectedPlan(plan);
         setStep('confirm');
+    };
+
+    const handlePaymentSuccess = async () => {
+        if (!selectedPlan) return;
+        setStep('processing');
+        try {
+            const response = await fetch('/api/v1/user/upgrade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    planId: selectedPlan.id,
+                    type: selectedPlan.type,
+                    amount: selectedPlan.price
+                })
+            });
+
+            if (response.ok) {
+                setStep('success');
+                // Sync user profile (isPremium flag) and credit count globally
+                await refreshUser();
+                refreshCredits();
+            } else {
+                toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
+                setStep('select');
+            }
+        } catch (error) {
+            toast.error('Lỗi kết nối server');
+            setStep('select');
+        }
     };
 
 
@@ -263,7 +297,7 @@ const UpgradePage = () => {
                                             </div>
                                         )}
 
-                                        <ul className="space-y-2 mb-4">
+                                        <ul className="space-y-2 mb-6">
                                             {plan.features.map((feature) => (
                                                 <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
                                                     <Check size={16} className="text-green-500 mt-0.5" />
@@ -271,12 +305,12 @@ const UpgradePage = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <button className={`w-full py-3 rounded-xl font-bold transition-all ${plan.recommended
-                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                            : 'bg-gray-100 hover:bg-indigo-100 text-indigo-700'
-                                            }`}>
-                                            Chọn gói này
-                                        </button>
+                                        <div className="flex justify-center mt-auto w-full">
+                                            <UpgradeButton
+                                                text={plan.type === 'subscription' ? "Unlock Pro" : "Get Credits"}
+                                                onClick={() => handleSelectPlan(plan)}
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -341,9 +375,9 @@ const UpgradePage = () => {
                                 {t('dashboard.transfer.autoActivation')}
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-3 mt-4">
                                 <button
-                                    onClick={() => setStep('success')} // Simulate success for now, in real life check status via API
+                                    onClick={handlePaymentSuccess}
                                     className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 animate-pulse"
                                 >
                                     <Check size={20} />

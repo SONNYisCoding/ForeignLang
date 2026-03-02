@@ -15,6 +15,7 @@ import java.util.UUID;
 public class LessonController {
 
     private final LessonRepository lessonRepository;
+    private final com.foreignlang.backend.repository.TopicRepository topicRepository;
 
     @GetMapping("/topic/{topicId}")
     public ResponseEntity<List<Lesson>> getLessonsByTopic(@PathVariable UUID topicId) {
@@ -26,5 +27,31 @@ public class LessonController {
         return lessonRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/topic/{topicId}")
+    public ResponseEntity<Lesson> createLesson(@PathVariable UUID topicId, @RequestBody Lesson lesson) {
+        return topicRepository.findById(topicId).map(topic -> {
+            lesson.setTopic(topic);
+            return ResponseEntity.ok(lessonRepository.save(lesson));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Lesson> updateLesson(@PathVariable UUID id, @RequestBody Lesson lessonDetails) {
+        return lessonRepository.findById(id).map(lesson -> {
+            lesson.setTitle(lessonDetails.getTitle());
+            lesson.setContentBody(lessonDetails.getContentBody());
+            lesson.setOrderIndex(lessonDetails.getOrderIndex());
+            return ResponseEntity.ok(lessonRepository.save(lesson));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLesson(@PathVariable UUID id) {
+        return lessonRepository.findById(id).map(lesson -> {
+            lessonRepository.delete(lesson);
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
