@@ -41,7 +41,7 @@ const EmailFeedbackPage: React.FC = () => {
     const {
         credits, quotaDetails,
         deductCredit, refreshCredits,
-        handleWatchAd, _showAdModal, _adTimer, _adFinished, _handleClaimReward, _closeAdModal
+        handleWatchAd //showAdModal, adTimer, adFinished, handleClaimReward, closeAdModal
     } = useCredits();
     const { user } = useAuth();
     const isPremium = user?.isPremium;
