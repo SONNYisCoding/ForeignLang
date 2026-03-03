@@ -191,7 +191,7 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of(frontendUrl)); // Add production domain here
+                configuration.setAllowedOrigins(List.of(frontendUrl, "https://foreign-lang.vercel.app/")); // Add production domain here
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);
