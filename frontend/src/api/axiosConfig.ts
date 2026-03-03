@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Create a centralized Axios instance
 const api = axios.create({
-    baseURL: '', // Empty if proxying via Vite, or set to your API domain
+    // Sử dụng biến môi trường, nếu không có thì mặc định về localhost
+    baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080', 
     headers: {
         'Content-Type': 'application/json',
     },
