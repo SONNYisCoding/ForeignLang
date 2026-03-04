@@ -15,17 +15,10 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: backendUrl,
           changeOrigin: true,
-          secure: false,
-        },
-        '/oauth2/authorization': {
-          target: backendUrl,
-          changeOrigin: true,
-          secure: false,
-        },
-        '/login/oauth2': {
-          target: backendUrl,
-          changeOrigin: true,
-          secure: false,
+          secure: true,
+          headers: {
+            Connection: 'keep-alive'
+          }
         }
       },
     },
