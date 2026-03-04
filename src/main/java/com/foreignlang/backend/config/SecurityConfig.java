@@ -35,18 +35,23 @@ public class SecurityConfig {
         private final UserRepository userRepository;
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
         private final com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider;
+        // Khai báo là final
+        private final List<String> frontendUrls;
 
+        // Cập nhật Constructor
         public SecurityConfig(
                         CustomOAuth2UserService customOAuth2UserService,
                         com.foreignlang.backend.service.CustomOidcUserService customOidcUserService,
                         UserRepository userRepository,
                         JwtAuthenticationFilter jwtAuthenticationFilter,
-                        com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider) {
+                        com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider,
+                        @org.springframework.beans.factory.annotation.Value("${app.frontend.urls}") List<String> frontendUrls) {
                 this.customOAuth2UserService = customOAuth2UserService;
                 this.customOidcUserService = customOidcUserService;
                 this.userRepository = userRepository;
                 this.jwtAuthenticationFilter = jwtAuthenticationFilter;
                 this.jwtTokenProvider = jwtTokenProvider;
+                this.frontendUrls = frontendUrls; // Gán giá trị tại đây
         }
 
         @org.springframework.beans.factory.annotation.Value("${app.frontend.urls}")
