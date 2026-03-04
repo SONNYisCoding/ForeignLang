@@ -54,9 +54,6 @@ public class SecurityConfig {
                 this.frontendUrls = frontendUrls; // Gán giá trị tại đây
         }
 
-        @org.springframework.beans.factory.annotation.Value("${app.frontend.urls}")
-        private List<String> frontendUrls;
-
         private String getFrontendUrl(jakarta.servlet.http.HttpServletRequest request) {
                 String referer = request.getHeader("Referer");
                 String origin = request.getHeader("Origin");
