@@ -2,7 +2,6 @@ package com.foreignlang.backend.controller;
 
 import com.foreignlang.backend.entity.Lesson;
 import com.foreignlang.backend.repository.LessonRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +10,18 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/lessons")
-@RequiredArgsConstructor
 public class LessonController {
 
     private final LessonRepository lessonRepository;
     private final com.foreignlang.backend.repository.TopicRepository topicRepository;
+
+    public LessonController(
+            LessonRepository lessonRepository,
+            com.foreignlang.backend.repository.TopicRepository topicRepository) {
+        this.lessonRepository = lessonRepository;
+        this.topicRepository = topicRepository;
+    }
+
 
     @GetMapping("/topic/{topicId}")
     public ResponseEntity<List<Lesson>> getLessonsByTopic(@PathVariable UUID topicId) {

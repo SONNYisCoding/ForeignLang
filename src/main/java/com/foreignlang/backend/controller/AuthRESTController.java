@@ -6,7 +6,6 @@ import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +25,6 @@ import com.foreignlang.backend.security.JwtTokenProvider;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
 @Slf4j
 public class AuthRESTController {
 
@@ -35,6 +33,20 @@ public class AuthRESTController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+
+    public AuthRESTController(
+            UserRepository userRepository,
+            UsageQuotaRepository usageQuotaRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.usageQuotaRepository = usageQuotaRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
 
     // DTO for registration
     public record RegisterRequest(

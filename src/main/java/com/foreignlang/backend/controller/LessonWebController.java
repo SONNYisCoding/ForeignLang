@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.Lesson;
 import com.foreignlang.backend.entity.Topic;
 import com.foreignlang.backend.repository.LessonRepository;
 import com.foreignlang.backend.repository.TopicRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,11 +15,18 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/lessons")
-@RequiredArgsConstructor
 public class LessonWebController {
 
     private final TopicRepository topicRepository;
     private final LessonRepository lessonRepository;
+
+    public LessonWebController(
+            TopicRepository topicRepository,
+            LessonRepository lessonRepository) {
+        this.topicRepository = topicRepository;
+        this.lessonRepository = lessonRepository;
+    }
+
 
     @GetMapping("/topic/{topicId}")
     public String listLessons(@PathVariable UUID topicId, Model model) {

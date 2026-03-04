@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.service.UsageQuotaService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +13,19 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/quota")
-@RequiredArgsConstructor
 @Slf4j
 public class UsageQuotaController {
 
     private final UserRepository userRepository;
     private final UsageQuotaService usageQuotaService;
+
+    public UsageQuotaController(
+            UserRepository userRepository,
+            UsageQuotaService usageQuotaService) {
+        this.userRepository = userRepository;
+        this.usageQuotaService = usageQuotaService;
+    }
+
 
     private String getUserEmail(HttpServletRequest request) {
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder

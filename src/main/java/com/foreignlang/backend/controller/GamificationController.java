@@ -4,7 +4,6 @@ import com.foreignlang.backend.service.GamificationService;
 import com.foreignlang.backend.service.StreakService;
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -20,12 +19,21 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/gamification")
-@RequiredArgsConstructor
 public class GamificationController {
 
     private final GamificationService gamificationService;
     private final StreakService streakService;
     private final UserRepository userRepository;
+
+    public GamificationController(
+            GamificationService gamificationService,
+            StreakService streakService,
+            UserRepository userRepository) {
+        this.gamificationService = gamificationService;
+        this.streakService = streakService;
+        this.userRepository = userRepository;
+    }
+
 
     @GetMapping("/leaderboard/{groupId}")
     public ResponseEntity<?> getLeaderboard(@PathVariable UUID groupId) {

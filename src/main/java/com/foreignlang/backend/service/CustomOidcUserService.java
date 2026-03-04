@@ -5,7 +5,6 @@ import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.security.UserPrincipal;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -17,12 +16,19 @@ import org.springframework.context.annotation.Primary;
 
 @Service
 @Primary // FORCE Spring to use this bean
-@RequiredArgsConstructor
 @Slf4j
 public class CustomOidcUserService extends OidcUserService {
 
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
+
+    public CustomOidcUserService(
+            UserRepository userRepository,
+            UsageQuotaRepository usageQuotaRepository) {
+        this.userRepository = userRepository;
+        this.usageQuotaRepository = usageQuotaRepository;
+    }
+
 
     @jakarta.annotation.PostConstruct
     public void init() {

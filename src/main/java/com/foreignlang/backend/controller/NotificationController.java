@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.Notification;
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.NotificationRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -17,11 +16,18 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
-@RequiredArgsConstructor
 public class NotificationController {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+
+    public NotificationController(
+            NotificationRepository notificationRepository,
+            UserRepository userRepository) {
+        this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
+    }
+
 
     private User getAuthenticatedUser(OAuth2User principal, jakarta.servlet.http.HttpServletRequest httpRequest) {
         // 1. Check for UserPrincipal (Unified representation)

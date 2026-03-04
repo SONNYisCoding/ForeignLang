@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.UsageQuota;
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import java.util.UUID;
  * Hybrid model: 5 bonus + 2 daily free + 3 from ads
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UsageQuotaService {
 
@@ -134,6 +132,16 @@ public class UsageQuotaService {
     }
 
     private final UserRepository userRepository;
+
+    public UsageQuotaService(
+            UsageQuotaRepository usageQuotaRepository,
+            SubscriptionService subscriptionService,
+            UserRepository userRepository) {
+        this.usageQuotaRepository = usageQuotaRepository;
+        this.subscriptionService = subscriptionService;
+        this.userRepository = userRepository;
+    }
+
 
     private UsageQuota getOrCreateQuota(UUID userId) {
         return usageQuotaRepository.findByUserId(userId)

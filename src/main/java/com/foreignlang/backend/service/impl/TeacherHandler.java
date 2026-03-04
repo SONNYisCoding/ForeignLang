@@ -2,16 +2,20 @@ package com.foreignlang.backend.service.impl;
 
 import com.foreignlang.backend.service.AiPersonaHandler;
 import com.foreignlang.backend.service.GeminiClient;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class TeacherHandler implements AiPersonaHandler {
 
     private final GeminiClient geminiClient;
+
+    public TeacherHandler(
+            GeminiClient geminiClient) {
+        this.geminiClient = geminiClient;
+    }
+
 
     private static final String SYSTEM_PROMPT = """
             You are an expert English teacher on ForeignLang, specializing in professional English communication.

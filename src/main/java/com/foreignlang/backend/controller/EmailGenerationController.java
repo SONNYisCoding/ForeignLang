@@ -8,7 +8,6 @@ import com.foreignlang.backend.service.GeminiService;
 import com.foreignlang.backend.service.UsageQuotaService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +19,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/email")
-@RequiredArgsConstructor
 @Slf4j
 public class EmailGenerationController {
 
@@ -29,6 +27,20 @@ public class EmailGenerationController {
     private final UsageQuotaService usageQuotaService;
     private final EmailHistoryRepository emailHistoryRepository;
     private final com.foreignlang.backend.service.StreakService streakService;
+
+    public EmailGenerationController(
+            GeminiService geminiService,
+            UserRepository userRepository,
+            UsageQuotaService usageQuotaService,
+            EmailHistoryRepository emailHistoryRepository,
+            com.foreignlang.backend.service.StreakService streakService) {
+        this.geminiService = geminiService;
+        this.userRepository = userRepository;
+        this.usageQuotaService = usageQuotaService;
+        this.emailHistoryRepository = emailHistoryRepository;
+        this.streakService = streakService;
+    }
+
 
     /**
      * Generate email using AI

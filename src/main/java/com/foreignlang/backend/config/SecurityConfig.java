@@ -3,7 +3,6 @@ package com.foreignlang.backend.config;
 import com.foreignlang.backend.service.CustomOAuth2UserService;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.entity.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +27,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
 
@@ -38,8 +36,43 @@ public class SecurityConfig {
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
         private final com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider;
 
-        @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
-        private String frontendUrl;
+        public SecurityConfig(
+                        CustomOAuth2UserService customOAuth2UserService,
+                        com.foreignlang.backend.service.CustomOidcUserService customOidcUserService,
+                        UserRepository userRepository,
+                        JwtAuthenticationFilter jwtAuthenticationFilter,
+                        com.foreignlang.backend.security.JwtTokenProvider jwtTokenProvider) {
+                this.customOAuth2UserService = customOAuth2UserService;
+                this.customOidcUserService = customOidcUserService;
+                this.userRepository = userRepository;
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.jwtTokenProvider = jwtTokenProvider;
+        }
+
+        @org.springframework.beans.factory.annotation.Value("${app.frontend.urls}")
+        private List<String> frontendUrls;
+
+        private String getFrontendUrl(jakarta.servlet.http.HttpServletRequest request) {
+                String referer = request.getHeader("Referer");
+                String origin = request.getHeader("Origin");
+                String sourceUrl = origin != null ? origin : (referer != null ? referer : "");
+
+                for (String url : frontendUrls) {
+                        if (sourceUrl.startsWith(url)) {
+                                return url;
+                        }
+                }
+
+                jakarta.servlet.http.HttpSession session = request.getSession(false);
+                if (session != null) {
+                        String savedUrl = (String) session.getAttribute("saved_frontend_url");
+                        if (savedUrl != null && frontendUrls.contains(savedUrl)) {
+                                return savedUrl;
+                        }
+                }
+
+                return frontendUrls.isEmpty() ? "" : frontendUrls.get(0);
+        }
 
         @Bean
         public AuthenticationSuccessHandler oAuth2SuccessHandler() {
@@ -79,12 +112,14 @@ public class SecurityConfig {
                                                 user.getId(), user.getEmail(), user.isProfileComplete());
 
                                 // Unified redirection to frontend callback handler
+                                String targetUrl = getFrontendUrl(request);
                                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-                                log.info("OAuth2 Success: Redirecting to frontend auth handler");
-                                response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + token);
+                                log.info("OAuth2 Success: Redirecting to frontend auth handler at {}", targetUrl);
+                                response.sendRedirect(targetUrl + "/oauth2/redirect?token=" + token);
                         } else {
+                                String targetUrl = getFrontendUrl(request);
                                 log.error("CRITICAL: Failed to retrieve User object in SuccessHandler");
-                                response.sendRedirect(frontendUrl + "/login?error=auth_principal_failure");
+                                response.sendRedirect(targetUrl + "/login?error=auth_principal_failure");
                         }
                 };
 
@@ -163,15 +198,46 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterAfter(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
+                                .addFilterBefore(new jakarta.servlet.Filter() {
+                                        @Override
+                                        public void doFilter(jakarta.servlet.ServletRequest request,
+                                                        jakarta.servlet.ServletResponse response,
+                                                        jakarta.servlet.FilterChain chain)
+                                                        throws java.io.IOException, jakarta.servlet.ServletException {
+                                                jakarta.servlet.http.HttpServletRequest req = (jakarta.servlet.http.HttpServletRequest) request;
+                                                if (req.getRequestURI().startsWith("/oauth2/authorization/")) {
+                                                        String referer = req.getHeader("Referer");
+                                                        if (referer != null) {
+                                                                for (String url : frontendUrls) {
+                                                                        if (referer.startsWith(url)) {
+                                                                                req.getSession().setAttribute(
+                                                                                                "saved_frontend_url",
+                                                                                                url);
+                                                                                break;
+                                                                        }
+                                                                }
+                                                        }
+                                                }
+                                                chain.doFilter(request, response);
+                                        }
+                                }, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class)
                                 .oauth2Login(oauth2 -> oauth2
                                                 .loginPage("/login")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(customOAuth2UserService)
                                                                 .oidcUserService(customOidcUserService))
                                                 .successHandler(oAuth2SuccessHandler())
-                                                .failureUrl(frontendUrl + "/?error=true"))
+                                                .failureHandler((request, response, exception) -> {
+                                                        response.sendRedirect(getFrontendUrl(
+                                                                        (jakarta.servlet.http.HttpServletRequest) request)
+                                                                        + "/?error=true");
+                                                }))
                                 .logout(logout -> logout
-                                                .logoutSuccessUrl(frontendUrl + "/")
+                                                .logoutSuccessHandler((request, response, authentication) -> {
+                                                        response.sendRedirect(getFrontendUrl(
+                                                                        (jakarta.servlet.http.HttpServletRequest) request)
+                                                                        + "/");
+                                                })
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "XSRF-TOKEN"))
                                 // For API endpoints, strictly return 401 instead of redirecting anywhere
@@ -191,7 +257,7 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of(frontendUrl)); // Add production domain here
+                configuration.setAllowedOrigins(frontendUrls); // Add multiple domains here
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);

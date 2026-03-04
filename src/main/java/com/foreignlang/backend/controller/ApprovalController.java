@@ -3,7 +3,6 @@ package com.foreignlang.backend.controller;
 import com.foreignlang.backend.entity.ContentStatus;
 
 import com.foreignlang.backend.repository.TopicRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,15 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin/approvals")
-@RequiredArgsConstructor
 public class ApprovalController {
 
     private final TopicRepository topicRepository;
+
+    public ApprovalController(
+            TopicRepository topicRepository) {
+        this.topicRepository = topicRepository;
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getPendingApprovals() {

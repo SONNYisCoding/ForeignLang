@@ -6,7 +6,6 @@ import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.GroupMemberRepository;
 import com.foreignlang.backend.repository.StudentGroupRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +17,21 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin/groups")
-@RequiredArgsConstructor
 public class GroupController {
 
     private final StudentGroupRepository groupRepository;
     private final GroupMemberRepository memberRepository;
     private final UserRepository userRepository;
+
+    public GroupController(
+            StudentGroupRepository groupRepository,
+            GroupMemberRepository memberRepository,
+            UserRepository userRepository) {
+        this.groupRepository = groupRepository;
+        this.memberRepository = memberRepository;
+        this.userRepository = userRepository;
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllGroups() {

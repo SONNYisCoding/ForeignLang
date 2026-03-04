@@ -6,7 +6,6 @@ import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.entity.User.Role;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.TopicRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +15,19 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@RequiredArgsConstructor
 public class AdminController {
 
     private final UserRepository userRepository;
 
     private final TopicRepository topicRepository;
+
+    public AdminController(
+            UserRepository userRepository,
+            TopicRepository topicRepository) {
+        this.userRepository = userRepository;
+        this.topicRepository = topicRepository;
+    }
+
 
     @GetMapping("/stats")
     public ResponseEntity<AdminStatsDTO> getStats() {

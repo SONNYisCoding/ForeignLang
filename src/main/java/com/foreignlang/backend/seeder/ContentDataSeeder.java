@@ -2,7 +2,6 @@ package com.foreignlang.backend.seeder;
 
 import com.foreignlang.backend.entity.*;
 import com.foreignlang.backend.repository.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 // @Profile("!prod") // Optional: Only run in non-prod environments if desired
 public class ContentDataSeeder implements CommandLineRunner {
@@ -19,6 +17,18 @@ public class ContentDataSeeder implements CommandLineRunner {
         private final LessonRepository lessonRepository;
         private final VocabularyBankRepository vocabularyBankRepository;
         private final TemplateRepository templateRepository;
+
+    public ContentDataSeeder(
+            TopicRepository topicRepository,
+            LessonRepository lessonRepository,
+            VocabularyBankRepository vocabularyBankRepository,
+            TemplateRepository templateRepository) {
+        this.topicRepository = topicRepository;
+        this.lessonRepository = lessonRepository;
+        this.vocabularyBankRepository = vocabularyBankRepository;
+        this.templateRepository = templateRepository;
+    }
+
 
         @Override
         public void run(String... args) throws Exception {

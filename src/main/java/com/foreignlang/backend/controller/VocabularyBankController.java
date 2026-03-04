@@ -6,7 +6,6 @@ import com.foreignlang.backend.entity.UserVocabulary;
 import com.foreignlang.backend.repository.VocabularyBankRepository;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.repository.UserVocabularyRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -23,12 +22,21 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/v1/vocabulary")
-@RequiredArgsConstructor
 public class VocabularyBankController {
 
     private final VocabularyBankRepository vocabularyBankRepository;
     private final UserRepository userRepository;
     private final UserVocabularyRepository userVocabularyRepository;
+
+    public VocabularyBankController(
+            VocabularyBankRepository vocabularyBankRepository,
+            UserRepository userRepository,
+            UserVocabularyRepository userVocabularyRepository) {
+        this.vocabularyBankRepository = vocabularyBankRepository;
+        this.userRepository = userRepository;
+        this.userVocabularyRepository = userVocabularyRepository;
+    }
+
 
     /**
      * Get all vocabulary for a specific topic

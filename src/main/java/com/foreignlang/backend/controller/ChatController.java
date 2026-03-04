@@ -6,7 +6,6 @@ import com.foreignlang.backend.security.UserPrincipal;
 import com.foreignlang.backend.service.AiService;
 import com.foreignlang.backend.service.AiPersonaHandler;
 import com.foreignlang.backend.service.ChatService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,12 +18,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/chat")
-@RequiredArgsConstructor
 @Slf4j
 public class ChatController {
 
     private final ChatService chatService;
     private final AiService aiService;
+
+    public ChatController(
+            ChatService chatService,
+            AiService aiService) {
+        this.chatService = chatService;
+        this.aiService = aiService;
+    }
+
 
     @PostMapping("/session")
     public ResponseEntity<ChatSession> startSession(

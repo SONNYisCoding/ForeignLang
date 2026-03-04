@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.Subscription;
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.SubscriptionRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +18,19 @@ import java.util.UUID;
  * Handles premium upgrades and subscription validation.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+
+    public SubscriptionService(
+            SubscriptionRepository subscriptionRepository,
+            UserRepository userRepository) {
+        this.subscriptionRepository = subscriptionRepository;
+        this.userRepository = userRepository;
+    }
+
 
     // Pricing in VND
     private static final BigDecimal MONTHLY_PRICE = new BigDecimal("29000");

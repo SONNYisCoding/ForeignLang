@@ -2,7 +2,6 @@ package com.foreignlang.backend.service;
 
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +9,15 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 @Service
-@RequiredArgsConstructor
 public class StreakService {
 
     private final UserRepository userRepository;
+
+    public StreakService(
+            UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     private ZoneId getZoneIdOrDefault(String timezone) {
         if (timezone == null || timezone.isBlank())

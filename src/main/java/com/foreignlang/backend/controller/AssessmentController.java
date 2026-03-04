@@ -6,7 +6,6 @@ import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UserRepository;
 import com.foreignlang.backend.service.GeminiClient;
 import com.foreignlang.backend.service.StreakService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +17,22 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/assessment")
-@RequiredArgsConstructor
 @Slf4j
 public class AssessmentController {
 
     private final UserRepository userRepository;
     private final StreakService streakService;
     private final GeminiClient geminiClient;
+
+    public AssessmentController(
+            UserRepository userRepository,
+            StreakService streakService,
+            GeminiClient geminiClient) {
+        this.userRepository = userRepository;
+        this.streakService = streakService;
+        this.geminiClient = geminiClient;
+    }
+
 
     private static final String WRITING_EVAL_PROMPT = """
             You are an English language proficiency evaluator for ForeignLang, an email writing platform.

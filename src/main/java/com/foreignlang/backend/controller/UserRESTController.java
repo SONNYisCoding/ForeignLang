@@ -7,7 +7,6 @@ import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.repository.TransactionRepository;
 import com.foreignlang.backend.repository.SubscriptionRepository;
 import com.foreignlang.backend.service.SubscriptionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -23,7 +22,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@RequiredArgsConstructor
 public class UserRESTController {
 
     private final UserRepository userRepository;
@@ -33,6 +31,24 @@ public class UserRESTController {
     private final SubscriptionService subscriptionService;
     private final com.foreignlang.backend.service.StreakService streakService;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    public UserRESTController(
+            UserRepository userRepository,
+            UsageQuotaRepository usageQuotaRepository,
+            TransactionRepository transactionRepository,
+            SubscriptionRepository subscriptionRepository,
+            SubscriptionService subscriptionService,
+            com.foreignlang.backend.service.StreakService streakService,
+            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.usageQuotaRepository = usageQuotaRepository;
+        this.transactionRepository = transactionRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.subscriptionService = subscriptionService;
+        this.streakService = streakService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     public record SetupPasswordRequest(String newPassword) {
     }

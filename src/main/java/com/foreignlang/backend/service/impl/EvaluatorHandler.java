@@ -3,16 +3,20 @@ package com.foreignlang.backend.service.impl;
 import com.foreignlang.backend.service.AiPersonaHandler;
 import com.foreignlang.backend.service.GeminiClient;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EvaluatorHandler implements AiPersonaHandler {
 
     private final GeminiClient geminiClient;
+
+    public EvaluatorHandler(
+            GeminiClient geminiClient) {
+        this.geminiClient = geminiClient;
+    }
+
 
     private static final String SYSTEM_PROMPT = """
             You are a strict but fair English writing evaluator on ForeignLang, \

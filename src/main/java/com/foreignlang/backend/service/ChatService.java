@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.ChatMessage;
 import com.foreignlang.backend.entity.ChatSession;
 import com.foreignlang.backend.repository.ChatMessageRepository;
 import com.foreignlang.backend.repository.ChatSessionRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +12,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class ChatService {
 
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
+
+    public ChatService(
+            ChatSessionRepository chatSessionRepository,
+            ChatMessageRepository chatMessageRepository) {
+        this.chatSessionRepository = chatSessionRepository;
+        this.chatMessageRepository = chatMessageRepository;
+    }
+
 
     @Transactional
     public ChatSession startOrResumeSession(String userIdStr, String guestId) {

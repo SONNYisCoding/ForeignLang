@@ -3,7 +3,6 @@ package com.foreignlang.backend.controller;
 import com.foreignlang.backend.entity.Subscription;
 import com.foreignlang.backend.service.SubscriptionService;
 import com.foreignlang.backend.service.UsageQuotaService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +16,18 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/v1/subscription")
-@RequiredArgsConstructor
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
     private final UsageQuotaService usageQuotaService;
+
+    public SubscriptionController(
+            SubscriptionService subscriptionService,
+            UsageQuotaService usageQuotaService) {
+        this.subscriptionService = subscriptionService;
+        this.usageQuotaService = usageQuotaService;
+    }
+
 
     /**
      * Get user's current subscription status and usage

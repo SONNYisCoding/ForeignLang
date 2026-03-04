@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.*;
 import com.foreignlang.backend.repository.LessonRepository;
 import com.foreignlang.backend.repository.TopicRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 @Slf4j
 @org.springframework.context.annotation.Profile("dev")
 public class DataSeeder {
@@ -25,6 +23,18 @@ public class DataSeeder {
         private final PasswordEncoder passwordEncoder;
         private final TopicRepository topicRepository;
         private final LessonRepository lessonRepository;
+
+    public DataSeeder(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            TopicRepository topicRepository,
+            LessonRepository lessonRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.topicRepository = topicRepository;
+        this.lessonRepository = lessonRepository;
+    }
+
 
         @Bean
         public CommandLineRunner initData() {

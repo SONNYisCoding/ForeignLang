@@ -4,7 +4,6 @@ import com.foreignlang.backend.entity.UsageQuota;
 import com.foreignlang.backend.entity.User;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -23,13 +22,22 @@ import java.util.UUID;
  */
 @Service
 @Primary // FORCE Spring to use this bean
-@RequiredArgsConstructor
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final UsageQuotaRepository usageQuotaRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public CustomOAuth2UserService(
+            UserRepository userRepository,
+            UsageQuotaRepository usageQuotaRepository,
+            PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.usageQuotaRepository = usageQuotaRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @jakarta.annotation.PostConstruct
     public void init() {

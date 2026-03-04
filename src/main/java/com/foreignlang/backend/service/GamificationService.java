@@ -8,7 +8,6 @@ import com.foreignlang.backend.repository.GroupMemberRepository;
 import com.foreignlang.backend.repository.StudentGroupRepository;
 import com.foreignlang.backend.repository.UsageQuotaRepository;
 import com.foreignlang.backend.repository.UserVocabularyRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class GamificationService {
 
     private final UsageQuotaRepository usageQuotaRepository;
@@ -24,6 +22,20 @@ public class GamificationService {
     private final StudentGroupRepository studentGroupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final StreakService streakService;
+
+    public GamificationService(
+            UsageQuotaRepository usageQuotaRepository,
+            UserVocabularyRepository userVocabularyRepository,
+            StudentGroupRepository studentGroupRepository,
+            GroupMemberRepository groupMemberRepository,
+            StreakService streakService) {
+        this.usageQuotaRepository = usageQuotaRepository;
+        this.userVocabularyRepository = userVocabularyRepository;
+        this.studentGroupRepository = studentGroupRepository;
+        this.groupMemberRepository = groupMemberRepository;
+        this.streakService = streakService;
+    }
+
 
     /**
      * Call this when a user's streak might have hit a milestone

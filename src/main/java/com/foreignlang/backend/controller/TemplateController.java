@@ -2,7 +2,6 @@ package com.foreignlang.backend.controller;
 
 import com.foreignlang.backend.entity.Template;
 import com.foreignlang.backend.repository.TemplateRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +10,15 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/templates")
-@RequiredArgsConstructor
 public class TemplateController {
 
     private final TemplateRepository templateRepository;
+
+    public TemplateController(
+            TemplateRepository templateRepository) {
+        this.templateRepository = templateRepository;
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Template>> getAllTemplates() {
