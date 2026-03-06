@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Spring_Boot-3.4-6DB33F?logo=springboot&logoColor=white" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
   <img src="https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql&logoColor=white" />
-  <img src="https://img.shields.io/badge/Gemini_AI-1.5_Flash-4285F4?logo=google&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gemini_AI-2.5_Flash-4285F4?logo=google&logoColor=white" />
   <img src="https://img.shields.io/badge/License-MIT-green" />
 </p>
 
@@ -333,11 +333,10 @@ ForeignLang/
 
 | Member | Role | Responsibility |
 |--------|------|----------------|
-| Le Tran | Project Lead | Architecture, Backend, AI Integration |
-| Team Member 2 | Frontend Dev | UI/UX Implementation |
-| Team Member 3 | Backend Dev | API Development |
-| Team Member 4 | QA/Testing | Quality Assurance |
-| Team Member 5 | Design | UI/UX Design |
+| Tran Nguyen Hoang Le | Project Lead | Architecture, Backend, AI Integration |
+| Nguyen Minh Triet | Frontend Dev | UI/UX Implementation, AI Integration |
+| Le Minh Huy | Backend Dev | API Development |
+| Van Quang Truong | Backend Dev, QA/Testing | Quality Assurance |
 
 > *FPT University — EXE101 Course — Spring 2026*
 
