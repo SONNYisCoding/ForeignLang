@@ -100,6 +100,6 @@ class UsageQuotaServiceTest {
         when(subscriptionService.isPremium(userId)).thenReturn(true);
 
         int remaining = usageQuotaService.getRemainingRequests(userId);
-        assertEquals(22, remaining); // 20 monthly sub limit + 2 weekly free limit
+        assertEquals(20, remaining); // Premium users have a strict 20 daily limit
     }
 }
