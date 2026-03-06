@@ -31,7 +31,7 @@ const TopicDetailPage = () => {
                 const response = await api.get(`/api/v1/topics/${id}`);
                 setTopic(response.data);
                 setLoading(false);
-            } catch (err) {
+            } catch {
                 setError('Failed to load topic details');
                 setLoading(false);
             }

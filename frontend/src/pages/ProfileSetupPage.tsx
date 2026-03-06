@@ -55,7 +55,7 @@ const ProfileSetupPage = () => {
 
             // Success - redirect to skill assessment
             navigate('/assessment');
-        } catch (err) {
+        } catch {
             setError(t('common.error'));
             setLoading(false);
         }

@@ -80,7 +80,7 @@ const LoginPage = () => {
             } else {
                 setError(data.error || 'Login failed. Please check your credentials.');
             }
-        } catch (err) {
+        } catch {
             setError('Network error. Please try again later.');
         } finally {
             setLoading(false);

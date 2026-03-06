@@ -99,9 +99,24 @@ const UpgradePage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [step, setStep] = useState<Step>('select');
-    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<PlanType>('subscription');
+    const initialFoundPlan = () => {
+        const planParam = searchParams.get('plan');
+        const packParam = searchParams.get('pack');
+        if (planParam || packParam) {
+            const allPlans = [...subscriptionPlans, ...creditPlans];
+            return allPlans.find(p => p.id === planParam || p.id === packParam) || null;
+        }
+        return null;
+    };
+
+    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(initialFoundPlan);
+    const [activeTab, setActiveTab] = useState<PlanType>(() => {
+        const found = initialFoundPlan();
+        if (found) return found.type;
+        if (searchParams.get('pack')) return 'credits';
+        return 'subscription';
+    });
 
     // Check authentication
     useEffect(() => {
@@ -119,27 +134,7 @@ const UpgradePage = () => {
     const { user, refreshUser } = useAuth(); // Get user ID for SePay content
     const { refreshCredits } = useCredits();
 
-    // Pre-select plan from URL params
-    useEffect(() => {
-        const planParam = searchParams.get('plan');
-        const packParam = searchParams.get('pack');
-        if (packParam) {
-             
-            setActiveTab('credits');
-        }
-        if (planParam || packParam) {
-            const allPlans = [...subscriptionPlans, ...creditPlans];
-            const found = allPlans.find(p => p.id === planParam || p.id === packParam);
-            if (found) {
-                 
-                setSelectedPlan(found);
-                 
-                setActiveTab(found.type);
-            }
-        }
 
-         
-    }, [searchParams]);
 
     const currentPlans = activeTab === 'subscription' ? subscriptionPlans : creditPlans;
 

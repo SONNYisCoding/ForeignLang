@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, BarChart3, Clock, Plus, Map, ChevronRight, Trash2 } from 'lucide-react';
 import UiverseLoader from '../../components/ui/UiverseLoader';
@@ -32,19 +32,13 @@ const saveRoadmaps = (items: SavedRoadmap[]) => {
 };
 
 const LearningRoadmapPage: React.FC = () => {
-    const [roadmaps, setRoadmaps] = useState<SavedRoadmap[]>([]);
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [roadmaps, setRoadmaps] = useState<SavedRoadmap[]>(loadRoadmaps);
+    const [selectedId, setSelectedId] = useState<string | null>(() => {
+        const loaded = loadRoadmaps();
+        return loaded.length > 0 ? loaded[0].id : null;
+    });
     const [showForm, setShowForm] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-
-    useEffect(() => {
-        const loaded = loadRoadmaps();
-         
-        setRoadmaps(loaded);
-        if (loaded.length > 0) setSelectedId(loaded[0].id);
-
-         
-    }, []);
 
     const selectedRoadmap = roadmaps.find(r => r.id === selectedId)?.data || null;
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, User, Clock, ChevronRight, X } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -31,11 +31,7 @@ const AdminChatHistoryPage = () => {
     const [filter, setFilter] = useState<'ALL' | 'USER' | 'GUEST'>('ALL');
     const { showError } = useToast();
 
-    useEffect(() => {
-        fetchSessions();
-    }, []);
-
-    const fetchSessions = () => {
+    const fetchSessions = useCallback(() => {
         setLoading(true);
         fetch('/api/v1/admin/chat/sessions', { credentials: 'include' })
             .then(res => res.json())
@@ -48,7 +44,12 @@ const AdminChatHistoryPage = () => {
                 showError('Failed to load chat sessions');
                 setLoading(false);
             });
-    };
+    }, [showError]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchSessions();
+    }, [fetchSessions]);
 
     const handleSelectSession = (session: ChatSession) => {
         setSelectedSession(session);
@@ -74,7 +75,7 @@ const AdminChatHistoryPage = () => {
                         {['ALL', 'USER', 'GUEST'].map(f => (
                             <button
                                 key={f}
-                                onClick={() => setFilter(f as any)}
+                                onClick={() => setFilter(f as 'ALL' | 'USER' | 'GUEST')}
                                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${filter === f ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
                             >
                                 {f}

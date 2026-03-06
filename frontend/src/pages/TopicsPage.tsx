@@ -24,7 +24,7 @@ const TopicsPage = () => {
             try {
                 const response = await api.get('/api/v1/topics/published');
                 setTopics(response.data);
-            } catch (err) {
+            } catch {
                 // Fallback to all topics if /published doesn't return results
                 try {
                     const fallback = await api.get('/api/v1/topics');

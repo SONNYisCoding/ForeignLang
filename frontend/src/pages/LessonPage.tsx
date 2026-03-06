@@ -32,7 +32,7 @@ const LessonPage = () => {
                 ]);
                 setLesson(lessonRes.data);
                 setAllLessons(lessonsRes.data.sort((a: Lesson, b: Lesson) => a.orderIndex - b.orderIndex));
-            } catch (err) {
+            } catch {
                 setError('Failed to load lesson');
             } finally {
                 setLoading(false);
