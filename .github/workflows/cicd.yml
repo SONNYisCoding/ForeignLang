@@ -1,0 +1,79 @@
+name: ForeignLang Full Pipeline (CI/CD)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # --- STAGE 1: BACKEND TESTING & BUILDING ---
+  backend-ci:
+    name: Backend Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Grant Execute Permission for Maven
+        run: chmod +x mvnw
+
+      - name: Run Backend Unit Tests
+        # Chạy toàn bộ JUnit & Mockito tests (UsageQuotaServiceTest, JwtTokenProviderTest...)
+        run: ./mvnw test
+
+      - name: Build Jar Package
+        # Build thử để đảm bảo không lỗi đóng gói
+        run: ./mvnw package -DskipTests
+
+  # --- STAGE 2: FRONTEND TESTING & BUILDING ---
+  frontend-ci:
+    name: Frontend Quality Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Check
+        run: npm run lint
+
+      - name: Run Frontend Unit Tests
+        # Chạy Vitest (ví dụ AuthModal.test.tsx)
+        run: npm run test
+
+      - name: Production Build Check
+        # Kiểm tra lỗi TypeScript (tsc) và đóng gói Vite
+        run: npm run build
+
+  # --- STAGE 3: AUTOMATIC DEPLOYMENT ---
+  deploy:
+    name: Trigger Production Deploy
+    # Chỉ chạy khi CẢ Backend và Frontend CI đều XANH (Success)
+    needs: [backend-ci, frontend-ci]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Render Deploy Hook
+        # Sử dụng Secret để bảo mật URL deploy
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
