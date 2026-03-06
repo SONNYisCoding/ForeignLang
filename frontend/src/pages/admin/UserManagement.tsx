@@ -32,28 +32,32 @@ const UserManagement = () => {
     // Confirm modal state
     const [confirmModal, setConfirmModal] = useState<{ type: 'ban' | 'reset'; loading: boolean } | null>(null);
 
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => {
+        fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // When modal opens, copy current roles
     useEffect(() => {
         if (modalUser) {
             setPendingRoles([...getUserRoles(modalUser)]);
         }
+         
     }, [modalUser]);
 
-    const fetchUsers = () => {
+    function fetchUsers() {
         setLoading(true);
         fetch('/api/v1/admin/users', { credentials: 'include' })
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => { setUsers(data); setLoading(false); })
             .catch(() => { showError('Failed to load users'); setLoading(false); });
-    };
+    }
 
-    const getUserRoles = (user: UserData): string[] => {
+    function getUserRoles(user: UserData): string[] {
         if (user.roles && user.roles.length > 0) return [...user.roles];
         if (user.role) return [user.role];
         return ['GUEST'];
-    };
+    }
 
     // --- Modal Actions ---
     const handleSaveRoles = () => {

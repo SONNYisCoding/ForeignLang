@@ -33,6 +33,7 @@ export interface FeedbackResult {
     summary: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getMockFeedback(_email: string): FeedbackResult {
     return {
         annotations: [

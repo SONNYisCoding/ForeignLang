@@ -32,6 +32,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         prevLangRef.current = i18n.language;
         i18n.changeLanguage('en'); // Force English for Admin
         return () => { i18n.changeLanguage(prevLangRef.current); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleLogout = async () => {

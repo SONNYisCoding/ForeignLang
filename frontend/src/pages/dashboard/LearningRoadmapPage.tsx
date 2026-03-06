@@ -39,8 +39,11 @@ const LearningRoadmapPage: React.FC = () => {
 
     useEffect(() => {
         const loaded = loadRoadmaps();
+         
         setRoadmaps(loaded);
         if (loaded.length > 0) setSelectedId(loaded[0].id);
+
+         
     }, []);
 
     const selectedRoadmap = roadmaps.find(r => r.id === selectedId)?.data || null;

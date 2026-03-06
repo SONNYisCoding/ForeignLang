@@ -24,6 +24,76 @@ interface Plan {
     type: PlanType;
 }
 
+const subscriptionPlans: Plan[] = [
+    {
+        id: 'flpro-monthly',
+        name: 'FLPro 1 Tháng',
+        price: 29000,
+        currency: '₫',
+        period: '/tháng',
+        description: 'Học viết email chuyên nghiệp với lộ trình cá nhân hóa.',
+        features: [
+            'Truy cập toàn bộ lộ trình học',
+            'Template Library không giới hạn',
+            'Tặng 5 AI Credits',
+            'Hỗ trợ ưu tiên'
+        ],
+        bonus: '+5 AI Credits miễn phí',
+        recommended: true,
+        type: 'subscription'
+    },
+    {
+        id: 'flpro-quarterly',
+        name: 'FLPro 3 Tháng',
+        price: 79000,
+        currency: '₫',
+        period: '/3 tháng',
+        description: 'Tiết kiệm 9% so với gói tháng.',
+        features: [
+            'Tất cả quyền lợi FLPro 1 Tháng',
+            'Tặng 20 AI Credits',
+            'Tiết kiệm 8.000₫',
+            'Ưu tiên tính năng mới'
+        ],
+        bonus: '+20 AI Credits miễn phí',
+        type: 'subscription'
+    }
+];
+
+const creditPlans: Plan[] = [
+    {
+        id: 'credits-5',
+        name: 'Gói 5 Credits',
+        price: 29000,
+        currency: '₫',
+        period: '',
+        description: 'Mua trực tiếp, không cần subscription.',
+        features: [
+            '5 AI Credits',
+            'Không hết hạn',
+            'Dùng khi nào cũng được',
+            'Thanh toán một lần'
+        ],
+        type: 'credits'
+    },
+    {
+        id: 'credits-15',
+        name: 'Gói 15 Credits',
+        price: 79000,
+        currency: '₫',
+        period: '',
+        description: 'Tiết kiệm 9% so với mua lẻ.',
+        features: [
+            '15 AI Credits',
+            'Không hết hạn',
+            'Bonus: Tiết kiệm 8.000₫',
+            'Dành cho người dùng nhiều'
+        ],
+        recommended: true,
+        type: 'credits'
+    }
+];
+
 const UpgradePage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -54,89 +124,22 @@ const UpgradePage = () => {
         const planParam = searchParams.get('plan');
         const packParam = searchParams.get('pack');
         if (packParam) {
+             
             setActiveTab('credits');
         }
         if (planParam || packParam) {
             const allPlans = [...subscriptionPlans, ...creditPlans];
             const found = allPlans.find(p => p.id === planParam || p.id === packParam);
             if (found) {
+                 
                 setSelectedPlan(found);
+                 
                 setActiveTab(found.type);
             }
         }
+
+         
     }, [searchParams]);
-
-    // FLPro Subscription Plans
-    const subscriptionPlans: Plan[] = [
-        {
-            id: 'flpro-monthly',
-            name: 'FLPro 1 Tháng',
-            price: 29000,
-            currency: '₫',
-            period: '/tháng',
-            description: 'Học viết email chuyên nghiệp với lộ trình cá nhân hóa.',
-            features: [
-                'Truy cập toàn bộ lộ trình học',
-                'Template Library không giới hạn',
-                'Tặng 5 AI Credits',
-                'Hỗ trợ ưu tiên'
-            ],
-            bonus: '+5 AI Credits miễn phí',
-            recommended: true,
-            type: 'subscription'
-        },
-        {
-            id: 'flpro-quarterly',
-            name: 'FLPro 3 Tháng',
-            price: 79000,
-            currency: '₫',
-            period: '/3 tháng',
-            description: 'Tiết kiệm 9% so với gói tháng.',
-            features: [
-                'Tất cả quyền lợi FLPro 1 Tháng',
-                'Tặng 20 AI Credits',
-                'Tiết kiệm 8.000₫',
-                'Ưu tiên tính năng mới'
-            ],
-            bonus: '+20 AI Credits miễn phí',
-            type: 'subscription'
-        }
-    ];
-
-    // AI Credits Packs
-    const creditPlans: Plan[] = [
-        {
-            id: 'credits-5',
-            name: 'Gói 5 Credits',
-            price: 29000,
-            currency: '₫',
-            period: '',
-            description: 'Mua trực tiếp, không cần subscription.',
-            features: [
-                '5 AI Credits',
-                'Không hết hạn',
-                'Dùng khi nào cũng được',
-                'Thanh toán một lần'
-            ],
-            type: 'credits'
-        },
-        {
-            id: 'credits-15',
-            name: 'Gói 15 Credits',
-            price: 79000,
-            currency: '₫',
-            period: '',
-            description: 'Tiết kiệm 9% so với mua lẻ.',
-            features: [
-                '15 AI Credits',
-                'Không hết hạn',
-                'Bonus: Tiết kiệm 8.000₫',
-                'Dành cho người dùng nhiều'
-            ],
-            recommended: true,
-            type: 'credits'
-        }
-    ];
 
     const currentPlans = activeTab === 'subscription' ? subscriptionPlans : creditPlans;
 
@@ -169,7 +172,7 @@ const UpgradePage = () => {
                 toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
                 setStep('select');
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi kết nối server');
             setStep('select');
         }

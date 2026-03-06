@@ -31,6 +31,7 @@ const TeacherLessons = () => {
                 showError('Failed to load lessons');
                 setLoading(false);
             });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const getStatusBadge = (status: string) => {

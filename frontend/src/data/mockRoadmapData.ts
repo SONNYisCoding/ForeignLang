@@ -26,6 +26,7 @@ export interface RoadmapData {
     modules: RoadmapModule[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getMockRoadmap(_input: string): RoadmapData {
     return {
         goal: 'Master Business Email Communication',

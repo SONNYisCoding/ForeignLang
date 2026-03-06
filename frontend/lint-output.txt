@@ -1,0 +1,396 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+
+J:\ForeignLang\ForeignLang\frontend\src\components\ui\CreditModal.tsx
+  3:41  error  Shadowing of global property 'Infinity'  no-shadow-restricted-names
+
+J:\ForeignLang\ForeignLang\frontend\src\components\ui\ThemeToggle.test.tsx
+  9:87  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+J:\ForeignLang\ForeignLang\frontend\src\components\ui\TypewriterEffect.tsx
+  28:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+J:\ForeignLang\ForeignLang\frontend\src\components\ui\TypewriterEffect.tsx:28:9
+  26 |
+  27 |     useEffect(() => {
+> 28 |         setDisplayedText("");
+     |         ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |         setIsStarted(false);
+  30 |         setIsComplete(false);
+  31 |  react-hooks/set-state-in-effect
+
+J:\ForeignLang\ForeignLang\frontend\src\contexts\AuthContext.tsx
+  105:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+J:\ForeignLang\ForeignLang\frontend\src\contexts\CreditContext.tsx
+  154:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+J:\ForeignLang\ForeignLang\frontend\src\contexts\SidebarContext.tsx
+  34:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+J:\ForeignLang\ForeignLang\frontend\src\contexts\ThemeContext.tsx
+  44:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+J:\ForeignLang\ForeignLang\frontend\src\contexts\ToastContext.tsx
+  51:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+J:\ForeignLang\ForeignLang\frontend\src\data\mockFeedbackData.ts
+  36:33  error  '_email' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\data\mockRoadmapData.ts
+  29:32  error  '_input' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\layouts\AdminLayout.tsx
+  35:8  warning  React Hook useEffect has a missing dependency: 'i18n'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+J:\ForeignLang\ForeignLang\frontend\src\layouts\TeacherLayout.tsx
+  34:8  warning  React Hook useEffect has a missing dependency: 'i18n'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+J:\ForeignLang\ForeignLang\frontend\src\main.tsx
+  12:8   error  'resource' is never reassigned. Use 'const' instead  prefer-const
+  32:12  error  'e' is defined but never used                        @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\LessonPage.tsx
+  35:22  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\LoginPage.tsx
+  83:18  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\ProfileSetupPage.tsx
+  58:18  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\RegisterPage.tsx
+  77:18  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\TopicDetailPage.tsx
+  34:22  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\TopicsPage.tsx
+  27:22  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\AdminChatHistoryPage.tsx
+  35:9   error    Error: Cannot access variable before it is declared
+
+`fetchSessions` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\AdminChatHistoryPage.tsx:35:9
+  33 |
+  34 |     useEffect(() => {
+> 35 |         fetchSessions();
+     |         ^^^^^^^^^^^^^ `fetchSessions` accessed before it is declared
+  36 |     }, []);
+  37 |
+  38 |     const fetchSessions = () => {
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\AdminChatHistoryPage.tsx:38:5
+  36 |     }, []);
+  37 |
+> 38 |     const fetchSessions = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |         fetch('/api/v1/admin/chat/sessions', { credentials: 'include' })
+     窶ｦ
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |             });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |     };
+     | ^^^^^^^ `fetchSessions` is declared here
+  52 |
+  53 |     const handleSelectSession = (session: ChatSession) => {
+  54 |         setSelectedSession(session);  react-hooks/immutability
+  36:8   warning  React Hook useEffect has a missing dependency: 'fetchSessions'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  77:63  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\ApprovalPage.tsx
+  28:23  error  Error: Cannot access variable before it is declared
+
+`fetchPending` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\ApprovalPage.tsx:28:23
+  26 |     const [actionLoading, setActionLoading] = useState(false);
+  27 |
+> 28 |     useEffect(() => { fetchPending(); }, []);
+     |                       ^^^^^^^^^^^^ `fetchPending` accessed before it is declared
+  29 |
+  30 |     const fetchPending = () => {
+  31 |         setLoading(true);
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\ApprovalPage.tsx:30:5
+  28 |     useEffect(() => { fetchPending(); }, []);
+  29 |
+> 30 |     const fetchPending = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |         fetch('/api/v1/admin/approvals', { credentials: 'include' })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 33 |             .then(res => res.json())
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |             .then(data => { setPendingTopics(data); setLoading(false); })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |             .catch(() => setLoading(false));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |     };
+     | ^^^^^^^ `fetchPending` is declared here
+  37 |
+  38 |     const handleAction = () => {
+  39 |         if (!confirmAction) return;  react-hooks/immutability
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\GroupManagement.tsx
+  35:23  error  Error: Cannot access variable before it is declared
+
+`fetchGroups` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\GroupManagement.tsx:35:23
+  33 |     const [selectedLearnerId, setSelectedLearnerId] = useState('');
+  34 |
+> 35 |     useEffect(() => { fetchGroups(); fetchUsers(); }, []);
+     |                       ^^^^^^^^^^^ `fetchGroups` accessed before it is declared
+  36 |
+  37 |     const fetchGroups = () => {
+  38 |         fetch('/api/v1/admin/groups', { credentials: 'include' })
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\GroupManagement.tsx:37:5
+  35 |     useEffect(() => { fetchGroups(); fetchUsers(); }, []);
+  36 |
+> 37 |     const fetchGroups = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |         fetch('/api/v1/admin/groups', { credentials: 'include' })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |             .then(res => res.json())
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |             .then(data => setGroups(data))
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |             .catch(err => console.error(err));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     };
+     | ^^^^^^^ `fetchGroups` is declared here
+  43 |
+  44 |     const fetchUsers = () => {
+  45 |         fetch('/api/v1/admin/users', { credentials: 'include' })  react-hooks/immutability
+  35:38  error  Error: Cannot access variable before it is declared
+
+`fetchUsers` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\GroupManagement.tsx:35:38
+  33 |     const [selectedLearnerId, setSelectedLearnerId] = useState('');
+  34 |
+> 35 |     useEffect(() => { fetchGroups(); fetchUsers(); }, []);
+     |                                      ^^^^^^^^^^ `fetchUsers` accessed before it is declared
+  36 |
+  37 |     const fetchGroups = () => {
+  38 |         fetch('/api/v1/admin/groups', { credentials: 'include' })
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\GroupManagement.tsx:44:5
+  42 |     };
+  43 |
+> 44 |     const fetchUsers = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |         fetch('/api/v1/admin/users', { credentials: 'include' })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |             .then(res => res.json())
+     窶ｦ
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |             .catch(err => console.error(err));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |     };
+     | ^^^^^^^ `fetchUsers` is declared here
+  58 |
+  59 |     const handleCreateGroup = (e: React.FormEvent) => {
+  60 |         e.preventDefault();                                                                                                                                                                                 react-hooks/immutability
+  48:45  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\UserManagement.tsx
+  35:23  error    Error: Cannot access variable before it is declared
+
+`fetchUsers` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\UserManagement.tsx:35:23
+  33 |     const [confirmModal, setConfirmModal] = useState<{ type: 'ban' | 'reset'; loading: boolean } | null>(null);
+  34 |
+> 35 |     useEffect(() => { fetchUsers(); }, []);
+     |                       ^^^^^^^^^^ `fetchUsers` accessed before it is declared
+  36 |
+  37 |     // When modal opens, copy current roles
+  38 |     useEffect(() => {
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\UserManagement.tsx:44:5
+  42 |     }, [modalUser]);
+  43 |
+> 44 |     const fetchUsers = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |         fetch('/api/v1/admin/users', { credentials: 'include' })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |             .then(data => { setUsers(data); setLoading(false); })
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |             .catch(() => { showError('Failed to load users'); setLoading(false); });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |     };
+     | ^^^^^^^ `fetchUsers` is declared here
+  51 |
+  52 |     const getUserRoles = (user: UserData): string[] => {
+  53 |         if (user.roles && user.roles.length > 0) return [...user.roles];  react-hooks/immutability
+  35:40  warning  React Hook useEffect has a missing dependency: 'fetchUsers'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+  40:33  error    Error: Cannot access variable before it is declared
+
+`getUserRoles` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\UserManagement.tsx:40:33
+  38 |     useEffect(() => {
+  39 |         if (modalUser) {
+> 40 |             setPendingRoles([...getUserRoles(modalUser)]);
+     |                                 ^^^^^^^^^^^^ `getUserRoles` accessed before it is declared
+  41 |         }
+  42 |     }, [modalUser]);
+  43 |
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\admin\UserManagement.tsx:52:5
+  50 |     };
+  51 |
+> 52 |     const getUserRoles = (user: UserData): string[] => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |         if (user.roles && user.roles.length > 0) return [...user.roles];
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |         if (user.role) return [user.role];
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |         return ['GUEST'];
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |     };
+     | ^^^^^^^ `getUserRoles` is declared here
+  57 |
+  58 |     // --- Modal Actions ---
+  59 |     const handleSaveRoles = () => {                                                                                                                                                                                                                        react-hooks/immutability
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\EmailHistoryPage.tsx
+  29:8  warning  React Hook useEffect has a missing dependency: 'fetchHistory'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\LearningRoadmapPage.tsx
+  42:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\LearningRoadmapPage.tsx:42:9
+  40 |     useEffect(() => {
+  41 |         const loaded = loadRoadmaps();
+> 42 |         setRoadmaps(loaded);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  43 |         if (loaded.length > 0) setSelectedId(loaded[0].id);
+  44 |     }, []);
+  45 |  react-hooks/set-state-in-effect
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\ProfilePage.tsx
+  70:18  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\SettingsPage.tsx
+  127:18   error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  360:78   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  360:126  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  360:176  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:70   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:118  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:168  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:79   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:131  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:180  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:237  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:289  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:71   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:123  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:172  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:229  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:281  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\UpgradePage.tsx
+   60:34  error    Error: Cannot access variable before it is declared
+
+`subscriptionPlans` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\UpgradePage.tsx:60:34
+  58 |         }
+  59 |         if (planParam || packParam) {
+> 60 |             const allPlans = [...subscriptionPlans, ...creditPlans];
+     |                                  ^^^^^^^^^^^^^^^^^ `subscriptionPlans` accessed before it is declared
+  61 |             const found = allPlans.find(p => p.id === planParam || p.id === packParam);
+  62 |             if (found) {
+  63 |                 setSelectedPlan(found);
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\UpgradePage.tsx:70:5
+   68 |
+   69 |     // FLPro Subscription Plans
+>  70 |     const subscriptionPlans: Plan[] = [
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  71 |         {
+      | ^^^^^^^^^
+>  72 |             id: 'flpro-monthly',
+      窶ｦ
+      | ^^^^^^^^^
+> 103 |         }
+      | ^^^^^^^^^
+> 104 |     ];
+      | ^^^^^^^ `subscriptionPlans` is declared here
+  105 |
+  106 |     // AI Credits Packs
+  107 |     const creditPlans: Plan[] = [        react-hooks/immutability
+   60:56  error    Error: Cannot access variable before it is declared
+
+`creditPlans` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\UpgradePage.tsx:60:56
+  58 |         }
+  59 |         if (planParam || packParam) {
+> 60 |             const allPlans = [...subscriptionPlans, ...creditPlans];
+     |                                                        ^^^^^^^^^^^ `creditPlans` accessed before it is declared
+  61 |             const found = allPlans.find(p => p.id === planParam || p.id === packParam);
+  62 |             if (found) {
+  63 |                 setSelectedPlan(found);
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\dashboard\UpgradePage.tsx:107:5
+  105 |
+  106 |     // AI Credits Packs
+> 107 |     const creditPlans: Plan[] = [
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 108 |         {
+      | ^^^^^^^^^
+> 109 |             id: 'credits-5',
+      窶ｦ
+      | ^^^^^^^^^
+> 138 |         }
+      | ^^^^^^^^^
+> 139 |     ];
+      | ^^^^^^^ `creditPlans` is declared here
+  140 |
+  141 |     const currentPlans = activeTab === 'subscription' ? subscriptionPlans : creditPlans;
+  142 |  react-hooks/immutability
+   67:8   warning  React Hook useEffect has missing dependencies: 'creditPlans' and 'subscriptionPlans'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  172:18  error    'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\teacher\LessonEditor.tsx
+   54:8    warning  React Hook useEffect has a missing dependency: 'showError'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  116:70   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  221:109  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\teacher\TeacherLessons.tsx
+  34:8  warning  React Hook useEffect has a missing dependency: 'showError'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+J:\ForeignLang\ForeignLang\frontend\src\pages\teacher\TeacherStudents.tsx
+  39:8  warning  React Hook useEffect has a missing dependency: 'showError'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+笨・59 problems (50 errors, 9 warnings)
+

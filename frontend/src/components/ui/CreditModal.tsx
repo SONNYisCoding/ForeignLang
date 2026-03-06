@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, Play, Sparkles, X, Infinity } from 'lucide-react';
+import { CreditCard, Play, Sparkles, X, Infinity as InfinityIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCredits } from '../../contexts/CreditContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -66,7 +66,7 @@ const CreditDropdown = ({ isOpen, onClose, anchorRef }: {
                         <div className="text-2xl font-black text-white mt-1">
                             {isPremium ? (
                                 <span className="text-lg flex items-center gap-2">
-                                    <Infinity size={24} /> PRO Plan Active - Unlimited Access
+                                    <InfinityIcon size={24} /> PRO Plan Active - Unlimited Access
                                 </span>
                             ) : (
                                 <>

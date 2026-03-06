@@ -21,6 +21,32 @@ interface UserItem {
     email: string;
 }
 
+// Reusable modal wrapper
+const ModalWrapper = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => (
+    <AnimatePresence>
+        {isOpen && (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+            >
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/50 dark:border-slate-700/50 w-full max-w-lg overflow-hidden relative"
+                >
+                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 pointer-events-none" />
+                    {children}
+                </motion.div>
+            </motion.div>
+        )}
+    </AnimatePresence>
+);
+
 const GroupManagement = () => {
     const [groups, setGroups] = useState<Group[]>([]);
     const [users, setUsers] = useState<UserItem[]>([]);
@@ -32,20 +58,18 @@ const GroupManagement = () => {
     const [newGroup, setNewGroup] = useState({ name: '', description: '', teacherId: '' });
     const [selectedLearnerId, setSelectedLearnerId] = useState('');
 
-    useEffect(() => { fetchGroups(); fetchUsers(); }, []);
-
-    const fetchGroups = () => {
+    function fetchGroups() {
         fetch('/api/v1/admin/groups', { credentials: 'include' })
             .then(res => res.json())
             .then(data => setGroups(data))
             .catch(err => console.error(err));
-    };
+    }
 
-    const fetchUsers = () => {
+    function fetchUsers() {
         fetch('/api/v1/admin/users', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
-                const mapped = data.map((u: any) => ({
+                const mapped = data.map((u: { id: string; fullName?: string; username?: string; role: string; email: string }) => ({
                     id: u.id,
                     name: u.fullName || u.username || u.email,
                     role: u.role,
@@ -54,7 +78,10 @@ const GroupManagement = () => {
                 setUsers(mapped);
             })
             .catch(err => console.error(err));
-    };
+    }
+
+     
+    useEffect(() => { fetchGroups(); fetchUsers(); }, []);
 
     const handleCreateGroup = (e: React.FormEvent) => {
         e.preventDefault();
@@ -98,32 +125,6 @@ const GroupManagement = () => {
     const learners = users.filter(u => u.role === 'LEARNER');
 
     const selectedGroupName = groups.find(g => g.id === selectedGroupId)?.name || '';
-
-    // Reusable modal wrapper
-    const ModalWrapper = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                    onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-                >
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/50 dark:border-slate-700/50 w-full max-w-lg overflow-hidden relative"
-                    >
-                        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 pointer-events-none" />
-                        {children}
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
 
     return (
         <motion.div

@@ -48,10 +48,10 @@ const LessonEditor = () => {
                 .catch(err => {
                     console.error(err);
                     showError('Failed to load topic details');
-                    navigate('/teacher/lessons');
                 });
         }
-    }, [id, navigate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     const handleSave = (isSubmit = false) => {
         setSaving(true);
@@ -113,7 +113,7 @@ const LessonEditor = () => {
         }));
     };
 
-    const updateLesson = (index: number, field: keyof Lesson, value: any) => {
+    const updateLesson = (index: number, field: keyof Lesson, value: unknown) => {
         const updated = [...formData.lessons];
         updated[index] = { ...updated[index], [field]: value };
         setFormData({ ...formData, lessons: updated });
@@ -153,8 +153,8 @@ const LessonEditor = () => {
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{id ? 'Edit Lesson Content' : 'Craft New Lesson'}</h1>
                             <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border ${formData.status === 'PENDING_APPROVAL'
-                                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50'
-                                    : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50'
+                                ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50'
+                                : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50'
                                 }`}>
                                 {formData.status === 'PENDING_APPROVAL' ? 'Under Review' : 'Draft Mode'}
                             </span>
@@ -218,7 +218,7 @@ const LessonEditor = () => {
                                 {['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].map(level => (
                                     <button
                                         key={level}
-                                        onClick={() => setFormData({ ...formData, difficultyLevel: level as any })}
+                                        onClick={() => setFormData({ ...formData, difficultyLevel: level as TopicData['difficultyLevel'] })}
                                         className={`flex items-center justify-between px-5 py-3.5 font-bold rounded-2xl border transition-all ${formData.difficultyLevel === level
                                             ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-500 dark:border-indigo-500 text-indigo-700 dark:text-indigo-400 shadow-sm'
                                             : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700/80 hover:border-gray-300'

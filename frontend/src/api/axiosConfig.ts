@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create a centralized Axios instance
 const api = axios.create({
     // Sử dụng biến môi trường, nếu không có thì mặc định về localhost
-    baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080', 
+    baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -22,7 +22,7 @@ api.interceptors.request.use(
             if (timezone) {
                 config.headers['X-Timezone'] = timezone;
             }
-        } catch (e) {
+        } catch {
             // Ignore timezone error
         }
 

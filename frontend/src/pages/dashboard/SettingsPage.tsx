@@ -124,7 +124,7 @@ const SettingsPage = () => {
                     toast.error('Failed to update profile');
                 }
             }
-        } catch (error) {
+        } catch {
             toast.error('An error occurred');
         } finally {
             setIsLoading(false);
@@ -357,6 +357,7 @@ const SettingsPage = () => {
                                                     <div>
                                                         <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Google</p>
                                                         <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                             {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' || (profileData as any).authProvider === 'MULTIPLE'
                                                                 ? 'Securely connected to Google account'
                                                                 : 'Connect to log in with Google'}
@@ -364,6 +365,7 @@ const SettingsPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="w-full sm:w-auto self-end sm:self-center">
+                                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                     {(profileData as any).authProvider === 'BOTH' || (profileData as any).authProvider === 'GOOGLE' || (profileData as any).authProvider === 'MULTIPLE' ? (
                                                         <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
                                                             <Check size={16} className="mr-1.5" /> Linked
@@ -390,6 +392,7 @@ const SettingsPage = () => {
                                                     <div>
                                                         <p className="font-bold text-lg text-gray-900 dark:text-white mb-0.5">Facebook</p>
                                                         <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                             {((profileData as any).authProvider === 'FACEBOOK' || (profileData as any).authProvider === 'BOTH' && !(profileData as any).authProvider.includes('GOOGLE')) || (profileData as any).authProvider === 'MULTIPLE' || (profileData as any).facebookId
                                                                 ? 'Securely connected to Facebook account'
                                                                 : 'Connect to log in with Facebook'}
@@ -397,6 +400,7 @@ const SettingsPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="w-full sm:w-auto self-end sm:self-center">
+                                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                     {((profileData as any).authProvider === 'FACEBOOK' || (profileData as any).authProvider === 'BOTH' && !(profileData as any).authProvider.includes('GOOGLE')) || (profileData as any).authProvider === 'MULTIPLE' || (profileData as any).facebookId ? (
                                                         <span className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2.5 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20">
                                                             <Check size={16} className="mr-1.5" /> Linked

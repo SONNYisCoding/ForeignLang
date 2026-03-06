@@ -25,10 +25,12 @@ interface Piece {
         delay: number;
         scale: number;
         rotation: number;
+        targetX: number;
+        duration: number;
     };
 }
 
-const ConfettiPiece = ({ color, style }: { color: string, style: any }) => (
+const ConfettiPiece = ({ color, style }: { color: string, style: Piece['style'] }) => (
     <motion.div
         initial={{
             y: -50,
@@ -39,12 +41,12 @@ const ConfettiPiece = ({ color, style }: { color: string, style: any }) => (
         }}
         animate={{
             y: window.innerHeight + 100,
-            x: style.x + (Math.random() - 0.5) * 300,
+            x: style.targetX,
             opacity: [1, 1, 1, 0],
             rotate: style.rotation,
         }}
         transition={{
-            duration: Math.random() * 2 + 2,
+            duration: style.duration,
             ease: "easeOut",
             delay: style.delay,
         }}
@@ -58,17 +60,23 @@ const Confetti: React.FC<ConfettiProps> = ({ active, duration = 4000, intensity 
 
     useEffect(() => {
         if (active) {
-            const newPieces = Array.from({ length: intensity }).map((_, i) => ({
-                id: Date.now() + i,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                style: {
-                    x: Math.random() * window.innerWidth,
-                    delay: Math.random() * 0.5,
-                    scale: Math.random() * 0.8 + 0.4,
-                    rotation: Math.random() * 360 * 5,
-                }
-            }));
+            const newPieces = Array.from({ length: intensity }).map((_, i) => {
+                const startX = Math.random() * window.innerWidth;
+                return {
+                    id: Date.now() + i,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    style: {
+                        x: startX,
+                        targetX: startX + (Math.random() - 0.5) * 300,
+                        duration: Math.random() * 2 + 2,
+                        delay: Math.random() * 0.5,
+                        scale: Math.random() * 0.8 + 0.4,
+                        rotation: Math.random() * 360 * 5,
+                    }
+                };
+            });
 
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPieces(newPieces);
 
             const timer = setTimeout(() => {

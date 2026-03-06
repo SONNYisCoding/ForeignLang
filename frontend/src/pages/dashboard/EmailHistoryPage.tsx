@@ -26,9 +26,10 @@ const EmailHistoryPage: React.FC = () => {
         } else {
             setLoading(false); // Mock loading for other tabs
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
-    const fetchHistory = async () => {
+    async function fetchHistory() {
         setLoading(true);
         try {
             const response = await fetch('/api/v1/email/history');

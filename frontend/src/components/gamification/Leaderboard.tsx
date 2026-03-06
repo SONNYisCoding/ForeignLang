@@ -44,6 +44,7 @@ const Leaderboard = ({ groupId }: LeaderboardProps) => {
         if (groupId) {
             fetchLeaderboard();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groupId]);
 
     const getRankIcon = (rank: number) => {
@@ -117,8 +118,8 @@ const Leaderboard = ({ groupId }: LeaderboardProps) => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1, type: "spring" }}
                         className={`flex items-center gap-4 p-3.5 rounded-2xl transition-all hover:scale-[1.02] ${entry.rank === 1
-                                ? 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200/50 dark:border-yellow-700/50 shadow-md shadow-yellow-500/20 z-10 relative'
-                                : 'bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm border border-transparent dark:border-slate-700/50'
+                            ? 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200/50 dark:border-yellow-700/50 shadow-md shadow-yellow-500/20 z-10 relative'
+                            : 'bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm border border-transparent dark:border-slate-700/50'
                             }`}
                     >
                         <div className="w-8 flex justify-center">

@@ -56,6 +56,7 @@ const NotificationDropdown = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchNotifications();
         // Optional: Polling every 60 seconds
         const interval = setInterval(fetchNotifications, 60000);

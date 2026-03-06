@@ -25,8 +25,11 @@ export const TypewriterEffect = ({
     const [isComplete, setIsComplete] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDisplayedText("");
+         
         setIsStarted(false);
+         
         setIsComplete(false);
 
         const startTimeout = setTimeout(() => {

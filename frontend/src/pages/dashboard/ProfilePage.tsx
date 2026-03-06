@@ -67,7 +67,7 @@ const ProfilePage = () => {
             } else {
                 setError(data.error || 'Failed to update profile');
             }
-        } catch (err) {
+        } catch {
             setError(t('common.error'));
         } finally {
             setLoading(false);

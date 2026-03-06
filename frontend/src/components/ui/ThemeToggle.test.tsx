@@ -6,7 +6,7 @@ import React from 'react';
 // Mock the framer-motion to avoid animation issues in jsdom
 vi.mock('framer-motion', () => ({
     motion: {
-        button: ({ children, onClick, className, 'aria-label': ariaLabel, ...props }: any) => (
+        button: ({ children, onClick, className, 'aria-label': ariaLabel, ...props }: React.ComponentProps<'button'>) => (
             <button onClick={onClick} className={className} aria-label={ariaLabel} {...props}>
                 {children}
             </button>

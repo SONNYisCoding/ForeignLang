@@ -9,7 +9,8 @@ import { SidebarProvider } from './contexts/SidebarContext';
 // Global Fetch Interceptor to attach JWT token to all legacy requests
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
-  let [resource, config] = args;
+  const resource = args[0];
+  let config = args[1];
   const token = localStorage.getItem('token');
 
   if (token) {
@@ -29,7 +30,7 @@ window.fetch = async (...args) => {
         'X-Timezone': timezone
       };
     }
-  } catch (e) {
+  } catch {
     // Ignore timezone error
   }
 

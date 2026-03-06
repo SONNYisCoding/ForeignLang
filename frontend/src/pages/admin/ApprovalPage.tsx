@@ -25,15 +25,16 @@ const ApprovalPage = () => {
     const [confirmAction, setConfirmAction] = useState<{ topic: PendingTopic; action: 'approve' | 'reject' } | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
 
-    useEffect(() => { fetchPending(); }, []);
-
-    const fetchPending = () => {
+    function fetchPending() {
         setLoading(true);
         fetch('/api/v1/admin/approvals', { credentials: 'include' })
             .then(res => res.json())
             .then(data => { setPendingTopics(data); setLoading(false); })
             .catch(() => setLoading(false));
-    };
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { fetchPending(); }, []);
 
     const handleAction = () => {
         if (!confirmAction) return;

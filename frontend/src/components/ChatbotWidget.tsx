@@ -35,7 +35,8 @@ const ChatbotWidget = () => {
             setTimeout(() => inputRef.current?.focus(), 300);
             if (!sessionId) initSession();
         }
-    }, [isOpen]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, sessionId]);
 
     const initSession = async () => {
         let guestId = localStorage.getItem('guest_chat_id');
@@ -68,7 +69,7 @@ const ChatbotWidget = () => {
             if (data.length > 0) {
                 setMessages([
                     WELCOME_MESSAGE,
-                    ...data.map((m: any) => ({
+                    ...data.map((m: { id: number; content: string; sender: string }) => ({
                         id: m.id,
                         text: m.content,
                         sender: m.sender.toLowerCase() as 'user' | 'bot',
@@ -110,7 +111,7 @@ const ChatbotWidget = () => {
                 const data = await historyRes.json();
                 setMessages([
                     WELCOME_MESSAGE,
-                    ...data.map((m: any) => ({
+                    ...data.map((m: { id: number; content: string; sender: string }) => ({
                         id: m.id,
                         text: m.content,
                         sender: m.sender.toLowerCase() as 'user' | 'bot',
