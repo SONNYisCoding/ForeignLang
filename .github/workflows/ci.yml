@@ -1,0 +1,64 @@
+name: ForeignLang CI Pipeline
+
+# Trigger: Chạy mỗi khi có Pull Request vào nhánh main
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+jobs:
+  # JOB 1: Kiểm tra Backend (Spring Boot)
+  backend-test:
+    name: Backend Tests (Java 21)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and Run Tests
+        # Sử dụng Maven Wrapper có sẵn trong project của bạn
+        run: ./mvnw clean test
+        env:
+          # Cung cấp các biến môi trường giả lập nếu code yêu cầu để vượt qua unit test
+          SPRING_PROFILES_ACTIVE: test
+          DB_URL: jdbc:h2:mem:testdb
+          JWT_SECRET: dummy_secret_for_testing_purposes_only
+
+  # JOB 2: Kiểm tra Frontend (Vite + ReactTS)
+  frontend-test:
+    name: Frontend Tests (Node.js)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run Lint Check (Optional but recommended)
+        working-directory: ./frontend
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        run: npm test -- --watchAll=false
